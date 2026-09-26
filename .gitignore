@@ -28,3 +28,6 @@ Thumbs.db
 
 # Docker volumes / data
 pgdata/
+
+# Agent worktrees
+.claude/worktrees/
