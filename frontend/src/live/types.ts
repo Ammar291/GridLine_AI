@@ -40,6 +40,8 @@ export interface Milestone {
   label: string;
   zoneId?: string;
   incidentId?: string;
+  /** Set on replan milestones: the run whose plan is being replaced. */
+  runId?: string;
   band?: Band;
 }
 

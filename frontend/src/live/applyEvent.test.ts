@@ -86,6 +86,10 @@ describe('applyEvent', () => {
     expect(s.incidents.inc_1?.band).toBe('critical');
     expect(s.milestones.at(-1)).toMatchObject({ kind: 'band', incidentId: 'inc_1', band: 'critical' });
   });
+  it('replan.triggered adds a replan milestone that names the run', () => {
+    const s = applyEvent(base(), eventsFixture['replan.triggered']);
+    expect(s.milestones.at(-1)).toMatchObject({ kind: 'replan', incidentId: 'inc_1', runId: 'run_1' });
+  });
   it('sensor.reading updates the sensor last value', () => {
     const s = applyEvent(base(), eventsFixture['sensor.reading']);
     expect(s.assets.sensors['RG-02']?.last_value).toBe(84);

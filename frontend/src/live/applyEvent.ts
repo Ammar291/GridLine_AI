@@ -229,7 +229,9 @@ export function applyEvent(state: LiveState, event: Event): LiveState {
       });
     }
     case 'replan.triggered':
-      return addMilestone(withFeed, event, { kind: 'replan', label: `Re-plan: ${event.payload.reason}`, incidentId: event.payload.incident_id });
+      return addMilestone(withFeed, event, {
+        kind: 'replan', label: `Re-plan: ${event.payload.reason}`, incidentId: event.payload.incident_id, runId: event.payload.run_id,
+      });
     case 'alert.issued': {
       const al = event.payload;
       const next = { ...withFeed, alerts: upsertById(withFeed.alerts, al) };
