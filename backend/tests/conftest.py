@@ -10,6 +10,9 @@ import pytest
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from gridline.city.model import City
+from gridline.city.nandipur import build_nandipur
+from gridline.config import Settings
 from gridline.db.engine import create_engine, session_factory
 from gridline.db.models import Document
 from gridline.db.schema import create_schema, drop_schema, truncate_corpus
@@ -27,6 +30,18 @@ RAG_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "corpus"
 def pytest_asyncio_loop_factories(config: pytest.Config, item: pytest.Item) -> dict[str, LoopFactory]:
     """Run every async test on a selector loop: psycopg's async driver cannot use Windows' Proactor loop."""
     return {"selector": asyncio.SelectorEventLoop}
+
+
+@pytest.fixture(scope="session")
+def city() -> City:
+    """The simulation's Nandipur, built once per session from backend/data (no database needed)."""
+    return build_nandipur(DATA_DIR)
+
+
+@pytest.fixture
+def settings() -> Settings:
+    """Fast simulation settings for tests: no .env file, 10 ms ticks, 50 ms WebSocket heartbeat."""
+    return Settings(_env_file=None, sim_tick_seconds=0.01, ws_heartbeat_seconds=0.05)
 
 
 @pytest.fixture(scope="session")

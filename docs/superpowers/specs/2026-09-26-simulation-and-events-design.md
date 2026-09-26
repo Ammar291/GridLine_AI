@@ -466,3 +466,52 @@ the stage sequence, the landslide failure, D-7 blocked ≥0.7, riverside water d
 `uv run pytest`, `uv run pyright` (strict on `gridline/`), `uv run ruff check .` and `uv run ruff format --check .`
 all clean; the app boots with `uv run uvicorn gridline.main:app` and a WebSocket client sees `sim.snapshot`
 followed by `sim.tick` frames after `POST /api/simulation/start`.
+
+## 13. Deviations (implementation, 2026-09-26)
+
+Decided with the orchestrator during implementation; everything else follows §1–§12.
+
+1. **One Nandipur (overrides A3 and §4).** `build_nandipur(data_dir)` converts the validated data layer
+   (`load_city_data`, `backend/data/city/*.yaml`) into the frozen `City`; no second hand-typed dataset and no DB
+   access. Ids are the data layer's (Z-HV, Z-RS, D-7, D-8, R-1, RD-01, RD-02, BR-1, BR-4, PR-HT2, SL-HV-1, RG-02,
+   WS-01, SM-01, CL-D7, RV-01, C-4, AMB-06, H-2, S-5 …). Model changes: `Zone` gets `permeability_class`,
+   `impervious_fraction` (2026 zone stats) and `area_km2` (bbox), loses `river_id` and the soil enum; new `Slope`
+   and `Substation`; `DrainageChannel` gets initial `blocked_fraction`, outfall channel/river, flap-gate stage and
+   fixed-pump capacity; `River` gets flows and stages (ordinary stage = surface level − gauge zero, warning stage
+   from policy PT-15); `is_sole_access` → `is_only_access`; `Project` has `slope_id`, `permit_number` and the
+   data's starting depth (PR-HT2 2.5 m); sensor kinds are the data's; hospital beds are summed from
+   `hospital_beds`; `City.thresholds` holds the policy numbers from `policy_thresholds.yaml`. Only gauged rivers
+   (R-1), active excavation projects (PR-HT2, PR-TQ, PR-MWM) and observable sensor kinds (not LL-01) are modelled.
+   `create_app(settings, *, city=None)` accepts a prebuilt city so tests load the YAML once.
+2. **Physics recalibrated (§5.2).** Infiltration by permeability class; runoff base = impervious share; a
+   `CATCHMENT_ROUTING` factor on rational runoff; tributaries routed first (D-2→D-4→D-3, D-8→D-7); flap gates close
+   at the data's river stage (D-8 4.0 m, D-11 2.5 m, leaving only fixed pumps); ponding spreads with depth
+   (`POND_SPREAD_CM`); the river follows a linear rating through (85 m³/s, 1.6 m) and (1100 m³/s, 4.2 m), driven by
+   a scenario upstream-flow factor plus channel outfalls. Slopes have their own saturation; the cut adds
+   infiltration and creep uses the unsupported cut `min(depth, soil depth) − 1.5 m` (permit bench height). Final
+   constants are named in `physics.py`. Halting PR-HT2 at t=60 leaves SL-HV-1 at 48 mm by t=300 (failure needs 80).
+3. **Severity (§3.3)** uses the policy bands (watch → moderate, warning → high, critical → critical): rain 30/50
+   mm/h; 24 h rain 65/115/175 mm at the gauges serving slopes over 25° (RG-01, RG-02); wind 62/89/118 km/h;
+   saturation 0.70/0.85; channel ratio 0.8 → moderate, ≥ 1.0 → critical (policy has no warning band); river
+   3.36/4.2/5.0/5.5 m; water 1/10/30 (road closure)/50 cm; forecast peak ≥ 30 moderate, ≥ 50 high.
+4. **Payloads (§3.2).** `WeatherObservation` fields are optional (rain gauges report rain, WS-01 wind and
+   temperature); `SoilObservation.depth_cm` → `slope_id`; `RiverObservation` adds `flood_stage_m`;
+   `SlopeObservation.monitor_id` → `slope_id` and `WaterAccumulation.sensor_id` → `zone_id`, both from
+   `simulation:engine` because the data layer has no inclinometers or flood-depth gauges (slopes with soil probes;
+   zones with water); crew statuses add `dispatched`, `busy`, `off_duty` (data and tool vocabulary) and drop
+   `resting`; ambulance `out_of_service` → `maintenance`, plus `hospital_id`, counts per hospital fleet; `SimTick`
+   and `SimStatus` add `running`; payloads forbid unknown keys; new `InvalidPayload` (422) for beds or occupancy
+   beyond capacity.
+5. **Scenarios (§6.2)** keep their narratives with data ids and policy numbers: storm peak 15 mm/h over Hillview,
+   24 h rain crossing 65/115/175 mm in stages 2/3/5, excavation 0.15 m/h from 2.5 m, rain easing after t=216
+   (hillside) or t=228 (cascading); the Kalinadi rises to about 5.2 m in the cascade; landslide condition 80 mm
+   on SL-HV-1 (fires at t=190); BR-1 closes at R-1 ≥ 5.0 m; RD-02 blocks at Z-RS ≥ 30 cm; H-2, AMB-06 and C-4
+   replace ngh, A-1/A-2 and C-1/C-3. The flash flood is a 2.5 h cloudburst (55 mm/h over Hillview and Riverside)
+   instead of 7 h at 45 mm/h. `Condition` names a `target_id` (zone, river or slope).
+6. **Structure.** Physics application in `simulation/dynamics.py`, sensors in `simulation/sensors.py`, scripted
+   timing in `simulation/schedule.py`, HTTP error mapping in `api/errors.py`. The world's zone model is
+   `ZoneConditions` (the frontend's `ZoneState` is the detector's). Start and speed bodies are named
+   `SimulationStart` / `SimulationSpeed` (frontend component names); `POST /start` and `/advance` bodies are
+   optional; `select_scenario` keeps the current seed when none is given.
+7. **Smoke script** also asserts the prevention counterfactual (halt at t=60 → no landslide) and re-runs itself
+   inside `backend/` when started elsewhere, so `uv run python scripts/demo_smoke.py` works from the repo root.

@@ -50,6 +50,19 @@ writes only `chunks` and each document's `content_hash`/`embedding_model`; uncha
 `EMBEDDING_PROVIDER=auto` uses the local fastembed model when it can load and the offline `hashed` embedder
 otherwise. Usage, filters and the Python API: `../docs/rag.md`.
 
+## Simulation and API
+
+```bash
+uv run uvicorn gridline.main:app          # http://localhost:8000/api/health, WebSocket ws://localhost:8000/ws
+uv run python ../scripts/demo_smoke.py    # headless cascading scenario; also runs from the repo root
+```
+
+The simulation needs no database: `gridline/city/nandipur.py` builds its `City` from `data/city/*.yaml`, and
+severity bands use the numbers in `policy_thresholds.yaml`. Control it under `/api/simulation/*` (status,
+scenarios, snapshot, scenario, start, pause, resume, reset, advance, speed, inject); watch it on `/ws`
+(`?types=weather.,environment.soil` filters by event-type prefix). Design and deviations:
+`docs/superpowers/specs/2026-09-26-simulation-and-events-design.md`.
+
 ## Tests
 
 ```bash
