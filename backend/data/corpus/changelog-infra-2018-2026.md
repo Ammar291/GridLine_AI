@@ -2,6 +2,7 @@
 document_id: changelog-infra-2018-2026
 title: Infrastructure Change Log 2018–2026
 kind: change_log
+category: change_log
 source: NMC Engineering Department
 version: "2026.09"
 effective_date: 2026-09-01

@@ -1,5 +1,8 @@
 """Parse the Markdown corpus: YAML front matter plus numbered ``##`` sections (spec §7).
 
+Front matter is validated by ``DocumentMeta``: ``kind`` (the document's form) and ``category`` (one of the RAG
+brief's ten knowledge categories) are both required closed sets, and unknown keys are rejected.
+
 ``## 4.2 Title`` becomes section ``s4.2``; text before the first heading becomes ``s0`` when non-empty;
 ``###`` headings stay inside their parent section. Any other ``##`` line, or a repeated number, is a
 ``CorpusError``.
@@ -99,6 +102,8 @@ def parse_document(path: Path) -> ParsedDocument:
         raise CorpusError(name, f"document_id {meta.document_id!r} does not match the file name")
     if (meta.kind == "report") != (incident is not None and bool(impacts)):
         raise CorpusError(name, "reports, and only reports, carry 'incident' and non-empty 'impacts' blocks")
+    if (meta.kind == "report") != (meta.category == "incident_report"):
+        raise CorpusError(name, "reports, and only reports, have category 'incident_report'")
     return ParsedDocument(
         meta=meta,
         sections=_split_sections(name, body),

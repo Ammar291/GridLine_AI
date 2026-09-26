@@ -7,7 +7,7 @@ from gridline.rag.chunker import chunk_document
 
 FIXTURES = Path(__file__).parent / "fixtures" / "corpus"
 FRONT_MATTER = (
-    "---\ndocument_id: {doc_id}\ntitle: Doc\nkind: policy\nsource: S\nversion: '1'\n"
+    "---\ndocument_id: {doc_id}\ntitle: Doc\nkind: policy\ncategory: procedure\nsource: S\nversion: '1'\n"
     "effective_date: 2024-01-01\nhazards: [landslide]\nzone_ids: [Z-HV]\nsummary: s\n---\n"
 )
 
@@ -43,6 +43,7 @@ def test_one_chunk_per_section_with_citation_ids():
     assert halt.metadata["source_path"] == "tests/fixtures/corpus/test-policy.md"
     assert halt.metadata["version"] == "1.0" and halt.metadata["effective_date"] == "2024-03-15"
     assert halt.metadata["part"] == 1 and halt.metadata["word_count"] == len(halt.text.split())
+    assert halt.metadata["category"] == "policy"
     assert chunk_document(policy) == chunks  # a pure function of the file: same ids on every run
 
 
@@ -61,6 +62,16 @@ def test_preamble_is_section_s0():
 
 def test_no_s0_chunk_without_preamble():
     assert [c.section_id for c in chunk_document(_fixture("test-fire-sop"))] == ["s1", "s2"]
+
+
+def test_every_part_carries_the_document_category(tmp_path):
+    para = " ".join(["lorem"] * 120) + "\n\n"
+    doc = _write(tmp_path, "## 1 Long\n\n" + para * 2 + "## 2 Short\n\nshort")
+    chunks = chunk_document(doc, max_words=150)
+    assert [c.chunk_id for c in chunks] == ["d#s1", "d#s1-p2", "d#s2"]
+    assert all(c.metadata["category"] == "procedure" for c in chunks)
+    report = chunk_document(_fixture("test-riverside-report"))
+    assert {c.metadata["category"] for c in report} == {"incident_report"}
 
 
 def test_long_section_is_split_into_parts_at_paragraphs(tmp_path):

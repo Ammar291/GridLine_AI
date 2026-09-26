@@ -318,23 +318,39 @@ running the tests. ARCHITECTURE §4/§7/§14 are touched only where this design 
 ## 15. Revision (2026-09-26, coordination with parallel sessions)
 
 Four other sessions build other subsystems in this repository at the same time. The city-data-layer design owns
-`gridline/db/base.py`, `gridline/db/engine.py`, the `documents` and `document_sections` tables, and the shared
-33-document corpus in `backend/data/corpus/` (front matter `document_id, title, kind, source, version,
-effective_date, hazards, zone_ids, ...`; numbered `##` headings; section ids `s4.2`; intro `s0`). This design is
-revised accordingly:
+`gridline/db/base.py`, `gridline/db/engine.py`, the `documents` and `document_sections` tables, the shared corpus
+in `backend/data/corpus/` and its parser (`gridline/db/seed/corpus.py`: YAML front matter, numbered `##` headings,
+section ids `s4.2`, preamble `s0`). This design is revised accordingly, and the points below describe what is
+built; where they differ from §3–§11, they win.
 
-- **RAG owns exactly one table, `chunks`.** It carries the document fields retrieval and citations need
-  (`document_id, document_title, document_kind, source, source_path, document_date, zone_ids, hazards,
-  content_hash, embedding_model`) so it needs no join and no `documents` table of its own. §4's `documents`
-  table is dropped from this design; `DocumentRecord` is derived with `SELECT DISTINCT` over `chunks`.
-- **Chunk ids equal the city corpus section ids** (`document_id#s4.2`; intro is `s0`; `###` headings stay inside
-  their parent section; only very long sections get `-p2` parts).
-- **The corpus loader accepts both front-matter dialects** (`slug`/`date` and `document_id`/`effective_date`),
-  maps the city kinds `report → incident_report`, `permit → construction_safety`, `profile → engineering_report`
-  onto the ten RAG kinds, keeps every other key as metadata, and validates `hazards`/`zone_ids` only as lists of
-  non-empty strings (the city data layer owns the id vocabulary; §5's closed sets are withdrawn).
-- **No second corpus.** §11 is withdrawn: RAG ingests the shared corpus. The three fixture documents under
-  `backend/tests/fixtures/corpus/` remain the test corpus; end-to-end tests on the shared corpus skip with a
-  reason until it lands.
+- **RAG owns the `chunks` table and the ingestion fingerprint.** `chunks` holds `id, document_id, section_id,
+  section_title, position, text, embedding` (vector(384), HNSW cosine) and the filter fields `kind, zone_ids,
+  hazards` plus `metadata` (jsonb). Ingestion also stamps `content_hash, embedding_model, ingested_at` on each
+  seeded `documents` row and never inserts or deletes documents; title and source are read from `documents` by
+  join. §4's own `documents` table is withdrawn.
+- **One parser, one front-matter dialect.** RAG chunks what the data layer's parser returns, so chunk ids equal
+  section ids (`document_id#s4.2`; `###` stays inside its section; only sections over 350 words get `-p2`
+  parts). Front matter: `document_id, title, kind, category, source, version, effective_date, hazards,
+  zone_ids`, optional `supersedes`, `summary`; unknown keys fail. §5's `slug`/`date` dialect, zone names and
+  hazard set are withdrawn: zones are the seed ids (`Z-HV`, ...) and hazards the data layer's five (`flood,
+  flash_flood, landslide, cyclone, urban_fire`).
+- **Kind and category are separate.** `kind` stays the data layer's six document forms (`policy, sop, report,
+  permit, change_log, profile`). The brief's ten knowledge categories, §4's list (`policy, sop, procedure,
+  incident_report, infrastructure_report, engineering_report, construction_safety, evacuation, resource_rules,
+  change_log`), are a second closed set, `DocumentCategory`, given explicitly as `category:` in every document's
+  front matter rather than derived from the kind. The parser enforces one link: reports, and only reports, are
+  `incident_report`. The pairs in use are `policy → policy | evacuation | resource_rules | construction_safety`,
+  `sop → sop | procedure`, `report → incident_report`, `permit → construction_safety`, `change_log → change_log`
+  and `profile → engineering_report | infrastructure_report | change_log`. The chunker copies the category into
+  each chunk's `metadata["category"]` (no new column); `RetrievalFilters.categories` filters on
+  `metadata->>'category'` (any-of, intersecting the other filters) and results expose it as
+  `RetrievedChunk.category` and in `metadata`. The per-document mapping is in `docs/rag.md`.
+- **One corpus, 37 documents.** §11 is withdrawn: RAG ingests the shared corpus (37 documents, 313 sections and
+  chunks). The data layer's 33 documents left categories 5 and 6 nearly empty, so four technical reports (kind
+  `profile`) were added: `survey-d7-2026` and `inspection-br1-2025` (`infrastructure_report`),
+  `geotech-sl-hv-1-2025` and `hydraulics-d7-2026` (`engineering_report`, with `geo-profiles-2020`). They use only
+  ids and numbers from `backend/data/city/*.yaml` and the existing documents, record measurements and findings
+  without drawing the agent's conclusions, and pass `validate_references`. The three documents under
+  `backend/tests/fixtures/corpus/` remain the test corpus.
 - Shared files (`pyproject.toml`, `.env.example`, `config.py`, `db/base.py`, `db/engine.py`,
   `db/models/__init__.py`, `tests/conftest.py`, `docker-compose.yml`) are edited additively only.

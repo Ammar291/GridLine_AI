@@ -1,10 +1,12 @@
 """End-to-end retrieval on the seeded Nandipur corpus (backend/data/corpus) with the hashed embedder."""
 
 import re
+from typing import get_args
 
 import pytest
 from sqlalchemy import func, select, text
 
+from gridline.city.schema_history import DocumentCategory
 from gridline.db.engine import session_factory
 from gridline.db.models import Chunk, Document, DocumentSection, Project
 from gridline.db.schema import truncate_corpus
@@ -17,6 +19,8 @@ from gridline.rag.store import ChunkStore
 from tests.conftest import DATA_DIR
 
 CORPUS = DATA_DIR / "corpus"
+DOCUMENTS = 37
+SECTIONS = 313
 
 
 @pytest.fixture(scope="module")
@@ -24,7 +28,7 @@ async def indexed(seeded, db_engine, db_url):
     """Sessions on the seeded test database with the real corpus indexed once for this (read-only) module."""
     await truncate_corpus(db_engine)
     report = await ingest(database_url=db_url, corpus_dir=CORPUS, embedder=HashedEmbedder())
-    assert report.documents_added == 33 and report.documents_removed == 0
+    assert report.documents_added == DOCUMENTS and report.documents_removed == 0
     yield session_factory(db_engine)
     await truncate_corpus(db_engine)  # leave the seeded database as the seed left it
 
@@ -41,16 +45,16 @@ async def test_every_section_and_threshold_citation_is_a_chunk(retriever, indexe
         threshold_ids = set(
             (await s.execute(text("select document_id || '#' || section from policy_thresholds"))).scalars()
         )
-    assert len(section_ids) == 277 and section_ids <= chunk_ids
+    assert len(section_ids) == SECTIONS and section_ids <= chunk_ids
     assert {re.sub(r"-p\d+$", "", c) for c in chunk_ids} == section_ids  # parts only extend a section
     assert threshold_ids and threshold_ids <= chunk_ids  # the detector's thresholds are citable evidence
 
 
 async def test_reingest_is_a_noop_and_keeps_city_rows(retriever, indexed, db_url):
     report = await ingest(database_url=db_url, corpus_dir=CORPUS, embedder=HashedEmbedder())
-    assert report.documents_unchanged == 33 and report.chunks_written == 0
+    assert report.documents_unchanged == DOCUMENTS and report.chunks_written == 0
     async with indexed() as s:
-        assert (await s.execute(select(func.count()).select_from(Document))).scalar_one() == 33
+        assert (await s.execute(select(func.count()).select_from(Document))).scalar_one() == DOCUMENTS
         permit = (await s.execute(select(Project.permit_doc_id).where(Project.id == "PR-HT2"))).scalar_one()
     assert permit == "permit-ht-2026-014"
 
@@ -122,4 +126,55 @@ async def test_large_top_k_and_filtered_search_are_complete(retriever, indexed):
 async def test_empty_results_are_empty_not_fabricated(retriever):
     nothing = RetrievalFilters(kinds=["permit"], zone_ids=["Z-LK"])
     assert await retriever.retrieve("landslide", filters=nothing) == []
+    no_such_pair = RetrievalFilters(kinds=["report"], categories=["evacuation"])
+    assert await retriever.retrieve("landslide", filters=no_such_pair) == []
     assert await retriever.retrieve("landslide", min_similarity=0.999) == []
+
+
+async def test_every_category_is_indexed(indexed):
+    async with indexed() as s:
+        count = "select metadata->>'category', count(distinct document_id) from chunks group by 1"
+        documents = {category: n for category, n in (await s.execute(text(count))).all()}
+    assert set(documents) == set(get_args(DocumentCategory))
+    assert documents["infrastructure_report"] >= 2 and documents["engineering_report"] >= 3
+
+
+@pytest.mark.parametrize(
+    "category",
+    ["infrastructure_report", "engineering_report", "incident_report", "evacuation", "construction_safety"],
+)
+async def test_category_filter_returns_only_that_category(retriever, category):
+    results = await retriever.retrieve(
+        "D-7 culvert capacity, Hillview slope saturation and Riverside flooding",
+        filters=RetrievalFilters(categories=[category]),
+        top_k=10,
+    )
+    assert results and all(r.category == r.metadata["category"] == category for r in results)
+
+
+async def test_bridge_inspection_answers_a_scour_question(retriever):
+    results = await retriever.retrieve("Kalinadi Bridge BR-1 pier 3 scour depth inspection", top_k=3)
+    assert results[0].document_id == "inspection-br1-2025"
+    assert results[0].category == "infrastructure_report" and results[0].kind == "profile"
+
+
+async def test_channel_survey_answers_a_d7_condition_question(retriever):
+    query = "condition of the D-7 channel lining, silt and trash racks"
+    results = await retriever.retrieve(query, top_k=3)
+    assert "survey-d7-2026" in {r.document_id for r in results}
+    filtered = await retriever.retrieve(query, filters=RetrievalFilters(categories=["infrastructure_report"]))
+    assert filtered[0].document_id == "survey-d7-2026"
+
+
+async def test_slope_assessment_answers_a_stability_question(retriever):
+    query = "SL-HV-1 factor of safety with saturation and unsupported cut"
+    results = await retriever.retrieve(query, top_k=3)
+    assert results[0].document_id == "geotech-sl-hv-1-2025" and results[0].category == "engineering_report"
+
+
+async def test_hydraulic_study_answers_a_design_flow_question(retriever):
+    query = "D-7 design peak flow by return period against the BR-4 culvert capacity"
+    results = await retriever.retrieve(query, top_k=3)
+    assert "hydraulics-d7-2026" in {r.document_id for r in results}
+    engineering = RetrievalFilters(categories=["engineering_report"])
+    assert (await retriever.retrieve(query, filters=engineering))[0].document_id == "hydraulics-d7-2026"

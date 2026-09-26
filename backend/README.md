@@ -47,6 +47,8 @@ uv run gridline-ingest             # after seeding: chunk, embed and store the c
 
 One chunk per corpus section, so citation ids like `dmp-2024#s4.2` resolve to a `chunks` row. Ingestion
 writes only `chunks` and each document's `content_hash`/`embedding_model`; unchanged files are skipped.
+Retrieval filters by kind, knowledge category, hazard, zone and document; each chunk carries its document's
+category in `metadata`. After adding or removing a corpus file, reseed with `--reset` before ingesting.
 `EMBEDDING_PROVIDER=auto` uses the local fastembed model when it can load and the offline `hashed` embedder
 otherwise. Usage, filters and the Python API: `../docs/rag.md`.
 
@@ -105,17 +107,24 @@ pure Python and need no database.
 data/city/          one YAML file per area; each maps table name -> list of records
   city.yaml zones.yaml geography.yaml drainage.yaml roads.yaml utilities.yaml
   emergency.yaml population.yaml infrastructure_changes.yaml policy_thresholds.yaml
-data/corpus/        33 Markdown documents: policies, SOPs, 17 incident reports, a permit,
-                    the 2018-2026 infrastructure change log and two profiles
+data/corpus/        37 Markdown documents: policies, SOPs, 17 incident reports, a permit,
+                    the 2018-2026 infrastructure change log, two profiles, two infrastructure
+                    reports (D-7 survey, BR-1 inspection) and two engineering reports
+                    (SL-HV-1 slope stability, D-7 hydraulic capacity)
 ```
 
 YAML keys equal the ORM column names. Computed columns are never typed in YAML: every `elevation_m`,
 zone area / elevation range / SVG path, road minimum elevation, tunnel low point, hill summit elevation and
 population density come from `gridline/city/terrain.py` at seed time.
 
-Corpus documents start with YAML front matter (`document_id`, `title`, `kind`, `source`, `version`,
-`effective_date`, `hazards`, `zone_ids`, optional `supersedes`, `summary`). Reports also carry the
-`incident:` block and `impacts:` list that seed `historical_incidents` and `historical_incident_impacts`.
+Corpus documents start with YAML front matter (`document_id`, `title`, `kind`, `category`, `source`,
+`version`, `effective_date`, `hazards`, `zone_ids`, optional `supersedes`, `summary`). `kind` is the
+document's form (`policy, sop, report, permit, change_log, profile`; surveys, inspections and engineering
+studies are `profile`). `category` is one of the RAG brief's ten knowledge categories (`policy, sop,
+procedure, incident_report, infrastructure_report, engineering_report, construction_safety, evacuation,
+resource_rules, change_log`), set explicitly per document; reports, and only reports, are `incident_report`.
+The mapping is in `../docs/rag.md`. Reports also carry the `incident:` block and `impacts:` list that seed
+`historical_incidents` and `historical_incident_impacts`.
 Body headings must be numbered, `## 4 Title` or `## 4.2 Title`, and become sections `s4` / `s4.2` with
 citation ids like `[dmp-2024#s4.2]`; text before the first heading is section `s0`.
 

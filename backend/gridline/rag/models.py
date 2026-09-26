@@ -1,18 +1,20 @@
 """Typed boundary models for the RAG layer (spec §8).
 
-The document vocabulary (``DocumentKind``, ``Hazard``) is the city data layer's, so ``chunks.kind`` always
-equals ``documents.kind`` and filters use the same words as the seed. Zone ids are plain strings (``Z-HV``).
+The document vocabulary (``DocumentKind``, ``DocumentCategory``, ``Hazard``) is the city data layer's front
+matter, so ``chunks.kind`` always equals ``documents.kind`` and filters use the same words as the corpus.
+A chunk's category lives in its ``metadata["category"]``. Zone ids are plain strings (``Z-HV``).
 """
 
 from typing import Any
 
 from pydantic import BaseModel, Field
 
-from gridline.city.schema_history import DocumentKind, Hazard
+from gridline.city.schema_history import DocumentCategory, DocumentKind, Hazard
 
 __all__ = [
     "ChunkDraft",
     "Citation",
+    "DocumentCategory",
     "DocumentKind",
     "DocumentRecord",
     "EmbeddingModelMismatchError",
@@ -54,6 +56,7 @@ class RetrievalFilters(BaseModel):
     filter, and chunks with no hazards match every hazard filter."""
 
     kinds: list[DocumentKind] | None = None
+    categories: list[DocumentCategory] | None = None
     hazards: list[Hazard] | None = None
     zone_ids: list[str] | None = None
     document_ids: list[str] | None = None
@@ -75,6 +78,7 @@ class StoredChunk(BaseModel):
     section: str
     source: str
     kind: DocumentKind
+    category: DocumentCategory
     zone_ids: list[str]
     hazards: list[Hazard]
     text: str

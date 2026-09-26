@@ -2,6 +2,7 @@
 document_id: test-fire-sop
 title: Test Market Fire SOP
 kind: sop
+category: sop
 source: Test Fire and Rescue Service
 version: "1.0"
 effective_date: 2022-06-01

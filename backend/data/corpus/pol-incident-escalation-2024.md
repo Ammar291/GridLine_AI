@@ -2,6 +2,7 @@
 document_id: pol-incident-escalation-2024
 title: Incident Escalation Policy
 kind: policy
+category: policy
 source: NMC-DMC
 version: "2.0"
 effective_date: 2024-03-01

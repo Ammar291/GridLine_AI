@@ -108,7 +108,7 @@ async def test_documents_by_kind(session: AsyncSession) -> None:
         "report": 17,
         "permit": 1,
         "change_log": 1,
-        "profile": 2,
+        "profile": 6,
     }
 
 

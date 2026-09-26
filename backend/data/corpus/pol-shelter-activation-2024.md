@@ -2,6 +2,7 @@
 document_id: pol-shelter-activation-2024
 title: Shelter Activation Policy
 kind: policy
+category: evacuation
 source: NMC-DMC
 version: "2.0"
 effective_date: 2024-02-01

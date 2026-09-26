@@ -28,7 +28,7 @@ from tests.conftest import DATA_DIR
 async def test_seed_counts_match_dataset(seeded: SeedSummary) -> None:
     c = seeded.counts
     assert set(c) == EXPECTED_TABLES
-    assert c["city"] == 1 and c["zones"] == 10 and c["drainage_channels"] == 9 and c["documents"] == 33
+    assert c["city"] == 1 and c["zones"] == 10 and c["drainage_channels"] == 9 and c["documents"] == 37
     assert (
         c["historical_incidents"] == 17 and c["infrastructure_changes"] == 29 and c["elevation_points"] == 475
     )

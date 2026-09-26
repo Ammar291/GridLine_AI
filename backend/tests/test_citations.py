@@ -11,6 +11,7 @@ def _chunk() -> StoredChunk:
         section="Construction halt rule on steep slopes",
         source="NMC Disaster Management Cell",
         kind="policy",
+        category="policy",
         zone_ids=[],
         hazards=["landslide"],
         text="All excavation ... shall be halted ...",

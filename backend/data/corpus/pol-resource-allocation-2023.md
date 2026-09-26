@@ -2,6 +2,7 @@
 document_id: pol-resource-allocation-2023
 title: Emergency Resource Allocation Policy
 kind: policy
+category: resource_rules
 source: NMC-DMC
 version: "1.3"
 effective_date: 2023-09-01
