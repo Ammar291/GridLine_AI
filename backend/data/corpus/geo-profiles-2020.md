@@ -2,6 +2,7 @@
 document_id: geo-profiles-2020
 title: Zone Geotechnical Profiles
 kind: profile
+category: engineering_report
 source: State Geological Survey, Nandipur District Office
 version: "1.0"
 effective_date: 2020-06-01

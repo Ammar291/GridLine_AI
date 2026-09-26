@@ -1,0 +1,537 @@
+infrastructure_changes:
+  - id: CH-2018-01
+    effective_date: "2018-11-20"
+    kind: desilting
+    zone_id: Z-SR
+    asset_kind: drainage_channel
+    asset_id: D-5
+    project_id: null
+    description: >-
+      Station Road drain (D-5) desilted and its culvert inlet cleared after the Station Road underpass flash flood,
+      raising effective capacity from 6.5 to 8.0 m3/s.
+    metric: capacity_m3s
+    value_before: 6.5
+    value_after: 8.0
+    unit: m3/s
+    hazard_review_done: true
+    approved_by: NMC Drainage Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: HI-2018-FF-01
+    notes: null
+  - id: CH-2019-01
+    effective_date: "2019-02-01"
+    kind: land_use
+    zone_id: Z-NC
+    asset_kind: project
+    asset_id: PR-NCH
+    project_id: PR-NCH
+    description: >-
+      Land use of 1,450,000 m2 of former paddy on the New Colony flood plain (FP-2) changed from agricultural to
+      residential for the New Colony Housing Scheme (PR-NCH).
+    metric: residential_area_m2
+    value_before: 0
+    value_after: 1450000
+    unit: m2
+    hazard_review_done: false
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Land use agricultural to residential; area lies on FP-2.
+  - id: CH-2019-02
+    effective_date: "2019-03-30"
+    kind: drainage_capacity
+    zone_id: Z-NC
+    asset_kind: drainage_channel
+    asset_id: D-9
+    project_id: null
+    description: >-
+      New Colony drain (D-9) built as a lined channel with a design capacity of 20 m3/s, sized for 35 % impervious
+      cover in the New Colony catchment.
+    metric: design_capacity_m3s
+    value_before: 0
+    value_after: 20
+    unit: m3/s
+    hazard_review_done: true
+    approved_by: NMC Drainage Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Design basis 35 % impervious cover.
+  - id: CH-2019-03
+    effective_date: "2019-06-15"
+    kind: quarry
+    zone_id: Z-TH
+    asset_kind: project
+    asset_id: PR-TQ
+    project_id: PR-TQ
+    description: >-
+      Tekri Quarry expansion (PR-TQ) began on the quarry face (SL-TH-1), clearing vegetation cover from 65 % to 30 %.
+    metric: vegetation_pct
+    value_before: 65
+    value_after: 30
+    unit: "%"
+    hazard_review_done: false
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Affects slope SL-TH-1.
+  - id: CH-2019-04
+    effective_date: "2019-09-05"
+    kind: monitoring
+    zone_id: Z-SR
+    asset_kind: tunnel
+    asset_id: TU-1
+    project_id: null
+    description: >-
+      Rail underpass (TU-1) fitted with an automatic flood barrier and a second sump pump (PU-T2) alongside PU-T1.
+    metric: sump_pumps
+    value_before: 1
+    value_after: 2
+    unit: count
+    hazard_review_done: true
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: HI-2018-FF-01
+    notes: Automatic barrier plus PU-T2.
+  - id: CH-2020-01
+    effective_date: "2020-01-20"
+    kind: monitoring
+    zone_id: Z-HV
+    asset_kind: sensor
+    asset_id: SM-01
+    project_id: null
+    description: >-
+      Soil moisture probes SM-01, SM-02 and SM-03 installed on the Hillview slopes, and slope response crew C-4
+      formed.
+    metric: soil_moisture_probes
+    value_before: 0
+    value_after: 3
+    unit: count
+    hazard_review_done: true
+    approved_by: NMC Disaster Management Cell
+    document_id: changelog-infra-2018-2026
+    related_incident_id: HI-2019-LS-01
+    notes: Probes SM-01..SM-03; crew C-4 formed.
+  - id: CH-2020-02
+    effective_date: "2020-04-12"
+    kind: hillside_construction
+    zone_id: Z-HV
+    asset_kind: slope
+    asset_id: SL-HV-3
+    project_id: null
+    description: >-
+      Rockfall mesh installed on the Hill Road cut at km 2.1 (SL-HV-3).
+    metric: null
+    value_before: null
+    value_after: null
+    unit: null
+    hazard_review_done: true
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Rockfall mesh installed.
+  - id: CH-2020-03
+    effective_date: "2020-10-05"
+    kind: hillside_construction
+    zone_id: Z-HV
+    asset_kind: project
+    asset_id: PR-HT1
+    project_id: PR-HT1
+    description: >-
+      Hillview Terrace Phase 1 (PR-HT1) cut the SL-HV-2 slope to a depth of 4 m, steepening the cut angle from
+      28 to 34 degrees.
+    metric: cut_angle_deg
+    value_before: 28
+    value_after: 34
+    unit: deg
+    hazard_review_done: false
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Affects slope SL-HV-2; cut depth 4 m.
+  - id: CH-2020-04
+    effective_date: "2020-11-30"
+    kind: road_construction
+    zone_id: Z-NC
+    asset_kind: road
+    asset_id: RD-09
+    project_id: null
+    description: >-
+      New Colony Avenue (RD-09) opened as a two-lane collector across the New Colony plain.
+    metric: lanes
+    value_before: 0
+    value_after: 2
+    unit: count
+    hazard_review_done: false
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: New road opened.
+  - id: CH-2021-01
+    effective_date: "2021-03-18"
+    kind: urbanization
+    zone_id: Z-NC
+    asset_kind: residential_area
+    asset_id: RA-17
+    project_id: null
+    description: >-
+      New Colony Sector 2 (RA-17) occupied, raising impervious cover in the New Colony catchment from 35 % to 52 %.
+    metric: impervious_pct
+    value_before: 35
+    value_after: 52
+    unit: "%"
+    hazard_review_done: false
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: null
+  - id: CH-2021-02
+    effective_date: "2021-06-30"
+    kind: utility
+    zone_id: Z-NC
+    asset_kind: power_substation
+    asset_id: PS-5
+    project_id: null
+    description: >-
+      Substation PS-5 commissioned on a platform raised 1.2 m above ground; the D-11 station pumps were re-fed from
+      PS-5.
+    metric: platform_raise_m
+    value_before: null
+    value_after: 1.2
+    unit: m
+    hazard_review_done: true
+    approved_by: NMC Engineering Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: D-11 pumps re-fed from PS-5.
+  - id: CH-2022-01
+    effective_date: "2022-04-20"
+    kind: embankment
+    zone_id: Z-OT
+    asset_kind: flood_plain
+    asset_id: FP-3
+    project_id: null
+    description: >-
+      Old Town riverfront embankment (FP-3) raised from a crest of 214.0 m to 214.6 m.
+    metric: crest_elevation_m
+    value_before: 214.0
+    value_after: 214.6
+    unit: m
+    hazard_review_done: true
+    approved_by: NMC Engineering Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: HI-2021-FL-01
+    notes: null
+  - id: CH-2022-02
+    effective_date: "2022-05-15"
+    kind: utility
+    zone_id: Z-TH
+    asset_kind: water_facility
+    asset_id: WF-3
+    project_id: null
+    description: >-
+      Tekri Hill Reservoir (WF-3) storage enlarged from 8 to 12 ML; the reservoir sits 400 m upslope of SL-HV-1.
+    metric: storage_ml
+    value_before: 8
+    value_after: 12
+    unit: ML
+    hazard_review_done: false
+    approved_by: NMC Engineering Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Structural review only; no hazard review.
+  - id: CH-2022-03
+    effective_date: "2022-11-10"
+    kind: hillside_construction
+    zone_id: Z-HV
+    asset_kind: project
+    asset_id: PR-HT1
+    project_id: PR-HT1
+    description: >-
+      A 6 m retaining wall completed on the Hillview Terrace Phase 1 cut (SL-HV-2); slope stability reclassified
+      from marginal to stabilised.
+    metric: retaining_wall_height_m
+    value_before: 0
+    value_after: 6
+    unit: m
+    hazard_review_done: true
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Stability marginal to stabilised.
+  - id: CH-2022-04
+    effective_date: "2022-12-01"
+    kind: utility
+    zone_id: Z-NC
+    asset_kind: fire_station
+    asset_id: FS-3
+    project_id: null
+    description: >-
+      New Colony fire station (FS-3) opened with fire trucks FT-09 and FT-10.
+    metric: null
+    value_before: null
+    value_after: null
+    unit: null
+    hazard_review_done: false
+    approved_by: NMC Engineering Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: not applicable
+  - id: CH-2023-01
+    effective_date: "2023-04-15"
+    kind: bridge
+    zone_id: Z-MI
+    asset_kind: bridge
+    asset_id: BR-2
+    project_id: null
+    description: >-
+      Eastern Bridge (BR-2) and the Eastern Highway Link (RD-12) opened as the second Kalinadi crossing.
+    metric: river_crossings
+    value_before: 1
+    value_after: 2
+    unit: count
+    hazard_review_done: true
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Built under the Eastern Bridge project PR-EB2.
+  - id: CH-2023-02
+    effective_date: "2023-08-25"
+    kind: urbanization
+    zone_id: Z-NC
+    asset_kind: residential_area
+    asset_id: RA-18
+    project_id: null
+    description: >-
+      New Colony Sector 3 (RA-18) occupied, adding 16,000 residents and raising impervious cover from 52 % to 62 %;
+      D-9 was not enlarged.
+    metric: impervious_pct
+    value_before: 52
+    value_after: 62
+    unit: "%"
+    hazard_review_done: false
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Population +16,000; D-9 unchanged.
+  - id: CH-2023-03
+    effective_date: "2023-10-10"
+    kind: pump
+    zone_id: Z-LK
+    asset_kind: pump_unit
+    asset_id: PU-L3
+    project_id: null
+    description: >-
+      D-11 station pump PU-L3 replaced after it overheated in the 2021 flood, restoring D-11 capacity to 12 m3/s.
+    metric: capacity_m3s
+    value_before: 9.5
+    value_after: 12
+    unit: m3/s
+    hazard_review_done: true
+    approved_by: NMC Drainage Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Values are D-11 channel capacity.
+  - id: CH-2024-01
+    effective_date: "2024-06-03"
+    kind: commercial_construction
+    zone_id: Z-MW
+    asset_kind: project
+    asset_id: PR-MWM
+    project_id: PR-MWM
+    description: >-
+      Market Ward Mall (PR-MWM) began an 8 m basement 25 m from D-4, discharging 0.4 m3/s of dewatering water into
+      D-4.
+    metric: dewatering_discharge_m3s
+    value_before: 0
+    value_after: 0.4
+    unit: m3/s
+    hazard_review_done: true
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Approved with conditions; basement 8 m, 25 m from D-4.
+  - id: CH-2024-02
+    effective_date: "2024-09-20"
+    kind: road_construction
+    zone_id: Z-TH
+    asset_kind: road
+    asset_id: RD-11
+    project_id: null
+    description: >-
+      Tekri Quarry Road (RD-11) regraded and side ditches added below the quarry bench.
+    metric: null
+    value_before: null
+    value_after: null
+    unit: null
+    hazard_review_done: true
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: HI-2024-LS-01
+    notes: Regraded, ditches added.
+  - id: CH-2024-03
+    effective_date: "2024-10-28"
+    kind: pump
+    zone_id: Z-LK
+    asset_kind: pump_unit
+    asset_id: PU-L2
+    project_id: null
+    description: >-
+      D-11 station pump PU-L2 failed during Cyclone Meher, reducing D-11 capacity from 12 to 9.5 m3/s; it has not
+      been repaired.
+    metric: capacity_m3s
+    value_before: 12
+    value_after: 9.5
+    unit: m3/s
+    hazard_review_done: false
+    approved_by: null
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: not applicable; values are D-11 channel capacity; not repaired.
+  - id: CH-2025-01
+    effective_date: "2025-01-15"
+    kind: desilting
+    zone_id: Z-OT
+    asset_kind: drainage_channel
+    asset_id: D-3
+    project_id: PR-D3R
+    description: >-
+      Old Town main drain (D-3) desilting and relining (PR-D3R) raised current capacity from 12 to 14 m3/s.
+    metric: capacity_m3s
+    value_before: 12
+    value_after: 14
+    unit: m3/s
+    hazard_review_done: true
+    approved_by: NMC Drainage Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: null
+  - id: CH-2025-02
+    effective_date: "2025-05-20"
+    kind: drainage_capacity
+    zone_id: Z-HV
+    asset_kind: drainage_channel
+    asset_id: D-7
+    project_id: PR-HRW
+    description: >-
+      Hill Road Widening (PR-HRW) rebuilt the D-7 culvert at BR-4 from 3.2 x 2.4 m to 2.4 x 1.8 m, reducing D-7
+      capacity from 42 to 27 m3/s.
+    metric: capacity_m3s
+    value_before: 42
+    value_after: 27
+    unit: m3/s
+    hazard_review_done: false
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Culvert at BR-4 3.2 x 2.4 m to 2.4 x 1.8 m; no hydraulic review.
+  - id: CH-2025-03
+    effective_date: "2025-05-20"
+    kind: road_construction
+    zone_id: Z-HV
+    asset_kind: road
+    asset_id: RD-01
+    project_id: PR-HRW
+    description: >-
+      Hill Road (RD-01) widened from 2 to 4 lanes on its lower 1.6 km under PR-HRW; Hillview impervious cover rose
+      from 33 % to 36 %.
+    metric: lanes
+    value_before: 2
+    value_after: 4
+    unit: count
+    hazard_review_done: false
+    approved_by: NMC Roads Division
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Impervious 33 to 36 %.
+  - id: CH-2025-04
+    effective_date: "2025-08-12"
+    kind: drainage_capacity
+    zone_id: Z-MI
+    asset_kind: drainage_channel
+    asset_id: D-12
+    project_id: null
+    description: >-
+      Survey found Mill Road industrial drain (D-12) capacity down from 16 to 12 m3/s with a blocked fraction of
+      0.25.
+    metric: capacity_m3s
+    value_before: 16
+    value_after: 12
+    unit: m3/s
+    hazard_review_done: false
+    approved_by: null
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: not applicable; survey finding, blocked 0.25.
+  - id: CH-2025-05
+    effective_date: "2025-12-01"
+    kind: encroachment
+    zone_id: Z-RS
+    asset_kind: drainage_channel
+    asset_id: D-8
+    project_id: null
+    description: >-
+      Encroachment by the D-8 settlement (RA-05) narrowed the Riverside outfall drain (D-8) by 15 %, reducing
+      capacity from 15 to 13 m3/s.
+    metric: capacity_m3s
+    value_before: 15
+    value_after: 13
+    unit: m3/s
+    hazard_review_done: false
+    approved_by: null
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: not applicable; width -15 %, encroachment by RA-05.
+  - id: CH-2026-01
+    effective_date: "2026-01-20"
+    kind: hillside_construction
+    zone_id: Z-HV
+    asset_kind: project
+    asset_id: PR-HT2
+    project_id: PR-HT2
+    description: >-
+      Construction permit HT-2026-014 issued with conditions for Hillview Terrace Phase 2 (PR-HT2).
+    metric: null
+    value_before: null
+    value_after: null
+    unit: null
+    hazard_review_done: true
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Approved with conditions; see permit-ht-2026-014.
+  - id: CH-2026-02
+    effective_date: "2026-03-02"
+    kind: hillside_construction
+    zone_id: Z-HV
+    asset_kind: project
+    asset_id: PR-HT2
+    project_id: PR-HT2
+    description: >-
+      Excavation for Hillview Terrace Phase 2 (PR-HT2) began on SL-HV-1, clearing vegetation cover from 45 % to 20 %.
+    metric: vegetation_pct
+    value_before: 45
+    value_after: 20
+    unit: "%"
+    hazard_review_done: true
+    approved_by: NMC Town Planning Department
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: Approved with conditions; affects slope SL-HV-1.
+  - id: CH-2026-03
+    effective_date: "2026-05-10"
+    kind: encroachment
+    zone_id: Z-HV
+    asset_kind: residential_area
+    asset_id: RA-02
+    project_id: null
+    description: >-
+      The Kalinadi Drain settlement (RA-02) along the D-7 upper reach grew from 1,900 to 2,600 people.
+    metric: population
+    value_before: 1900
+    value_after: 2600
+    unit: people
+    hazard_review_done: false
+    approved_by: null
+    document_id: changelog-infra-2018-2026
+    related_incident_id: null
+    notes: not applicable

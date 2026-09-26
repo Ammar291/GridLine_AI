@@ -2,6 +2,7 @@
 document_id: pol-flood-response-2024
 title: Flood Response Policy
 kind: policy
+category: policy
 source: NMC-DMC
 version: "2.0"
 effective_date: 2024-05-15

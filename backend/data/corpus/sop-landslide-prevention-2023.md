@@ -2,6 +2,7 @@
 document_id: sop-landslide-prevention-2023
 title: Landslide Prevention and Slope Monitoring SOP
 kind: sop
+category: sop
 source: NMC-DMC with State Geological Survey
 version: "1.2"
 effective_date: 2023-08-01

@@ -12,6 +12,8 @@ dependencies = [
     "pyyaml>=6.0",
     "numpy>=2.0",
     "fastembed>=0.7",
+    "fastapi>=0.141.1",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [project.scripts]
@@ -24,6 +26,7 @@ dev = [
     "pyright>=1.1.400",
     "ruff>=0.12",
     "types-pyyaml>=6.0",
+    "httpx>=0.28.1",
 ]
 
 [build-system]
@@ -38,6 +41,10 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
 testpaths = ["tests"]
+filterwarnings = [
+    # Starlette 1.x nudges TestClient users towards httpx2; httpx is the project's pinned dev dependency.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated:UserWarning",
+]
 
 [tool.pyright]
 include = ["gridline"]

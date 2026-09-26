@@ -1,9 +1,9 @@
 """Knowledge tables: documents, document sections, RAG chunks and policy thresholds.
 
-``documents`` is shared by the city data layer (which seeds document metadata and per-section text) and the RAG
-layer (which fills ``content_hash``/``embedding_model`` and writes ``chunks``). ``chunks`` keeps the RAG layer's
-definition unchanged (ARCHITECTURE.md §4, §7); chunk ids and section ids share the ``<document_id>#s4.2`` form so
-a citation id resolves in both tables.
+``documents`` is shared by the city data layer (which seeds document metadata and per-section text) and the
+RAG layer (which fills ``content_hash``/``embedding_model`` and writes ``chunks``). ``chunks`` keeps the RAG
+layer's definition unchanged (ARCHITECTURE.md §4, §7); chunk ids and section ids share the
+``<document_id>#s4.2`` form so a citation id resolves in both tables.
 """
 
 import datetime as dt
@@ -24,7 +24,8 @@ class Document(Base):
 
     __tablename__ = "documents"
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)  # front-matter document_id / slug, e.g. "dmp-2024"
+    # Front-matter document_id / slug, e.g. "dmp-2024".
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     kind: Mapped[str] = mapped_column(Text, nullable=False, index=True)
     source: Mapped[str] = mapped_column(Text, nullable=False)
@@ -47,12 +48,15 @@ class Document(Base):
 
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="document", cascade="all, delete-orphan")
     sections: Mapped[list["DocumentSection"]] = relationship(
-        back_populates="document", cascade="all, delete-orphan", lazy="selectin", order_by="DocumentSection.position"
+        back_populates="document",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="DocumentSection.position",
     )
 
 
 class DocumentSection(Base):
-    """A numbered ``##`` section of a corpus document; ``id`` is the citation id ``<document_id>#<section>``."""
+    """A numbered ``##`` section of a corpus document; ``id`` is the citation id ``<doc_id>#<section>``."""
 
     __tablename__ = "document_sections"
 
@@ -100,7 +104,7 @@ class Chunk(Base):
 
 
 class PolicyThreshold(Base):
-    """A numeric threshold stated in a policy section, so the detector can use the number the model can cite."""
+    """A numeric threshold stated in a policy section, so the detector uses the number the model can cite."""
 
     __tablename__ = "policy_thresholds"
 

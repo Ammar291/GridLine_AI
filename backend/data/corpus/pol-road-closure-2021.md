@@ -2,6 +2,7 @@
 document_id: pol-road-closure-2021
 title: Road Closure and Traffic Management Policy
 kind: policy
+category: policy
 source: NMC Roads Division with City Police
 version: "1.0"
 effective_date: 2021-11-01
