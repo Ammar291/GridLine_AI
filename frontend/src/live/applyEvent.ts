@@ -1,8 +1,10 @@
 // Pure reducer: (LiveState, Event) -> LiveState over the backend's event contract, plus the pending events of later
 // milestones (applyPending). Every event except the heartbeat also lands in the feed.
 import type { Event, EventOf, SimStatus } from '@/api/types';
+import { agentRunFromSnapshot, applyAgentStep } from './applyAgentStep';
 import { applyPendingEvent } from './applyPending';
 import { applyWorldEvent } from './applyWorld';
+import { applyLiveWeather, dataModeOf } from './liveWeather';
 import { eventGroup } from './describeEvent';
 import { addMilestone } from './reduce';
 import { FEED_CAP, type LiveState, type SimState } from './types';
@@ -16,6 +18,7 @@ export function isEngineReset(e: Event): boolean {
 function startOver(state: LiveState): LiveState {
   return {
     ...state, readings: {}, telemetry: {}, milestones: [], zoneState: {}, incidents: {}, approvals: {}, actions: {}, alerts: [],
+    liveWeather: { observation: null, forecast: null }, agentRun: null,
   };
 }
 
@@ -28,11 +31,25 @@ function simFrom(s: SimStatus): SimState {
 /** The first frame of every connection. A reconnect within the same run keeps the charts; a new run starts over. */
 function applySnapshot(state: LiveState, e: EventOf<'sim.snapshot'>): LiveState {
   const { status, world, city } = e.payload;
-  const sameRun = state.hasSnapshot && state.sim.scenario === status.scenario && status.tick >= state.sim.tick;
-  return { ...(sameRun ? state : startOver(state)), hasSnapshot: true, city, world, sim: simFrom(status) };
+  const source = e.payload.source ?? state.source;
+  const sameMode = state.source === null || source === null || state.source.mode === source.mode;
+  const sameRun = sameMode && state.hasSnapshot && state.sim.scenario === status.scenario && status.tick >= state.sim.tick;
+  return {
+    ...(sameRun ? state : startOver(state)), hasSnapshot: true, city, world, sim: simFrom(status), source,
+    agentRun: agentRunFromSnapshot(e.payload.agent_run),
+  };
 }
 
-const isRoutine = (e: Event) => e.event_type === 'sim.tick' || eventGroup(e.event_type) === 'reading';
+/** A change of data source starts the feed and readings over: LIVE and DEMO describe different cities. */
+function applySource(state: LiveState, e: EventOf<'source.status'>): LiveState {
+  const switched = state.source !== null && state.source.mode !== e.payload.mode;
+  return { ...(switched ? { ...startOver(state), feed: [e] } : state), source: e.payload };
+}
+
+/** Ticks, readings and a zone.state that keeps its band are routine: a full feed drops them first. */
+const isRoutine = (e: Event) =>
+  e.event_type === 'sim.tick' || eventGroup(e.event_type) === 'reading' ||
+  (e.event_type === 'zone.state' && (e.payload.prev_band == null || e.payload.prev_band === e.payload.band));
 
 /**
  * Append to the feed. Readings arrive about 20 per tick, so a full feed drops its oldest tick or reading first and
@@ -68,8 +85,13 @@ export function applyEvent(state: LiveState, event: Event): LiveState {
       const next = { ...base, world, sim: { ...base.sim, stage: p.stage, scenario: p.scenario } };
       return addMilestone(next, event, { kind: 'scenario', label: p.description });
     }
+    case 'scenario.trigger':
+      return addMilestone(s, event, { kind: 'scenario', label: event.payload.label });
+    case 'source.status':
+      return applySource(s, event);
     case 'weather.observation':
     case 'weather.forecast':
+      return dataModeOf(s) === 'live' ? applyLiveWeather(s, event) : applyWorldEvent(s, event);
     case 'environment.soil':
     case 'environment.river':
     case 'environment.drainage':
@@ -84,7 +106,11 @@ export function applyEvent(state: LiveState, event: Event): LiveState {
     case 'emergency.ambulance':
     case 'emergency.hospital':
     case 'emergency.shelter':
+    case 'weather.rainfall':
+    case 'emergency.fire':
       return applyWorldEvent(s, event);
+    case 'agent.step':
+      return { ...s, agentRun: applyAgentStep(s.agentRun, event.payload) };
     case 'zone.state':
     case 'threat.detected':
     case 'threat.escalated':

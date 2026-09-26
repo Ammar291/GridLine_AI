@@ -33,6 +33,7 @@ from gridline.city.dataset import CityData
 from gridline.city.model import City, SensorKind
 from gridline.city.schema_common import Located
 from gridline.city.terrain import CITY_BBOX, river_y
+from gridline.simulation.triggers import TriggerInfo, trigger_infos
 
 
 class ViewBox(BaseModel):
@@ -171,6 +172,7 @@ class CityMap(BaseModel):
     map_features: list[MapFeature]
     scenarios: list[ScenarioInfo]
     injections: list[InjectionPreset]
+    triggers: list[TriggerInfo]
 
 
 def build_city_map(data: CityData, city: City) -> CityMap:
@@ -231,6 +233,7 @@ def build_city_map(data: CityData, city: City) -> CityMap:
         map_features=_features(data),
         scenarios=scenario_infos(),
         injections=list(INJECTION_PRESETS),
+        triggers=trigger_infos(),
     )
     return draft.model_copy(update={"zones": _zones(data, draft)})
 

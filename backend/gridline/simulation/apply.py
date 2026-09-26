@@ -4,8 +4,10 @@ world, and return the event plus any derived events (``source="simulation:engine
 The emitted location is always the asset's zone; a contradicting requested location is ignored.
 """
 
+import math
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import timedelta
 
 from gridline.city.model import City
 from gridline.errors import InvalidPayload, NotInjectable
@@ -17,7 +19,9 @@ from gridline.simulation.world import (
     AmbulanceState,
     BridgeState,
     CrewState,
+    FireState,
     HospitalState,
+    RainOverride,
     RoadState,
     ShelterState,
     WorldState,
@@ -27,6 +31,7 @@ LANDSLIDE_DISPLACEMENT_MM = 1500.0  # slope movement added by a landslide
 LANDSLIDE_RATE_MM_H = 500.0  # movement rate reported in the tick of the failure
 LANDSLIDE_BLOCKAGE = 0.7  # minimum blocked fraction of the slope's toe channel after a landslide
 LANDSLIDE_REASON = "landslide debris"
+FIRE_EXPOSURE_M = 500.0  # zones whose boundary lies within this distance of the burning zone are exposed
 
 
 @dataclass(frozen=True)
@@ -68,6 +73,16 @@ def _forecast(ctx: _Ctx, f: p.Payload) -> list[Event]:
         ctx.city.zone(ctx.location)
     ctx.world.forecast = f
     return [ctx.emit(EventType.WEATHER_FORECAST, f, ctx.location)]
+
+
+def _rainfall(ctx: _Ctx, r: p.Payload) -> list[Event]:
+    assert isinstance(r, p.RainfallDriver)
+    zone_ids = [ctx.city.zone(z).id for z in r.zone_ids] or [z.id for z in ctx.city.zones]
+    until = ctx.world.sim_time + timedelta(hours=r.duration_h)
+    for zone_id in zone_ids:
+        ctx.world.rain_overrides[zone_id] = RainOverride(intensity_mm_h=r.intensity_mm_h, until=until)
+    location = zone_ids[0] if len(r.zone_ids) == 1 else None
+    return [ctx.emit(EventType.WEATHER_RAINFALL, r, location)]
 
 
 def _road(ctx: _Ctx, r: p.Payload) -> list[Event]:
@@ -230,8 +245,26 @@ def _shelter(ctx: _Ctx, s: p.Payload) -> list[Event]:
     return [ctx.emit(EventType.EMERGENCY_SHELTER, filled, shelter.zone_id)]
 
 
+def _fire(ctx: _Ctx, f: p.Payload) -> list[Event]:
+    assert isinstance(f, p.IndustrialFire)
+    zone = ctx.city.zone(f.zone_id)
+    exposed = [z for z in ctx.city.zones if _bbox_gap_m(zone.bbox, z.bbox) <= FIRE_EXPOSURE_M]
+    ids, population = [z.id for z in exposed], sum(z.population for z in exposed)
+    ctx.world.fires[zone.id] = FireState(site=f.site, exposed_zone_ids=ids, exposed_population=population)
+    filled = f.model_copy(update={"exposed_zone_ids": ids, "exposed_population": population})
+    return [ctx.emit(EventType.EMERGENCY_FIRE, filled, zone.id)]
+
+
+def _bbox_gap_m(a: tuple[float, float, float, float], b: tuple[float, float, float, float]) -> float:
+    """Shortest distance between two axis-aligned boxes; 0 when they touch or overlap."""
+    dx = max(0.0, b[0] - a[2], a[0] - b[2])
+    dy = max(0.0, b[1] - a[3], a[1] - b[3])
+    return math.hypot(dx, dy)
+
+
 _HANDLERS: dict[EventType, Callable[[_Ctx, p.Payload], list[Event]]] = {
     EventType.WEATHER_FORECAST: _forecast,
+    EventType.WEATHER_RAINFALL: _rainfall,
     EventType.INFRASTRUCTURE_ROAD: _road,
     EventType.INFRASTRUCTURE_BRIDGE: _bridge,
     EventType.INFRASTRUCTURE_DRAINAGE_OBSTRUCTION: _obstruction,
@@ -241,4 +274,5 @@ _HANDLERS: dict[EventType, Callable[[_Ctx, p.Payload], list[Event]]] = {
     EventType.EMERGENCY_AMBULANCE: _ambulance,
     EventType.EMERGENCY_HOSPITAL: _hospital,
     EventType.EMERGENCY_SHELTER: _shelter,
+    EventType.EMERGENCY_FIRE: _fire,
 }

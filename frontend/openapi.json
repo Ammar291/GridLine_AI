@@ -449,6 +449,193 @@
           }
         }
       }
+    },
+    "/api/simulation/trigger": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Trigger",
+        "description": "Press a DEMO control: announcement, injected events and one simulated hour, all on the bus.",
+        "operationId": "trigger_api_simulation_trigger_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  },
+                  "type": "array",
+                  "title": "Response Trigger Api Simulation Trigger Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/detector/bands": {
+      "get": {
+        "tags": [
+          "detector"
+        ],
+        "summary": "Get Bands",
+        "operationId": "get_bands_api_detector_bands_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bands"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/source": {
+      "get": {
+        "tags": [
+          "source"
+        ],
+        "summary": "Get Source",
+        "operationId": "get_source_api_source_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceStatus"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "source"
+        ],
+        "summary": "Switch Source",
+        "description": "Stop the current source and start ``mode``'s; a ``source.status`` event announces the change.",
+        "operationId": "switch_source_api_source_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourceSwitch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/runs/{run_id}/approval": {
+      "post": {
+        "tags": [
+          "agent"
+        ],
+        "summary": "Decide Run Approval",
+        "description": "Record the decision and resume the graph; progress arrives as ``agent.step`` events.",
+        "operationId": "decideRunApproval",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowDecision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRun"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such run"
+          },
+          "409": {
+            "description": "The run is not waiting for approval"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -482,6 +669,74 @@
           "status"
         ],
         "title": "AdvanceResponse"
+      },
+      "AgentStepEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "agent.step",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/WorkflowStep"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "AgentStepEvent"
       },
       "AmbulanceState": {
         "properties": {
@@ -622,6 +877,56 @@
           "payload"
         ],
         "title": "AmbulanceStatusEvent"
+      },
+      "Band": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "watch",
+          "warning",
+          "critical"
+        ],
+        "title": "Band",
+        "description": "A zone's risk band from its landslide and flood indices (``gridline.threats.indices``)."
+      },
+      "BandThresholds": {
+        "properties": {
+          "watch": {
+            "type": "number",
+            "title": "Watch"
+          },
+          "warning": {
+            "type": "number",
+            "title": "Warning"
+          },
+          "critical": {
+            "type": "number",
+            "title": "Critical"
+          }
+        },
+        "type": "object",
+        "required": [
+          "watch",
+          "warning",
+          "critical"
+        ],
+        "title": "BandThresholds"
+      },
+      "Bands": {
+        "properties": {
+          "landslide": {
+            "$ref": "#/components/schemas/BandThresholds"
+          },
+          "flood": {
+            "$ref": "#/components/schemas/BandThresholds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "landslide",
+          "flood"
+        ],
+        "title": "Bands"
       },
       "BridgeState": {
         "properties": {
@@ -882,6 +1187,13 @@
             },
             "type": "array",
             "title": "Injections"
+          },
+          "triggers": {
+            "items": {
+              "$ref": "#/components/schemas/TriggerInfo"
+            },
+            "type": "array",
+            "title": "Triggers"
           }
         },
         "type": "object",
@@ -901,7 +1213,8 @@
           "pump_depot",
           "map_features",
           "scenarios",
-          "injections"
+          "injections",
+          "triggers"
         ],
         "title": "CityMap"
       },
@@ -1282,10 +1595,22 @@
             "$ref": "#/components/schemas/ScenarioStageEvent"
           },
           {
+            "$ref": "#/components/schemas/ScenarioTriggerEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ZoneStateEvent"
+          },
+          {
+            "$ref": "#/components/schemas/SourceStatusEvent"
+          },
+          {
             "$ref": "#/components/schemas/WeatherObservationEvent"
           },
           {
             "$ref": "#/components/schemas/WeatherForecastEvent"
+          },
+          {
+            "$ref": "#/components/schemas/RainfallDriverEvent"
           },
           {
             "$ref": "#/components/schemas/SoilObservationEvent"
@@ -1328,6 +1653,12 @@
           },
           {
             "$ref": "#/components/schemas/ShelterCapacityEvent"
+          },
+          {
+            "$ref": "#/components/schemas/IndustrialFireEvent"
+          },
+          {
+            "$ref": "#/components/schemas/AgentStepEvent"
           }
         ],
         "title": "Event",
@@ -1335,7 +1666,9 @@
         "discriminator": {
           "propertyName": "event_type",
           "mapping": {
+            "agent.step": "#/components/schemas/AgentStepEvent",
             "emergency.ambulance": "#/components/schemas/AmbulanceStatusEvent",
+            "emergency.fire": "#/components/schemas/IndustrialFireEvent",
             "emergency.hospital": "#/components/schemas/HospitalCapacityEvent",
             "emergency.rescue_team": "#/components/schemas/RescueTeamStatusEvent",
             "emergency.shelter": "#/components/schemas/ShelterCapacityEvent",
@@ -1350,12 +1683,16 @@
             "infrastructure.failure": "#/components/schemas/InfrastructureFailureEvent",
             "infrastructure.road": "#/components/schemas/RoadStatusEvent",
             "scenario.stage": "#/components/schemas/ScenarioStageEvent",
+            "scenario.trigger": "#/components/schemas/ScenarioTriggerEvent",
             "sim.heartbeat": "#/components/schemas/HeartbeatEvent",
             "sim.snapshot": "#/components/schemas/SimSnapshotEvent",
             "sim.status": "#/components/schemas/SimStatusEvent",
             "sim.tick": "#/components/schemas/SimTickEvent",
+            "source.status": "#/components/schemas/SourceStatusEvent",
             "weather.forecast": "#/components/schemas/WeatherForecastEvent",
-            "weather.observation": "#/components/schemas/WeatherObservationEvent"
+            "weather.observation": "#/components/schemas/WeatherObservationEvent",
+            "weather.rainfall": "#/components/schemas/RainfallDriverEvent",
+            "zone.state": "#/components/schemas/ZoneStateEvent"
           }
         }
       },
@@ -1367,8 +1704,12 @@
           "sim.snapshot",
           "sim.heartbeat",
           "scenario.stage",
+          "scenario.trigger",
+          "zone.state",
+          "source.status",
           "weather.observation",
           "weather.forecast",
+          "weather.rainfall",
           "environment.soil",
           "environment.river",
           "environment.drainage",
@@ -1382,9 +1723,37 @@
           "emergency.rescue_team",
           "emergency.ambulance",
           "emergency.hospital",
-          "emergency.shelter"
+          "emergency.shelter",
+          "emergency.fire",
+          "agent.step"
         ],
         "title": "EventType"
+      },
+      "FireState": {
+        "properties": {
+          "site": {
+            "type": "string",
+            "title": "Site"
+          },
+          "exposed_zone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Exposed Zone Ids"
+          },
+          "exposed_population": {
+            "type": "integer",
+            "title": "Exposed Population"
+          }
+        },
+        "type": "object",
+        "required": [
+          "site",
+          "exposed_zone_ids",
+          "exposed_population"
+        ],
+        "title": "FireState"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1641,6 +2010,150 @@
           "beds_occupied"
         ],
         "title": "HospitalState"
+      },
+      "HourlyPrecipitation": {
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Time"
+          },
+          "precipitation_mm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Precipitation Mm"
+          },
+          "probability": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Probability"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "time",
+          "precipitation_mm",
+          "probability"
+        ],
+        "title": "HourlyPrecipitation"
+      },
+      "IndustrialFire": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "site": {
+            "type": "string",
+            "title": "Site"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "exposed_zone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Exposed Zone Ids"
+          },
+          "exposed_population": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Exposed Population",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zone_id",
+          "site",
+          "description",
+          "exposed_zone_ids",
+          "exposed_population"
+        ],
+        "title": "IndustrialFire",
+        "description": "A fire at a site in a zone; who is exposed is computed from the city by the apply handler."
+      },
+      "IndustrialFireEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "emergency.fire",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/IndustrialFire"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "IndustrialFireEvent"
       },
       "InfrastructureFailure": {
         "properties": {
@@ -2375,6 +2888,112 @@
         ],
         "title": "PumpUnit"
       },
+      "RainfallDriver": {
+        "properties": {
+          "zone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Zone Ids"
+          },
+          "intensity_mm_h": {
+            "type": "number",
+            "maximum": 200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Intensity Mm H"
+          },
+          "duration_h": {
+            "type": "number",
+            "maximum": 24.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Duration H"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zone_ids",
+          "intensity_mm_h",
+          "duration_h",
+          "description"
+        ],
+        "title": "RainfallDriver",
+        "description": "Operator rain: ``intensity_mm_h`` over ``zone_ids`` (empty means every zone) for ``duration_h`` hours.\n\nA driver, not a reading: the scenario's rain resumes when it ends and is never lowered by it."
+      },
+      "RainfallDriverEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "weather.rainfall",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/RainfallDriver"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "RainfallDriverEvent"
+      },
       "RescueTeamStatus": {
         "properties": {
           "crew_id": {
@@ -2904,6 +3523,105 @@
         ],
         "title": "ScenarioStageEvent"
       },
+      "ScenarioTrigger": {
+        "properties": {
+          "trigger": {
+            "type": "string",
+            "title": "Trigger"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "tick": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tick"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "trigger",
+          "label",
+          "description",
+          "tick"
+        ],
+        "title": "ScenarioTrigger",
+        "description": "An operator pressed a DEMO control; its injected events and one simulated hour follow on the bus."
+      },
+      "ScenarioTriggerEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "scenario.trigger",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ScenarioTrigger"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "ScenarioTriggerEvent"
+      },
       "SelectScenarioRequest": {
         "properties": {
           "scenario": {
@@ -3144,6 +3862,26 @@
           },
           "city": {
             "$ref": "#/components/schemas/CityMap"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "agent_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -3748,6 +4486,186 @@
         ],
         "title": "SoilObservationEvent"
       },
+      "SourceStatus": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "demo"
+            ],
+            "title": "Mode"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "city": {
+            "type": "string",
+            "title": "City"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "poll_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poll Seconds"
+          },
+          "last_updated": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Updated"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mode",
+          "label",
+          "city",
+          "provider",
+          "latitude",
+          "longitude",
+          "poll_seconds",
+          "last_updated",
+          "last_error"
+        ],
+        "title": "SourceStatus",
+        "description": "Which data source feeds the bus: DEMO (the Nandipur simulation) or LIVE (real weather, real city)."
+      },
+      "SourceStatusEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "source.status",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SourceStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "SourceStatusEvent"
+      },
+      "SourceSwitch": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "demo"
+            ],
+            "title": "Mode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "title": "SourceSwitch"
+      },
       "StageInfo": {
         "properties": {
           "index": {
@@ -3877,6 +4795,53 @@
           "metadata"
         ],
         "title": "StoredChunk"
+      },
+      "TriggerInfo": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/TriggerName"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "description"
+        ],
+        "title": "TriggerInfo",
+        "description": "A DEMO button as the dashboard lists it (``GET /api/city``)."
+      },
+      "TriggerName": {
+        "type": "string",
+        "enum": [
+          "heavy_rain",
+          "landslide",
+          "drainage_block",
+          "flash_flood",
+          "industrial_fire",
+          "cascading_disaster"
+        ],
+        "title": "TriggerName"
+      },
+      "TriggerRequest": {
+        "properties": {
+          "trigger": {
+            "$ref": "#/components/schemas/TriggerName"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trigger"
+        ],
+        "title": "TriggerRequest"
       },
       "ValidationError": {
         "properties": {
@@ -4075,6 +5040,13 @@
           "summary": {
             "type": "string",
             "title": "Summary"
+          },
+          "hourly": {
+            "items": {
+              "$ref": "#/components/schemas/HourlyPrecipitation"
+            },
+            "type": "array",
+            "title": "Hourly"
           }
         },
         "additionalProperties": false,
@@ -4085,7 +5057,8 @@
           "expected_total_mm",
           "peak_intensity_mm_h",
           "confidence",
-          "summary"
+          "summary",
+          "hourly"
         ],
         "title": "WeatherForecast"
       },
@@ -4328,6 +5301,1144 @@
         ],
         "title": "WeatherState"
       },
+      "WorkflowAction": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "candidate_id": {
+            "type": "string",
+            "title": "Candidate Id"
+          },
+          "tool": {
+            "type": "string",
+            "title": "Tool"
+          },
+          "input": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "rationale": {
+            "type": "string",
+            "title": "Rationale"
+          },
+          "citation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Citation Ids"
+          },
+          "requires_approval": {
+            "type": "boolean",
+            "title": "Requires Approval"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action_id",
+          "candidate_id",
+          "tool",
+          "input",
+          "label",
+          "rationale",
+          "citation_ids",
+          "requires_approval"
+        ],
+        "title": "WorkflowAction"
+      },
+      "WorkflowActionResult": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "tool": {
+            "type": "string",
+            "title": "Tool"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "executed",
+              "unchanged",
+              "rejected",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "affected_entities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Affected Entities"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action_id",
+          "tool",
+          "status",
+          "message",
+          "affected_entities"
+        ],
+        "title": "WorkflowActionResult"
+      },
+      "WorkflowActionVerification": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "title": "Action Id"
+          },
+          "tool": {
+            "type": "string",
+            "title": "Tool"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowCheck"
+            },
+            "type": "array",
+            "title": "Checks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action_id",
+          "tool",
+          "status",
+          "checks"
+        ],
+        "title": "WorkflowActionVerification"
+      },
+      "WorkflowApprovalOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "approval_gate",
+            "title": "Node",
+            "default": "approval_gate"
+          },
+          "approval_id": {
+            "type": "string",
+            "title": "Approval Id"
+          },
+          "action_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Action Ids"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "approve",
+                  "reject"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "approval_id",
+          "action_ids",
+          "decision",
+          "note",
+          "decided_at"
+        ],
+        "title": "WorkflowApprovalOutput"
+      },
+      "WorkflowAssessmentOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "assess",
+            "title": "Node",
+            "default": "assess"
+          },
+          "hazard": {
+            "type": "string",
+            "enum": [
+              "landslide",
+              "flood"
+            ],
+            "title": "Hazard"
+          },
+          "band": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "watch",
+              "warning",
+              "critical"
+            ],
+            "title": "Band"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "grounded": {
+            "type": "boolean",
+            "title": "Grounded"
+          },
+          "cited_count": {
+            "type": "integer",
+            "title": "Cited Count"
+          },
+          "ungrounded_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ungrounded Ids"
+          },
+          "affected_zone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Affected Zone Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "hazard",
+          "band",
+          "confidence",
+          "grounded",
+          "cited_count",
+          "ungrounded_ids",
+          "affected_zone_ids"
+        ],
+        "title": "WorkflowAssessmentOutput"
+      },
+      "WorkflowCheck": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "passed": {
+            "type": "boolean",
+            "title": "Passed"
+          },
+          "expected": {
+            "type": "string",
+            "title": "Expected"
+          },
+          "observed": {
+            "type": "string",
+            "title": "Observed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "passed",
+          "expected",
+          "observed"
+        ],
+        "title": "WorkflowCheck"
+      },
+      "WorkflowChunk": {
+        "properties": {
+          "chunk_id": {
+            "type": "string",
+            "title": "Chunk Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "document_title": {
+            "type": "string",
+            "title": "Document Title"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "similarity": {
+            "type": "number",
+            "title": "Similarity"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "chunk_id",
+          "document_id",
+          "document_title",
+          "section",
+          "kind",
+          "similarity"
+        ],
+        "title": "WorkflowChunk"
+      },
+      "WorkflowClaim": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "citation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Citation Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "citation_ids"
+        ],
+        "title": "WorkflowClaim"
+      },
+      "WorkflowCompletionOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "complete",
+            "title": "Node",
+            "default": "complete"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "completed_with_failures",
+              "rejected"
+            ],
+            "title": "Outcome"
+          },
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowEntityState"
+            },
+            "type": "array",
+            "title": "Entities"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "outcome",
+          "entities"
+        ],
+        "title": "WorkflowCompletionOutput"
+      },
+      "WorkflowDecision": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject"
+            ],
+            "title": "Decision"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "decision"
+        ],
+        "title": "WorkflowDecision"
+      },
+      "WorkflowEntity": {
+        "properties": {
+          "table": {
+            "type": "string",
+            "title": "Table"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "table",
+          "id",
+          "name"
+        ],
+        "title": "WorkflowEntity"
+      },
+      "WorkflowEntityState": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Fields"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "fields"
+        ],
+        "title": "WorkflowEntityState"
+      },
+      "WorkflowEvidenceOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "retrieve",
+            "title": "Node",
+            "default": "retrieve"
+          },
+          "queries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Queries"
+          },
+          "chunks": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowChunk"
+            },
+            "type": "array",
+            "title": "Chunks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "queries",
+          "chunks"
+        ],
+        "title": "WorkflowEvidenceOutput"
+      },
+      "WorkflowExecutionOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "execute",
+            "title": "Node",
+            "default": "execute"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowActionResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "results"
+        ],
+        "title": "WorkflowExecutionOutput"
+      },
+      "WorkflowGraphOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "query_graph",
+            "title": "Node",
+            "default": "query_graph"
+          },
+          "start": {
+            "$ref": "#/components/schemas/WorkflowEntity"
+          },
+          "entity_count": {
+            "type": "integer",
+            "title": "Entity Count"
+          },
+          "edge_count": {
+            "type": "integer",
+            "title": "Edge Count"
+          },
+          "paths": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowPath"
+            },
+            "type": "array",
+            "title": "Paths"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "start",
+          "entity_count",
+          "edge_count",
+          "paths"
+        ],
+        "title": "WorkflowGraphOutput"
+      },
+      "WorkflowObserveOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "observe",
+            "title": "Node",
+            "default": "observe"
+          },
+          "headline": {
+            "type": "string",
+            "title": "Headline"
+          },
+          "signals": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowSignal"
+            },
+            "type": "array",
+            "title": "Signals"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "headline",
+          "signals"
+        ],
+        "title": "WorkflowObserveOutput"
+      },
+      "WorkflowPath": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowEntity"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "relations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Relations"
+          },
+          "citation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Citation Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nodes",
+          "relations",
+          "citation_ids"
+        ],
+        "title": "WorkflowPath",
+        "description": "``nodes[i] --relations[i]--> nodes[i+1]``, each hop backed by the KG edge in ``citation_ids[i]``."
+      },
+      "WorkflowPlanOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "recommend",
+            "title": "Node",
+            "default": "recommend"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "ollama",
+              "mock"
+            ],
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "candidate_count": {
+            "type": "integer",
+            "title": "Candidate Count"
+          },
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowAction"
+            },
+            "type": "array",
+            "title": "Actions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "provider",
+          "model",
+          "fallback_reason",
+          "duration_ms",
+          "candidate_count",
+          "actions"
+        ],
+        "title": "WorkflowPlanOutput"
+      },
+      "WorkflowReasoningOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "reason",
+            "title": "Node",
+            "default": "reason"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "ollama",
+              "mock"
+            ],
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "claims": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowClaim"
+            },
+            "type": "array",
+            "title": "Claims"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "provider",
+          "model",
+          "fallback_reason",
+          "duration_ms",
+          "summary",
+          "claims"
+        ],
+        "title": "WorkflowReasoningOutput"
+      },
+      "WorkflowReceiveOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "receive",
+            "title": "Node",
+            "default": "receive"
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "hazard": {
+            "type": "string",
+            "enum": [
+              "landslide",
+              "flood"
+            ],
+            "title": "Hazard"
+          },
+          "failure_kind": {
+            "type": "string",
+            "title": "Failure Kind"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/WorkflowEntity"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "zone_name": {
+            "type": "string",
+            "title": "Zone Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "citation_id": {
+            "type": "string",
+            "title": "Citation Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "event_id",
+          "hazard",
+          "failure_kind",
+          "asset",
+          "zone_id",
+          "zone_name",
+          "description",
+          "sim_time",
+          "citation_id"
+        ],
+        "title": "WorkflowReceiveOutput"
+      },
+      "WorkflowRun": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "trigger_event_id": {
+            "type": "string",
+            "title": "Trigger Event Id"
+          },
+          "hazard": {
+            "type": "string",
+            "enum": [
+              "landslide",
+              "flood"
+            ],
+            "title": "Hazard"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "asset_id": {
+            "type": "string",
+            "title": "Asset Id"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowStep"
+            },
+            "type": "array",
+            "title": "Steps"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run_id",
+          "trigger_event_id",
+          "hazard",
+          "zone_id",
+          "asset_id",
+          "provider",
+          "model",
+          "started_at",
+          "steps"
+        ],
+        "title": "WorkflowRun"
+      },
+      "WorkflowSignal": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "zone_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone Id"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "event_type",
+          "source",
+          "zone_id",
+          "severity",
+          "summary"
+        ],
+        "title": "WorkflowSignal"
+      },
+      "WorkflowStep": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "node": {
+            "type": "string",
+            "enum": [
+              "receive",
+              "observe",
+              "query_graph",
+              "retrieve",
+              "reason",
+              "assess",
+              "recommend",
+              "approval_gate",
+              "execute",
+              "verify",
+              "complete"
+            ],
+            "title": "Node"
+          },
+          "index": {
+            "type": "integer",
+            "maximum": 11.0,
+            "minimum": 1.0,
+            "title": "Index"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "done",
+              "waiting",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "output": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkflowReceiveOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowObserveOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowGraphOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowEvidenceOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowReasoningOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowAssessmentOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowPlanOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowApprovalOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowExecutionOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowVerificationOutput"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WorkflowCompletionOutput"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "node",
+                  "mapping": {
+                    "approval_gate": "#/components/schemas/WorkflowApprovalOutput",
+                    "assess": "#/components/schemas/WorkflowAssessmentOutput",
+                    "complete": "#/components/schemas/WorkflowCompletionOutput",
+                    "execute": "#/components/schemas/WorkflowExecutionOutput",
+                    "observe": "#/components/schemas/WorkflowObserveOutput",
+                    "query_graph": "#/components/schemas/WorkflowGraphOutput",
+                    "reason": "#/components/schemas/WorkflowReasoningOutput",
+                    "receive": "#/components/schemas/WorkflowReceiveOutput",
+                    "recommend": "#/components/schemas/WorkflowPlanOutput",
+                    "retrieve": "#/components/schemas/WorkflowEvidenceOutput",
+                    "verify": "#/components/schemas/WorkflowVerificationOutput"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run_id",
+          "node",
+          "index",
+          "status",
+          "started_at",
+          "finished_at",
+          "duration_ms",
+          "output",
+          "error"
+        ],
+        "title": "WorkflowStep",
+        "description": "The ``agent.step`` payload: the latest state of one node of one run."
+      },
+      "WorkflowVerificationOutput": {
+        "properties": {
+          "node": {
+            "type": "string",
+            "const": "verify",
+            "title": "Node",
+            "default": "verify"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "partially_verified",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "per_action": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowActionVerification"
+            },
+            "type": "array",
+            "title": "Per Action"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "status",
+          "per_action"
+        ],
+        "title": "WorkflowVerificationOutput"
+      },
       "WorldSnapshot": {
         "properties": {
           "tick": {
@@ -4432,6 +6543,13 @@
             },
             "type": "object",
             "title": "Shelters"
+          },
+          "fires": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FireState"
+            },
+            "type": "object",
+            "title": "Fires"
           }
         },
         "type": "object",
@@ -4451,7 +6569,8 @@
           "crews",
           "ambulances",
           "hospitals",
-          "shelters"
+          "shelters",
+          "fires"
         ],
         "title": "WorldSnapshot",
         "description": "Frozen, JSON-safe export of the whole world (``sim.snapshot`` and ``GET /api/simulation/snapshot``)."
@@ -4511,6 +6630,143 @@
           "saturation"
         ],
         "title": "ZoneConditions"
+      },
+      "ZoneStateEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "zone.state",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ZoneStatePayload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "ZoneStateEvent"
+      },
+      "ZoneStatePayload": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "saturation": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Saturation"
+          },
+          "rain_24h_mm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Rain 24H Mm"
+          },
+          "rain_intensity_mm_h": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Rain Intensity Mm H"
+          },
+          "landslide_index": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Landslide Index"
+          },
+          "flood_index": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Flood Index"
+          },
+          "band": {
+            "$ref": "#/components/schemas/Band"
+          },
+          "prev_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Band"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated Sim Time"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zone_id",
+          "saturation",
+          "rain_24h_mm",
+          "rain_intensity_mm_h",
+          "landslide_index",
+          "flood_index",
+          "band",
+          "prev_band",
+          "updated_sim_time"
+        ],
+        "title": "ZoneStatePayload",
+        "description": "One zone's risk indices after a tick (``gridline.threats.indices``): a signal, never a decision."
       }
     }
   }

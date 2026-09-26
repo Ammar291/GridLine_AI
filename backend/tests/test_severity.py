@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from gridline.city.model import City
 from gridline.events import payloads as p
-from gridline.events.types import EventType, Severity
+from gridline.events.types import Band, EventType, Severity
 from gridline.simulation.severity import severity_for
 
 NOW = datetime(2026, 7, 14, 6, 0, tzinfo=UTC)
@@ -17,6 +17,19 @@ INF, L, M, H, C = Severity.INFO, Severity.LOW, Severity.MODERATE, Severity.HIGH,
 def rain(mm_h: float, day_mm: float = 0, station: str = "RG-03") -> p.WeatherObservation:
     return p.WeatherObservation(
         station_id=station, rainfall_intensity_mm_h=mm_h, cumulative_rainfall_24h_mm=day_mm
+    )
+
+
+def zone(band: Band) -> p.ZoneStatePayload:
+    return p.ZoneStatePayload(
+        zone_id="Z-HV",
+        saturation=0.5,
+        rain_24h_mm=0,
+        rain_intensity_mm_h=0,
+        landslide_index=0,
+        flood_index=0,
+        band=band,
+        updated_sim_time=NOW,
     )
 
 
@@ -195,6 +208,16 @@ CASES: list[tuple[EventType, BaseModel, Severity]] = [
     (EventType.WEATHER_FORECAST, forecast(10), INF),
     (EventType.WEATHER_FORECAST, forecast(35), M),
     (EventType.WEATHER_FORECAST, forecast(55), H),
+    (EventType.WEATHER_RAINFALL, p.RainfallDriver(intensity_mm_h=5, duration_h=1), INF),
+    (EventType.WEATHER_RAINFALL, p.RainfallDriver(intensity_mm_h=20, duration_h=1), L),
+    (EventType.WEATHER_RAINFALL, p.RainfallDriver(intensity_mm_h=35, duration_h=1), M),
+    (EventType.WEATHER_RAINFALL, p.RainfallDriver(intensity_mm_h=60, duration_h=1), H),
+    (EventType.EMERGENCY_FIRE, p.IndustrialFire(zone_id="Z-MI", site="s", exposed_population=5000), H),
+    (EventType.EMERGENCY_FIRE, p.IndustrialFire(zone_id="Z-MI", site="s", exposed_population=80000), C),
+    (EventType.ZONE_STATE, zone(Band.NORMAL), INF),
+    (EventType.ZONE_STATE, zone(Band.WATCH), M),
+    (EventType.ZONE_STATE, zone(Band.WARNING), H),
+    (EventType.ZONE_STATE, zone(Band.CRITICAL), C),
     (EventType.SIM_HEARTBEAT, p.Heartbeat(tick=1, sim_time=NOW), INF),
     (
         EventType.SCENARIO_STAGE,

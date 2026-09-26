@@ -10,6 +10,37 @@ const opened = () => applyEvent(base(), ev['incident.opened']);
 const assets = (s: LiveState) => liveAssets(s.city, s.world, s.readings);
 const at = <T extends Event>(e: T, sim_time: string): T => ({ ...e, sim_time });
 
+describe('applyEvent: DEMO controls', () => {
+  it('a scenario.trigger is a city-wide timeline marker', () => {
+    const s = applyEvent(base(), ev['scenario.trigger']);
+    expect(s.milestones.at(-1)).toMatchObject({ kind: 'scenario', label: 'Flash Flood', simTime: ev['scenario.trigger'].sim_time });
+    expect(s.milestones.at(-1)?.zoneId).toBeUndefined();
+  });
+
+  it('an emergency.fire records the fire in the world and marks its zone', () => {
+    const s = applyEvent(base(), ev['emergency.fire']);
+    expect(s.world?.fires.riverside).toEqual({ site: 'fixture warehouse', exposed_zone_ids: ['riverside', 'old_town'], exposed_population: 80000 });
+    expect(s.milestones.at(-1)).toMatchObject({ kind: 'infrastructure', label: 'Fire: fixture warehouse', zoneId: 'riverside' });
+  });
+
+  it('weather.rainfall lands in the feed only', () => {
+    const before = base();
+    const s = applyEvent(before, ev['weather.rainfall']);
+    expect(s.feed.at(-1)).toBe(ev['weather.rainfall']);
+    expect(s.milestones).toEqual(before.milestones);
+    expect(s.world).toEqual(before.world);
+  });
+
+  it('a zone.state without a band change is routine: a full feed drops it first', () => {
+    const quiet = { ...ev['zone.state'], event_id: 'quiet', payload: { ...ev['zone.state'].payload, prev_band: 'warning' as const } };
+    let s = applyEvent(applyEvent(base(), quiet), ev['zone.state']);
+    for (let i = 0; s.feed.length < FEED_CAP; i++) s = applyEvent(s, { ...ev['infrastructure.road'], event_id: `r${String(i)}` });
+    s = applyEvent(s, ev['infrastructure.bridge']);
+    expect(s.feed.some((e) => e.event_id === 'quiet')).toBe(false);
+    expect(s.feed.some((e) => e.event_id === ev['zone.state'].event_id)).toBe(true);
+  });
+});
+
 describe('applyEvent: backend events', () => {
   it('the snapshot sets city, world and sim, and the dashboard derives live assets from them', () => {
     const s = base();

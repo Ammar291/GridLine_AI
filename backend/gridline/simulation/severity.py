@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from gridline.city.model import PolicyThresholds
 from gridline.events import payloads as p
-from gridline.events.types import SEVERITY_ORDER, EventType, Severity
+from gridline.events.types import SEVERITY_ORDER, Band, EventType, Severity
 
 RAIN_LOW_MM_H = 10.0  # below this rainfall intensity a reading is info
 WIND_LOW_KMH = 40.0  # below this sustained wind a reading is info
@@ -23,6 +23,7 @@ WATER_LOW_CM = 1.0
 WATER_MODERATE_CM = 10.0
 WATER_CRITICAL_CM = 50.0
 OBSTRUCTION_BANDS = (0.1, 0.25, 0.5, 0.8)  # blocked fraction: low, moderate, high, critical lower bounds
+FIRE_CRITICAL_POPULATION = 20000  # exposed people from which a fire is critical rather than high
 
 INF, L, M, H, C = Severity.INFO, Severity.LOW, Severity.MODERATE, Severity.HIGH, Severity.CRITICAL
 
@@ -131,6 +132,19 @@ def _forecast(obs: p.WeatherForecast, t: PolicyThresholds) -> Severity:
     return banded(obs.peak_intensity_mm_h, [(t.rain_1h_watch_mm_h, M), (t.rain_1h_warning_mm_h, H)])
 
 
+def _rainfall(obs: p.RainfallDriver, t: PolicyThresholds) -> Severity:
+    rain = [(RAIN_LOW_MM_H, L), (t.rain_1h_watch_mm_h, M), (t.rain_1h_warning_mm_h, H)]
+    return banded(obs.intensity_mm_h, rain)
+
+
+def _fire(obs: p.IndustrialFire, _: PolicyThresholds) -> Severity:
+    return C if obs.exposed_population >= FIRE_CRITICAL_POPULATION else H
+
+
+def _zone_state(obs: p.ZoneStatePayload, _: PolicyThresholds) -> Severity:
+    return {Band.NORMAL: INF, Band.WATCH: M, Band.WARNING: H, Band.CRITICAL: C}[obs.band]
+
+
 Rule = Callable[[BaseModel, PolicyThresholds], Severity]
 
 
@@ -146,6 +160,8 @@ def _band[P: BaseModel](kind: type[P], rule: Callable[[P, PolicyThresholds], Sev
 RULES: dict[EventType, Rule] = {
     EventType.WEATHER_OBSERVATION: _band(p.WeatherObservation, _weather),
     EventType.WEATHER_FORECAST: _band(p.WeatherForecast, _forecast),
+    EventType.WEATHER_RAINFALL: _band(p.RainfallDriver, _rainfall),
+    EventType.ZONE_STATE: _band(p.ZoneStatePayload, _zone_state),
     EventType.ENVIRONMENT_SOIL: _band(p.SoilObservation, _soil),
     EventType.ENVIRONMENT_RIVER: _band(p.RiverObservation, _river),
     EventType.ENVIRONMENT_DRAINAGE: _band(p.DrainageObservation, _drainage),
@@ -160,6 +176,7 @@ RULES: dict[EventType, Rule] = {
     EventType.EMERGENCY_AMBULANCE: _band(p.AmbulanceStatus, _ambulance),
     EventType.EMERGENCY_HOSPITAL: _band(p.HospitalCapacity, _hospital),
     EventType.EMERGENCY_SHELTER: _band(p.ShelterCapacity, _shelter),
+    EventType.EMERGENCY_FIRE: _band(p.IndustrialFire, _fire),
 }
 
 

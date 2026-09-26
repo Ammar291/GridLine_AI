@@ -28,14 +28,22 @@ def weather_at(scenario: Scenario, tick: int) -> WeatherState:
 
 
 def apply_drivers(world: WorldState, city: City, scenario: Scenario, tick: int, dt_h: float) -> None:
-    """Scenario rain per zone (and its 24 h window) and city-wide weather for this tick."""
+    """Scenario rain per zone, raised to operator rain still in force (and its 24 h window), and weather."""
     for zone in city.zones:
         state = world.zones[zone.id]
-        state.rainfall_intensity_mm_h = scenario.rain_at(zone.id, tick)
+        state.rainfall_intensity_mm_h = _rain(world, scenario, zone.id, tick)
         window = world.rain_window[zone.id]
         window.append(state.rainfall_intensity_mm_h * dt_h)
         state.rain_24h_mm = sum(window)
     world.weather = weather_at(scenario, tick)
+
+
+def _rain(world: WorldState, scenario: Scenario, zone_id: str, tick: int) -> float:
+    rain = scenario.rain_at(zone_id, tick)
+    override = world.rain_overrides.get(zone_id)
+    if override is not None and world.sim_time <= override.until:
+        rain = max(rain, override.intensity_mm_h)
+    return rain
 
 
 def slope_cut_m(world: WorldState, city: City, slope_id: str) -> float:

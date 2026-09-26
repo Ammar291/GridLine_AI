@@ -5,6 +5,7 @@ import { useLiveStore } from '@/live/liveStore';
 import { useLiveAssets } from '@/live/useLiveAssets';
 import { useUiStore } from '@/ui/uiStore';
 import { statusLabel } from '@/live/format';
+import { dataModeOf } from '@/live/liveWeather';
 import { StatTile } from './StatTile';
 
 const DASH = '—';
@@ -18,6 +19,8 @@ export function OverviewStrip() {
   const world = useLiveStore((s) => s.world);
   const city = useLiveStore((s) => s.city);
   const assets = useLiveAssets();
+  const source = useLiveStore((s) => s.source);
+  const live = dataModeOf({ source }) === 'live';
   const selectIncident = useUiStore((s) => s.selectIncident);
   const selectEntity = useUiStore((s) => s.selectEntity);
 
@@ -36,7 +39,7 @@ export function OverviewStrip() {
     <div data-testid="overview-strip" aria-busy={!hasSnapshot} className="grid grid-cols-[auto_1.3fr_1fr_1fr_1fr_1fr_1.6fr] h-full bg-panel border-b border-line">
       <div className="flex flex-col justify-center px-4 border-r border-line">
         <h1 className="condensed text-[17px] font-semibold leading-5">GridLine AI</h1>
-        <span className="text-[11px] text-ink-2">Nandipur emergency operations</span>
+        <span className="text-[11px] text-ink-2">{`${source?.city ?? 'Nandipur'} emergency operations`}</span>
       </div>
       <StatTile label="City status" value={hasSnapshot && status ? status.label : DASH} band={hasSnapshot ? status?.band : undefined}
         detail={hasSnapshot ? (status ? `Highest band across ${String(Object.keys(zoneState).length)} zones` : 'No threat detector readings yet') : undefined} />
@@ -61,8 +64,8 @@ export function OverviewStrip() {
       <StatTile label="Active incidents" value={hasSnapshot ? String(openCount) : DASH} onClick={selectTop} />
       <StatTile
         label="Emergency resources"
-        value={hasSnapshot ? `${String(res.crewsAvailable)} of ${String(res.crewsTotal)}` : DASH}
-        detail={hasSnapshot
+        value={hasSnapshot && !live ? `${String(res.crewsAvailable)} of ${String(res.crewsTotal)}` : DASH}
+        detail={live ? 'No live resource feed for this city' : hasSnapshot
           ? `crews free · ${String(res.ambulancesAvailable)}/${String(res.ambulancesTotal)} ambulances · ${String(res.pumpsAtDepot)}/${String(res.pumpsTotal)} pumps · ${String(res.sheltersOpen)} shelters open · ${cut}`
           : undefined}
       />

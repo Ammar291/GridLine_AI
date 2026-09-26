@@ -1,5 +1,8 @@
 import type { ApiMode } from '@/api/client';
-import type { Action, Alert, Approval, Band, City, Event, Incident, SimStatus, WorldSnapshot, ZoneState } from '@/api/types';
+import type {
+  Action, Alert, Approval, Band, City, Event, Incident, Severity, SimStatus, SourceStatus, WeatherForecast, WeatherObservation, WorkflowStep,
+  WorldSnapshot, ZoneState,
+} from '@/api/types';
 
 export type ConnectionStatus = 'connecting' | 'open' | 'reconnecting' | 'closed';
 export type RunnerState = SimStatus['state'];
@@ -50,9 +53,26 @@ export interface Milestone {
   band?: Band;
 }
 
+/** LIVE mode's latest Open-Meteo reading, with the band the backend gave it and when it was observed. */
+export type LiveObservation = WeatherObservation & { severity: Severity; observedAt: string };
+
+export interface LiveWeather {
+  observation: LiveObservation | null;
+  forecast: WeatherForecast | null;
+}
+
+/** The live agent workflow run: one step per graph node reached so far, sorted by index. Header facts come from outputs. */
+export interface AgentRunState {
+  runId: string;
+  steps: WorkflowStep[];
+}
+
 export interface LiveState {
   connection: ConnectionStatus;
   mode: ApiMode;
+  /** LIVE or DEMO data source (null until the backend says; treated as DEMO). */
+  source: SourceStatus | null;
+  liveWeather: LiveWeather;
   hasSnapshot: boolean;
   sim: SimState;
   /** Static city from the snapshot (GET /api/city serves the same). */
@@ -71,6 +91,8 @@ export interface LiveState {
   /** Per zone, capped at TELEMETRY_CAP. */
   telemetry: Record<string, TelemetryPoint[]>;
   milestones: Milestone[];
+  /** The latest agent.step run (sim.snapshot's agent_run on connect), null until a disaster starts one. */
+  agentRun: AgentRunState | null;
 }
 
 export const FEED_CAP = 500;
@@ -85,6 +107,8 @@ export function initialLiveState(mode: ApiMode): LiveState {
   return {
     connection: 'connecting',
     mode,
+    source: null,
+    liveWeather: { observation: null, forecast: null },
     hasSnapshot: false,
     sim: initialSim(),
     city: null,
@@ -98,5 +122,6 @@ export function initialLiveState(mode: ApiMode): LiveState {
     feed: [],
     telemetry: {},
     milestones: [],
+    agentRun: null,
   };
 }

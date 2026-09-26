@@ -54,7 +54,9 @@ def test_one_tick_emits_one_observation_per_sensor_then_sim_tick(city: City) -> 
     assert all(e.source == "simulation:engine" for e in slope_events)
     observed = len(city.sensors) + len(monitored)
     construction = [e for e in events if e.event_type == EventType.INFRASTRUCTURE_CONSTRUCTION]
-    assert len(events) == observed + len(construction) + 1
+    zone_states = [e for e in events if e.event_type == EventType.ZONE_STATE]
+    assert [e.location for e in zone_states] == [z.id for z in city.zones]  # one risk reading per zone
+    assert len(events) == observed + len(construction) + len(zone_states) + 1
 
 
 def test_sensor_payloads_carry_their_ids_and_units(city: City) -> None:

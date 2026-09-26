@@ -5,7 +5,9 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import BaseModel, ValidationError
 
+from gridline.agents.steps import WorkflowStep
 from gridline.events import payloads as p
+from gridline.events.types import Band
 
 NOW = datetime(2026, 7, 14, 6, 0, tzinfo=UTC)
 STATUS = p.SimStatus(
@@ -18,6 +20,7 @@ VALID: list[BaseModel] = [
     p.SimSnapshot(status=STATUS, world={"tick": 0}),
     p.Heartbeat(tick=0, sim_time=NOW),
     p.ScenarioStage(scenario="normal_city", stage_index=0, stage="steady_state", description="d", tick=0),
+    p.SourceStatus(mode="live", label="LIVE — KDMC", city="Kalyan-Dombivli", provider="Open-Meteo"),
     p.WeatherObservation(station_id="RG-02", rainfall_intensity_mm_h=0, cumulative_rainfall_24h_mm=0),
     p.WeatherForecast(
         issued_sim_time=NOW,
@@ -61,6 +64,20 @@ VALID: list[BaseModel] = [
     p.AmbulanceStatus(ambulance_id="AMB-06", status="dispatched", location_zone_id="Z-RS"),
     p.HospitalCapacity(hospital_id="H-2", beds_occupied=63, er_status="normal"),
     p.ShelterCapacity(shelter_id="S-5", status="closed", occupancy=0),
+    p.RainfallDriver(zone_ids=["Z-HV"], intensity_mm_h=60, duration_h=3, description="cloudburst"),
+    p.IndustrialFire(zone_id="Z-MI", site="Mill Road warehouse"),
+    p.ZoneStatePayload(
+        zone_id="Z-HV",
+        saturation=0.5,
+        rain_24h_mm=10,
+        rain_intensity_mm_h=2,
+        landslide_index=0.2,
+        flood_index=0.1,
+        band=Band.NORMAL,
+        updated_sim_time=NOW,
+    ),
+    p.ScenarioTrigger(trigger="heavy_rain", label="Heavy Rain", description="d", tick=0),
+    WorkflowStep(run_id="run-1", node="observe", index=2, status="running", started_at=NOW),
 ]
 
 
@@ -90,6 +107,7 @@ INVALID: list[tuple[type[BaseModel], dict[str, object]]] = [
     (p.SimSnapshot, {"status": {}, "world": {}}),
     (p.Heartbeat, {"tick": 0}),
     (p.ScenarioStage, {"scenario": "x", "stage_index": -1, "stage": "s", "description": "d", "tick": 0}),
+    (p.SourceStatus, {"mode": "staging", "label": "l", "city": "c", "provider": "p"}),
     (p.WeatherObservation, {"station_id": "RG-02", "rainfall_intensity_mm_h": -1}),
     (p.WeatherObservation, {"station_id": "WS-01", "wind_speed_kmh": 3, "wind_direction_deg": 360}),
     (
@@ -162,6 +180,27 @@ INVALID: list[tuple[type[BaseModel], dict[str, object]]] = [
     ),
     (p.HospitalCapacity, {"hospital_id": "H-2", "beds_occupied": -1, "er_status": "normal"}),
     (p.ShelterCapacity, {"shelter_id": "S-5", "status": "open", "occupancy": -1}),
+    (p.RainfallDriver, {"intensity_mm_h": 0, "duration_h": 1}),
+    (p.RainfallDriver, {"intensity_mm_h": 20, "duration_h": 25}),
+    (p.IndustrialFire, {"zone_id": "Z-MI", "site": "s", "exposed_population": -1}),
+    (
+        p.ZoneStatePayload,
+        {
+            "zone_id": "Z-HV",
+            "saturation": 0.5,
+            "rain_24h_mm": 0,
+            "rain_intensity_mm_h": 0,
+            "landslide_index": 1.5,
+            "flood_index": 0,
+            "band": "normal",
+            "updated_sim_time": NOW,
+        },
+    ),
+    (p.ScenarioTrigger, {"trigger": "heavy_rain", "label": "l", "description": "d", "tick": -1}),
+    (
+        WorkflowStep,
+        {"run_id": "run-1", "node": "observe", "index": 12, "status": "running", "started_at": NOW},
+    ),
 ]
 
 

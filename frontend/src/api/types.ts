@@ -23,6 +23,8 @@ export type PumpUnit = S['PumpUnit'];
 export type MapFeature = S['MapFeature'];
 export type Scenario = S['ScenarioInfo'];
 export type InjectionPreset = S['InjectionPreset'];
+export type TriggerInfo = S['TriggerInfo'];
+export type TriggerName = S['TriggerName'];
 
 // ---- live world: sim.snapshot, then kept current by events ----
 export type WorldSnapshot = S['WorldSnapshot'];
@@ -35,14 +37,23 @@ export type CrewState = S['CrewState'];
 export type ShelterState = S['ShelterState'];
 export type HospitalState = S['HospitalState'];
 export type SlopeState = S['SlopeState'];
+export type FireState = S['FireState'];
 
 // ---- simulation control and sources ----
 export type Health = S['Health'];
 export type SimulationStatus = S['SimulationStatus'];
 export type SimulationStart = S['SimulationStart'];
 export type InjectRequest = S['InjectRequest'];
+export type TriggerRequest = S['TriggerRequest'];
 export type Chunk = S['StoredChunk'];
 export type Severity = S['Severity'];
+
+// ---- data source: LIVE (Open-Meteo, Kalyan-Dombivli) or DEMO (Nandipur simulation) ----
+export type SourceStatus = S['SourceStatus'];
+export type DataMode = SourceStatus['mode'];
+export type WeatherObservation = S['WeatherObservation'];
+export type WeatherForecast = S['WeatherForecast'];
+export type HourlyPrecipitation = S['HourlyPrecipitation'];
 
 // ---- events: the backend's union plus the pending events of later milestones ----
 export type Event = S['Event'];
@@ -51,13 +62,37 @@ export type SimStatus = S['SimStatus'];
 export type EventType = Event['event_type'];
 export type EventOf<T extends EventType> = Extract<Event, { event_type: T }>;
 
-// ---- PENDING (openapi.pending.yaml): threat detector, incidents and agent, approvals and actions, alerts, LLM ----
-export type LlmStatus = S['LlmStatus'];
+// ---- risk indices: zone.state and GET /api/detector/bands ----
 export type Band = S['Band'];
-export type Hazard = S['Hazard'];
 export type Bands = S['Bands'];
 export type BandThresholds = S['BandThresholds'];
-export type ZoneState = S['ZoneState'];
+/** A zone's indices as the dashboard keeps them: the zone.state payload without its key and previous band. */
+export type ZoneState = Omit<S['ZoneStatePayload'], 'zone_id' | 'prev_band'>;
+
+// ---- live agent workflow: agent.step events, sim.snapshot's agent_run, POST /api/agent/runs/{run_id}/approval ----
+export type WorkflowRun = S['WorkflowRun'];
+export type WorkflowStep = S['WorkflowStep'];
+export type WorkflowNode = WorkflowStep['node'];
+export type WorkflowStepStatus = WorkflowStep['status'];
+export type WorkflowOutput = NonNullable<WorkflowStep['output']>;
+export type WorkflowDecision = S['WorkflowDecision'];
+export type WorkflowEntity = S['WorkflowEntity'];
+export type WorkflowReceiveOutput = S['WorkflowReceiveOutput'];
+export type WorkflowObserveOutput = S['WorkflowObserveOutput'];
+export type WorkflowGraphOutput = S['WorkflowGraphOutput'];
+export type WorkflowPath = S['WorkflowPath'];
+export type WorkflowEvidenceOutput = S['WorkflowEvidenceOutput'];
+export type WorkflowReasoningOutput = S['WorkflowReasoningOutput'];
+export type WorkflowAssessmentOutput = S['WorkflowAssessmentOutput'];
+export type WorkflowPlanOutput = S['WorkflowPlanOutput'];
+export type WorkflowApprovalOutput = S['WorkflowApprovalOutput'];
+export type WorkflowExecutionOutput = S['WorkflowExecutionOutput'];
+export type WorkflowVerificationOutput = S['WorkflowVerificationOutput'];
+export type WorkflowCompletionOutput = S['WorkflowCompletionOutput'];
+
+// ---- PENDING (openapi.pending.yaml): threat detector, incidents and agent, approvals and actions, alerts, LLM ----
+export type LlmStatus = S['LlmStatus'];
+export type Hazard = S['Hazard'];
 export type IncidentSummary = S['IncidentSummary'];
 export type Incident = S['Incident'];
 export type IncidentStatus = S['IncidentStatus'];

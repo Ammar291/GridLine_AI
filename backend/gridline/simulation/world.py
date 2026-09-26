@@ -31,6 +31,13 @@ class WeatherState(BaseModel):
     wind_direction_deg: float
 
 
+class RainOverride(BaseModel):
+    """Operator rain on one zone until a sim time (``weather.rainfall``); internal, not in the snapshot."""
+
+    intensity_mm_h: float
+    until: AwareDatetime
+
+
 class ZoneConditions(BaseModel):
     saturation: float
     rainfall_intensity_mm_h: float = 0.0
@@ -97,6 +104,12 @@ class ShelterState(BaseModel):
     occupancy: int
 
 
+class FireState(BaseModel):
+    site: str
+    exposed_zone_ids: list[str]
+    exposed_population: int
+
+
 class WorldSnapshot(BaseModel):
     """Frozen, JSON-safe export of the whole world (``sim.snapshot`` and ``GET /api/simulation/snapshot``)."""
 
@@ -118,6 +131,7 @@ class WorldSnapshot(BaseModel):
     ambulances: dict[str, AmbulanceState]
     hospitals: dict[str, HospitalState]
     shelters: dict[str, ShelterState]
+    fires: dict[str, FireState]
 
 
 def _copies[M: BaseModel](states: dict[str, M]) -> dict[str, M]:
@@ -143,6 +157,8 @@ class WorldState:
     hospitals: dict[str, HospitalState]
     shelters: dict[str, ShelterState]
     forecast: WeatherForecast | None = field(default=None)
+    rain_overrides: dict[str, RainOverride] = field(default_factory=dict[str, RainOverride])
+    fires: dict[str, FireState] = field(default_factory=dict[str, FireState])  # keyed by zone id
 
     @classmethod
     def from_city(
@@ -203,4 +219,5 @@ class WorldState:
             ambulances=_copies(self.ambulances),
             hospitals=_copies(self.hospitals),
             shelters=_copies(self.shelters),
+            fires=_copies(self.fires),
         )

@@ -2,8 +2,9 @@
 // shapes. It never fabricates reasoning, approvals, actions or verification: those endpoints answer 501 or empty.
 import { ApiError, type ApiClient, type SocketHandle, type SocketHandlers } from '@/api/client';
 import type {
-  Action, Approval, ApprovalDecision, Bands, Chunk, City, Document, Event, EventOf, EventType, Health, Incident,
-  IncidentSummary, InjectRequest, LlmStatus, SimStatus, SimulationStart, SimulationStatus, WorldSnapshot,
+  Action, Approval, ApprovalDecision, Bands, Chunk, City, DataMode, Document, Event, EventOf, EventType, Health, Incident,
+  IncidentSummary, InjectRequest, LlmStatus, SimStatus, SimulationStart, SimulationStatus, SourceStatus, TriggerRequest,
+  WorkflowDecision, WorkflowRun, WorldSnapshot,
 } from '@/api/types';
 import { applyEvent } from '@/live/applyEvent';
 import { initialLiveState, type LiveState } from '@/live/types';
@@ -15,6 +16,11 @@ import { buildReplay, MOCK_BANDS, REPLAY_SCENARIO, REPLAY_SEED, REPLAY_TICKS, si
 /** Both fixtures are written by the backend (`npm run gen:contract`); never edit them by hand. */
 export const nandipurCity = cityJson as City;
 export const nandipurWorld = worldJson as WorldSnapshot;
+
+const MOCK_DEMO_SOURCE: SourceStatus = {
+  mode: 'demo', label: 'DEMO — Nandipur', city: 'Nandipur', provider: 'Synthetic simulation', latitude: null, longitude: null,
+  poll_seconds: null, last_updated: null, last_error: null,
+};
 
 const notInMock = () => Promise.reject(new ApiError(501, { detail: 'Not available in mock mode' }, 'Not available in mock mode'));
 
@@ -83,7 +89,14 @@ export class MockApiClient implements ApiClient {
       return Promise.resolve(this.announce());
     },
     inject: (_body: InjectRequest): Promise<Event[]> => notInMock(),
+    trigger: (_body: TriggerRequest): Promise<Event[]> => notInMock(),
   };
+
+  // Mock mode replays the Nandipur simulation only; LIVE data needs the backend (and the network).
+  source(): Promise<SourceStatus> { return Promise.resolve({ ...MOCK_DEMO_SOURCE }); }
+  setSource(mode: DataMode): Promise<SourceStatus> {
+    return mode === 'demo' ? this.source() : Promise.reject(new ApiError(501, { detail: 'LIVE mode needs the backend' }, 'LIVE mode needs the backend'));
+  }
 
   // ---- PENDING endpoints: what mock mode can honestly answer ----
   llmStatus(): Promise<LlmStatus> { return Promise.resolve({ provider: 'none', model: null }); }
@@ -115,6 +128,9 @@ export class MockApiClient implements ApiClient {
   }
 
   approvals(): Promise<Approval[]> { return Promise.resolve([]); }
+  decideRunApproval(_runId: string, _body: WorkflowDecision): Promise<WorkflowRun> {
+    return Promise.reject(new ApiError(501, { detail: 'The agent is not available in mock mode' }, 'The agent is not available in mock mode'));
+  }
   decide(_id: string, _body: ApprovalDecision): Promise<Approval> { return notInMock(); }
   actions(): Promise<Action[]> { return Promise.resolve([]); }
   action(_id: string): Promise<Action> { return Promise.reject(new ApiError(404, { detail: 'Action not found' })); }

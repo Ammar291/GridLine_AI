@@ -27,22 +27,25 @@ export function buildRows(points: TelemetryPoint[]): TimelineRow[] {
 }
 
 /**
- * Milestones for this zone whose sim time is one of the rows (the x axis is categorical, so a marker can only sit
- * on an existing reading). A milestone that names a zone matches on that zone; one without a zone (approval,
- * action, re-plan) matches through its incident's zone when `incidents` is given; one with neither is city-wide.
+ * Milestones for this zone, each placed on the first row at or after its sim time: the x axis is categorical, so a
+ * marker can only sit on an existing reading (one after the last reading waits for the next). A milestone that names
+ * a zone matches on that zone; one without a zone (approval, action, re-plan) matches through its incident's zone
+ * when `incidents` is given; one with neither is city-wide.
  */
 export function milestoneMarkers(
   milestones: Milestone[], zoneId: string, rows: TimelineRow[], incidents: Record<string, Incident> = {},
 ): TimelineMarker[] {
-  const times = new Set(rows.map((r) => r.simTime));
   const inZone = (m: Milestone) => {
     if (m.zoneId !== undefined) return m.zoneId === zoneId;
     if (m.incidentId !== undefined) return incidents[m.incidentId]?.zone_id === zoneId;
-    return true; // city-wide (a scenario stage): marked on every zone's chart
+    return true; // city-wide (a scenario stage or a demo event): marked on every zone's chart
   };
-  return milestones.flatMap((m) =>
-    m.simTime !== null && times.has(m.simTime) && inZone(m) ? [{ id: m.id, simTime: m.simTime, label: m.label, kind: m.kind }] : [],
-  );
+  return milestones.flatMap((m) => {
+    const at = m.simTime;
+    if (at === null || !inZone(m)) return [];
+    const row = rows.find((r) => r.simTime >= at);
+    return row ? [{ id: m.id, simTime: row.simTime, label: m.label, kind: m.kind }] : [];
+  });
 }
 
 /** One marker per sim time; the labels of every milestone at that time are kept, in order. */

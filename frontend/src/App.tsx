@@ -9,18 +9,26 @@ import { EventFeed } from '@/components/events/EventFeed';
 import { IncidentPanel } from '@/components/incident/IncidentPanel';
 import { Dashboard } from '@/components/layout/Dashboard';
 import { CityMap } from '@/components/map/CityMap';
+import { LiveConditions } from '@/components/source/LiveConditions';
+import { LiveForecast } from '@/components/source/LiveForecast';
 import { RiskTimeline } from '@/components/timeline/RiskTimeline';
+import { WorkflowPanel } from '@/components/workflow/WorkflowPanel';
+import { useLiveStore } from '@/live/liveStore';
+import { dataModeOf } from '@/live/liveWeather';
 import { useLive } from '@/live/useLive';
 
 function Shell() {
   const client = useApiClient();
   useLive(client);
+  // One pipeline for both modes; only the data source differs, so only the source-specific panels swap.
+  const live = useLiveStore((s) => dataModeOf(s) === 'live');
+  const hasAgentRun = useLiveStore((s) => s.agentRun !== null);
   return (
     <Dashboard
-      map={<CityMap />}
-      timeline={<RiskTimeline />}
+      map={live ? <LiveConditions /> : <CityMap />}
+      timeline={live ? <LiveForecast /> : <RiskTimeline />}
       feed={<EventFeed />}
-      incident={<IncidentPanel />}
+      incident={hasAgentRun ? <WorkflowPanel /> : <IncidentPanel />}
       approvals={<ApprovalsInbox />}
       actions={<ActionsLog />}
     />

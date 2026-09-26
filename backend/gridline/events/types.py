@@ -14,14 +14,27 @@ class Severity(StrEnum):
 SEVERITY_ORDER: tuple[Severity, ...] = tuple(Severity)
 
 
+class Band(StrEnum):
+    """A zone's risk band from its landslide and flood indices (``gridline.threats.indices``)."""
+
+    NORMAL = "normal"
+    WATCH = "watch"
+    WARNING = "warning"
+    CRITICAL = "critical"
+
+
 class EventType(StrEnum):
     SIM_TICK = "sim.tick"
     SIM_STATUS = "sim.status"
     SIM_SNAPSHOT = "sim.snapshot"
     SIM_HEARTBEAT = "sim.heartbeat"
     SCENARIO_STAGE = "scenario.stage"
+    SCENARIO_TRIGGER = "scenario.trigger"
+    ZONE_STATE = "zone.state"
+    SOURCE_STATUS = "source.status"
     WEATHER_OBSERVATION = "weather.observation"
     WEATHER_FORECAST = "weather.forecast"
+    WEATHER_RAINFALL = "weather.rainfall"
     ENVIRONMENT_SOIL = "environment.soil"
     ENVIRONMENT_RIVER = "environment.river"
     ENVIRONMENT_DRAINAGE = "environment.drainage"
@@ -36,11 +49,14 @@ class EventType(StrEnum):
     EMERGENCY_AMBULANCE = "emergency.ambulance"
     EMERGENCY_HOSPITAL = "emergency.hospital"
     EMERGENCY_SHELTER = "emergency.shelter"
+    EMERGENCY_FIRE = "emergency.fire"
+    AGENT_STEP = "agent.step"
 
 
 INJECTABLE_TYPES: frozenset[EventType] = frozenset(
     {
         EventType.WEATHER_FORECAST,
+        EventType.WEATHER_RAINFALL,
         EventType.INFRASTRUCTURE_ROAD,
         EventType.INFRASTRUCTURE_BRIDGE,
         EventType.INFRASTRUCTURE_DRAINAGE_OBSTRUCTION,
@@ -50,5 +66,6 @@ INJECTABLE_TYPES: frozenset[EventType] = frozenset(
         EventType.EMERGENCY_AMBULANCE,
         EventType.EMERGENCY_HOSPITAL,
         EventType.EMERGENCY_SHELTER,
+        EventType.EMERGENCY_FIRE,
     }
 )

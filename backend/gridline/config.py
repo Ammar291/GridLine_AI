@@ -6,6 +6,8 @@ from typing import Literal
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from gridline.events.payloads import DataMode
+
 EmbeddingProvider = Literal["auto", "fastembed", "hashed"]
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -33,6 +35,16 @@ class Settings(BaseSettings):
     sim_autostart: bool = False
     ws_heartbeat_seconds: float = Field(default=15.0, gt=0)
     event_queue_size: int = Field(default=1000, ge=1)
+
+    data_mode: DataMode = "demo"  # the mode at startup; switchable at runtime via POST /api/source
+    live_poll_seconds: float = Field(default=300.0, gt=0, description="Open-Meteo poll interval in LIVE mode")
+    live_forecast_base_url: str = "https://api.open-meteo.com/v1/forecast"
+
+    # The agent's LLM: a local Ollama model; "mock" uses the offline heuristic reasoner only.
+    llm_provider: Literal["ollama", "mock"] = "ollama"
+    ollama_host: str = "http://127.0.0.1:11434"  # IPv4: "localhost" can stall trying ::1 first on Windows
+    ollama_model: str = "qwen2.5:7b-instruct"
+    llm_timeout_seconds: float = Field(default=180.0, gt=0)
 
     def resolved_corpus_dir(self) -> Path:
         """Corpus directory as an absolute path (relative paths are relative to backend/)."""

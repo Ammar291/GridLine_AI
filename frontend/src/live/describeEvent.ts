@@ -1,12 +1,15 @@
 import type { City, Event } from '@/api/types';
 import { bandLabel } from '@/components/ui/bandLabel';
+import { sentenceLabel } from '@/components/workflow/labels';
 import { NODE_LABELS, statusLabel, toolVerb } from './format';
 
 export type EventGroup = 'simulation' | 'reading' | 'city' | 'threat' | 'agent' | 'approval' | 'action' | 'alert';
 
 export function eventGroup(type: string): EventGroup {
   if (type.startsWith('weather.observation') || type.startsWith('environment.')) return 'reading';
-  if (type.startsWith('infrastructure.') || type.startsWith('emergency.') || type === 'weather.forecast') return 'city';
+  if (type.startsWith('infrastructure.') || type.startsWith('emergency.') || type === 'weather.forecast' || type === 'weather.rainfall') {
+    return 'city';
+  }
   if (type.startsWith('threat.') || type.startsWith('incident.') || type === 'zone.state') return 'threat';
   if (type.startsWith('agent.') || type === 'replan.triggered') return 'agent';
   if (type.startsWith('approval.')) return 'approval';
@@ -35,6 +38,12 @@ export function describeEvent(e: Event, city: City | null): string {
       const p = e.payload;
       return `Simulation ${p.state}: ${p.scenario.replace(/_/g, ' ')}, ${String(p.speed)}×, tick ${String(p.tick)}`;
     }
+    case 'source.status': {
+      const p = e.payload;
+      return p.last_error ? `${p.label}: refresh failed (${p.last_error})` : `Data source: ${p.label} (${p.provider})`;
+    }
+    case 'scenario.trigger':
+      return `Demo event: ${e.payload.label}`;
     case 'scenario.stage':
       return `Stage ${String(e.payload.stage_index + 1)}: ${e.payload.description}`;
     case 'weather.observation': {
@@ -49,6 +58,16 @@ export function describeEvent(e: Event, city: City | null): string {
     }
     case 'weather.forecast':
       return `Forecast: ${e.payload.summary} (peak ${num(e.payload.peak_intensity_mm_h)} mm/h)`;
+    case 'weather.rainfall': {
+      const p = e.payload;
+      const where = p.zone_ids.length === 0 ? 'the whole city' : p.zone_ids.map((id) => zoneName(city, id)).join(', ');
+      return `Rain ${num(p.intensity_mm_h)} mm/h for ${num(p.duration_h)} h over ${where}${reason(p.description)}`;
+    }
+    case 'emergency.fire': {
+      const p = e.payload;
+      const people = p.exposed_population.toLocaleString('en-US');
+      return `Fire at ${p.site} in ${zoneName(city, p.zone_id)}: ${people} people exposed in ${String(p.exposed_zone_ids.length)} zones`;
+    }
     case 'environment.soil':
       return `Soil moisture ${e.payload.probe_id} (${zoneName(city, e.location)}) ${pct(e.payload.saturation)} saturated`;
     case 'environment.river': {
@@ -148,6 +167,10 @@ export function describeEvent(e: Event, city: City | null): string {
       return `Action ${e.payload.action_id} ${statusLabel(e.payload.verification.status).toLowerCase()}`;
     case 'replan.triggered':
       return `Re-planning: ${e.payload.reason}`;
+    case 'agent.step': {
+      const p = e.payload;
+      return `Agent: ${sentenceLabel(p.node)} ${p.status}${p.error ? ` (${p.error})` : ''}`;
+    }
     case 'alert.issued':
       return `Alert (${e.payload.level}) for ${zoneName(city, e.payload.zone_id)}: ${e.payload.message}`;
     default:

@@ -5,8 +5,7 @@
 # to a later milestone. Delete an entry when its backend lands: the merge FAILS if the backend already defines a
 # path, a schema or an event type listed here, so a stale entry cannot shadow the real contract.
 #
-#   threat detector (ARCHITECTURE section 5)   zone.state, threat.detected, threat.escalated; Band, Hazard, ZoneState,
-#                                               Bands, GET /api/detector/bands
+#   threat detector (ARCHITECTURE section 5)   threat.detected, threat.escalated; Hazard
 #   incidents and agent (section 8)            incident.*, agent.*, replan.triggered; GET /api/incidents*
 #   approvals, tools, verification (10, 11)    approval.*, action.*; /api/approvals*, /api/actions*
 #   alerts                                     alert.issued; Alert
@@ -22,7 +21,6 @@ info:
   title: GridLine AI pending overlay
   version: pending
 x-pending-events:
-  - ZoneStateEvent
   - ThreatDetectedEvent
   - ThreatEscalatedEvent
   - IncidentOpenedEvent
@@ -43,11 +41,6 @@ paths:
       operationId: getLlmStatus
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LlmStatus' } } } }
-  /api/detector/bands:
-    get:
-      operationId: getDetectorBands
-      responses:
-        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Bands' } } } }
   /api/events:
     get:
       operationId: listEvents
@@ -125,38 +118,7 @@ components:
         model: { type: [string, 'null'] }
 
     # ---- threat detector ----
-    Band: { type: string, enum: [normal, watch, warning, critical] }
     Hazard: { type: string, enum: [landslide, flood] }
-    BandThresholds:
-      type: object
-      required: [watch, warning, critical]
-      properties: { watch: { type: number }, warning: { type: number }, critical: { type: number } }
-    Bands:
-      type: object
-      required: [landslide, flood]
-      properties:
-        landslide: { $ref: '#/components/schemas/BandThresholds' }
-        flood: { $ref: '#/components/schemas/BandThresholds' }
-    ZoneState:
-      type: object
-      required: [saturation, rain_24h_mm, rain_intensity_mm_h, landslide_index, flood_index, band, updated_sim_time]
-      properties:
-        saturation: { type: number }
-        rain_24h_mm: { type: number }
-        rain_intensity_mm_h: { type: number }
-        landslide_index: { type: number }
-        flood_index: { type: number }
-        band: { $ref: '#/components/schemas/Band' }
-        updated_sim_time: { type: string }
-    ZoneStatePayload:
-      allOf:
-        - { $ref: '#/components/schemas/ZoneState' }
-        - type: object
-          required: [zone_id]
-          properties:
-            zone_id: { type: string }
-            prev_band:
-              oneOf: [{ $ref: '#/components/schemas/Band' }, { type: 'null' }]
     ThreatPayload:
       type: object
       required: [incident_id, zone_id, hazard, band, index]
@@ -552,12 +514,6 @@ components:
         location: { type: [string, 'null'] }
         severity: { $ref: '#/components/schemas/Severity' }
         incident_id: { type: [string, 'null'] }
-    ZoneStateEvent:
-      allOf:
-        - { $ref: '#/components/schemas/PendingEventEnvelope' }
-        - type: object
-          required: [event_type, payload]
-          properties: { event_type: { type: string, const: zone.state }, payload: { $ref: '#/components/schemas/ZoneStatePayload' } }
     ThreatDetectedEvent:
       allOf:
         - { $ref: '#/components/schemas/PendingEventEnvelope' }

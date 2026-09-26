@@ -251,16 +251,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/llm/status": {
+    "/api/simulation/trigger": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getLlmStatus"];
+        get?: never;
         put?: never;
-        post?: never;
+        /**
+         * Trigger
+         * @description Press a DEMO control: announcement, injected events and one simulated hour, all on the bus.
+         */
+        post: operations["trigger_api_simulation_trigger_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -274,7 +278,65 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getDetectorBands"];
+        /** Get Bands */
+        get: operations["get_bands_api_detector_bands_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/source": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Source */
+        get: operations["get_source_api_source_get"];
+        put?: never;
+        /**
+         * Switch Source
+         * @description Stop the current source and start ``mode``'s; a ``source.status`` event announces the change.
+         */
+        post: operations["switch_source_api_source_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/agent/runs/{run_id}/approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Run Approval
+         * @description Record the decision and resume the graph; progress arrives as ``agent.step`` events.
+         */
+        post: operations["decideRunApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/llm/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLlmStatus"];
         put?: never;
         post?: never;
         delete?: never;
@@ -429,6 +491,34 @@ export interface components {
             events_emitted: number;
             status: components["schemas"]["SimulationStatus"];
         };
+        /** AgentStepEvent */
+        AgentStepEvent: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Source */
+            source: string;
+            /** Location */
+            location: string | null;
+            severity: components["schemas"]["Severity"];
+            /** Incident Id */
+            incident_id: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "agent.step";
+            payload: components["schemas"]["WorkflowStep"];
+        };
         /** AmbulanceState */
         AmbulanceState: {
             /**
@@ -493,6 +583,26 @@ export interface components {
              */
             event_type: "emergency.ambulance";
             payload: components["schemas"]["AmbulanceStatus"];
+        };
+        /**
+         * Band
+         * @description A zone's risk band from its landslide and flood indices (``gridline.threats.indices``).
+         * @enum {string}
+         */
+        Band: "normal" | "watch" | "warning" | "critical";
+        /** BandThresholds */
+        BandThresholds: {
+            /** Watch */
+            watch: number;
+            /** Warning */
+            warning: number;
+            /** Critical */
+            critical: number;
+        };
+        /** Bands */
+        Bands: {
+            landslide: components["schemas"]["BandThresholds"];
+            flood: components["schemas"]["BandThresholds"];
         };
         /** BridgeState */
         BridgeState: {
@@ -610,6 +720,8 @@ export interface components {
             scenarios: components["schemas"]["ScenarioInfo"][];
             /** Injections */
             injections: components["schemas"]["InjectionPreset"][];
+            /** Triggers */
+            triggers: components["schemas"]["TriggerInfo"][];
         };
         /** ConstructionActivity */
         ConstructionActivity: {
@@ -765,12 +877,21 @@ export interface components {
          * Event
          * @description Any event on the bus or the WebSocket, discriminated by ``event_type``.
          */
-        Event: components["schemas"]["SimTickEvent"] | components["schemas"]["SimStatusEvent"] | components["schemas"]["SimSnapshotEvent"] | components["schemas"]["HeartbeatEvent"] | components["schemas"]["ScenarioStageEvent"] | components["schemas"]["WeatherObservationEvent"] | components["schemas"]["WeatherForecastEvent"] | components["schemas"]["SoilObservationEvent"] | components["schemas"]["RiverObservationEvent"] | components["schemas"]["DrainageObservationEvent"] | components["schemas"]["SlopeObservationEvent"] | components["schemas"]["WaterAccumulationEvent"] | components["schemas"]["RoadStatusEvent"] | components["schemas"]["BridgeStatusEvent"] | components["schemas"]["DrainageObstructionEvent"] | components["schemas"]["ConstructionActivityEvent"] | components["schemas"]["InfrastructureFailureEvent"] | components["schemas"]["RescueTeamStatusEvent"] | components["schemas"]["AmbulanceStatusEvent"] | components["schemas"]["HospitalCapacityEvent"] | components["schemas"]["ShelterCapacityEvent"] | components["schemas"]["ZoneStateEvent"] | components["schemas"]["ThreatDetectedEvent"] | components["schemas"]["ThreatEscalatedEvent"] | components["schemas"]["IncidentOpenedEvent"] | components["schemas"]["IncidentClosedEvent"] | components["schemas"]["AgentRunStartedEvent"] | components["schemas"]["AgentRunFinishedEvent"] | components["schemas"]["AgentNodeStartedEvent"] | components["schemas"]["AgentNodeFinishedEvent"] | components["schemas"]["ApprovalRequestedEvent"] | components["schemas"]["ApprovalDecidedEvent"] | components["schemas"]["ActionExecutedEvent"] | components["schemas"]["ActionVerifiedEvent"] | components["schemas"]["ReplanTriggeredEvent"] | components["schemas"]["AlertIssuedEvent"];
+        Event: components["schemas"]["SimTickEvent"] | components["schemas"]["SimStatusEvent"] | components["schemas"]["SimSnapshotEvent"] | components["schemas"]["HeartbeatEvent"] | components["schemas"]["ScenarioStageEvent"] | components["schemas"]["ScenarioTriggerEvent"] | components["schemas"]["ZoneStateEvent"] | components["schemas"]["SourceStatusEvent"] | components["schemas"]["WeatherObservationEvent"] | components["schemas"]["WeatherForecastEvent"] | components["schemas"]["RainfallDriverEvent"] | components["schemas"]["SoilObservationEvent"] | components["schemas"]["RiverObservationEvent"] | components["schemas"]["DrainageObservationEvent"] | components["schemas"]["SlopeObservationEvent"] | components["schemas"]["WaterAccumulationEvent"] | components["schemas"]["RoadStatusEvent"] | components["schemas"]["BridgeStatusEvent"] | components["schemas"]["DrainageObstructionEvent"] | components["schemas"]["ConstructionActivityEvent"] | components["schemas"]["InfrastructureFailureEvent"] | components["schemas"]["RescueTeamStatusEvent"] | components["schemas"]["AmbulanceStatusEvent"] | components["schemas"]["HospitalCapacityEvent"] | components["schemas"]["ShelterCapacityEvent"] | components["schemas"]["IndustrialFireEvent"] | components["schemas"]["AgentStepEvent"] | components["schemas"]["ThreatDetectedEvent"] | components["schemas"]["ThreatEscalatedEvent"] | components["schemas"]["IncidentOpenedEvent"] | components["schemas"]["IncidentClosedEvent"] | components["schemas"]["AgentRunStartedEvent"] | components["schemas"]["AgentRunFinishedEvent"] | components["schemas"]["AgentNodeStartedEvent"] | components["schemas"]["AgentNodeFinishedEvent"] | components["schemas"]["ApprovalRequestedEvent"] | components["schemas"]["ApprovalDecidedEvent"] | components["schemas"]["ActionExecutedEvent"] | components["schemas"]["ActionVerifiedEvent"] | components["schemas"]["ReplanTriggeredEvent"] | components["schemas"]["AlertIssuedEvent"];
         /**
          * EventType
          * @enum {string}
          */
-        EventType: "sim.tick" | "sim.status" | "sim.snapshot" | "sim.heartbeat" | "scenario.stage" | "weather.observation" | "weather.forecast" | "environment.soil" | "environment.river" | "environment.drainage" | "environment.slope" | "environment.water_accumulation" | "infrastructure.road" | "infrastructure.bridge" | "infrastructure.drainage_obstruction" | "infrastructure.construction" | "infrastructure.failure" | "emergency.rescue_team" | "emergency.ambulance" | "emergency.hospital" | "emergency.shelter";
+        EventType: "sim.tick" | "sim.status" | "sim.snapshot" | "sim.heartbeat" | "scenario.stage" | "scenario.trigger" | "zone.state" | "source.status" | "weather.observation" | "weather.forecast" | "weather.rainfall" | "environment.soil" | "environment.river" | "environment.drainage" | "environment.slope" | "environment.water_accumulation" | "infrastructure.road" | "infrastructure.bridge" | "infrastructure.drainage_obstruction" | "infrastructure.construction" | "infrastructure.failure" | "emergency.rescue_team" | "emergency.ambulance" | "emergency.hospital" | "emergency.shelter" | "emergency.fire" | "agent.step";
+        /** FireState */
+        FireState: {
+            /** Site */
+            site: string;
+            /** Exposed Zone Ids */
+            exposed_zone_ids: string[];
+            /** Exposed Population */
+            exposed_population: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -884,6 +1005,68 @@ export interface components {
              * @enum {string}
              */
             er_status: "normal" | "busy" | "overwhelmed";
+        };
+        /** HourlyPrecipitation */
+        HourlyPrecipitation: {
+            /**
+             * Time
+             * Format: date-time
+             */
+            time: string;
+            /** Precipitation Mm */
+            precipitation_mm: number;
+            /** Probability */
+            probability: number | null;
+        };
+        /**
+         * IndustrialFire
+         * @description A fire at a site in a zone; who is exposed is computed from the city by the apply handler.
+         */
+        IndustrialFire: {
+            /** Zone Id */
+            zone_id: string;
+            /** Site */
+            site: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Exposed Zone Ids */
+            exposed_zone_ids: string[];
+            /**
+             * Exposed Population
+             * @default 0
+             */
+            exposed_population: number;
+        };
+        /** IndustrialFireEvent */
+        IndustrialFireEvent: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Source */
+            source: string;
+            /** Location */
+            location: string | null;
+            severity: components["schemas"]["Severity"];
+            /** Incident Id */
+            incident_id: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "emergency.fire";
+            payload: components["schemas"]["IndustrialFire"];
         };
         /** InfrastructureFailure */
         InfrastructureFailure: {
@@ -1155,6 +1338,53 @@ export interface components {
             /** Capacity M3S */
             capacity_m3s: number;
         };
+        /**
+         * RainfallDriver
+         * @description Operator rain: ``intensity_mm_h`` over ``zone_ids`` (empty means every zone) for ``duration_h`` hours.
+         *
+         *     A driver, not a reading: the scenario's rain resumes when it ends and is never lowered by it.
+         */
+        RainfallDriver: {
+            /** Zone Ids */
+            zone_ids: string[];
+            /** Intensity Mm H */
+            intensity_mm_h: number;
+            /** Duration H */
+            duration_h: number;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+        };
+        /** RainfallDriverEvent */
+        RainfallDriverEvent: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Source */
+            source: string;
+            /** Location */
+            location: string | null;
+            severity: components["schemas"]["Severity"];
+            /** Incident Id */
+            incident_id: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "weather.rainfall";
+            payload: components["schemas"]["RainfallDriver"];
+        };
         /** RescueTeamStatus */
         RescueTeamStatus: {
             /** Crew Id */
@@ -1380,6 +1610,48 @@ export interface components {
             event_type: "scenario.stage";
             payload: components["schemas"]["ScenarioStage"];
         };
+        /**
+         * ScenarioTrigger
+         * @description An operator pressed a DEMO control; its injected events and one simulated hour follow on the bus.
+         */
+        ScenarioTrigger: {
+            /** Trigger */
+            trigger: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+            /** Tick */
+            tick: number;
+        };
+        /** ScenarioTriggerEvent */
+        ScenarioTriggerEvent: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Source */
+            source: string;
+            /** Location */
+            location: string | null;
+            severity: components["schemas"]["Severity"];
+            /** Incident Id */
+            incident_id: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "scenario.trigger";
+            payload: components["schemas"]["ScenarioTrigger"];
+        };
         /** SelectScenarioRequest */
         SelectScenarioRequest: {
             scenario: components["schemas"]["ScenarioName"];
@@ -1482,6 +1754,8 @@ export interface components {
             status: components["schemas"]["SimStatus"];
             world: components["schemas"]["WorldSnapshot"];
             city: components["schemas"]["CityMap"];
+            source?: components["schemas"]["SourceStatus"] | null;
+            agent_run?: components["schemas"]["WorkflowRun"] | null;
         };
         /** SimStatus */
         SimStatus: {
@@ -1721,6 +1995,69 @@ export interface components {
             event_type: "environment.soil";
             payload: components["schemas"]["SoilObservation"];
         };
+        /**
+         * SourceStatus
+         * @description Which data source feeds the bus: DEMO (the Nandipur simulation) or LIVE (real weather, real city).
+         */
+        SourceStatus: {
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "live" | "demo";
+            /** Label */
+            label: string;
+            /** City */
+            city: string;
+            /** Provider */
+            provider: string;
+            /** Latitude */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
+            /** Poll Seconds */
+            poll_seconds: number | null;
+            /** Last Updated */
+            last_updated: string | null;
+            /** Last Error */
+            last_error: string | null;
+        };
+        /** SourceStatusEvent */
+        SourceStatusEvent: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Source */
+            source: string;
+            /** Location */
+            location: string | null;
+            severity: components["schemas"]["Severity"];
+            /** Incident Id */
+            incident_id: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "source.status";
+            payload: components["schemas"]["SourceStatus"];
+        };
+        /** SourceSwitch */
+        SourceSwitch: {
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "live" | "demo";
+        };
         /** StageInfo */
         StageInfo: {
             /** Index */
@@ -1766,6 +2103,26 @@ export interface components {
             metadata: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * TriggerInfo
+         * @description A DEMO button as the dashboard lists it (``GET /api/city``).
+         */
+        TriggerInfo: {
+            id: components["schemas"]["TriggerName"];
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+        };
+        /**
+         * TriggerName
+         * @enum {string}
+         */
+        TriggerName: "heavy_rain" | "landslide" | "drainage_block" | "flash_flood" | "industrial_fire" | "cascading_disaster";
+        /** TriggerRequest */
+        TriggerRequest: {
+            trigger: components["schemas"]["TriggerName"];
         };
         /** ValidationError */
         ValidationError: {
@@ -1848,6 +2205,8 @@ export interface components {
             confidence: number;
             /** Summary */
             summary: string;
+            /** Hourly */
+            hourly: components["schemas"]["HourlyPrecipitation"][];
         };
         /** WeatherForecastEvent */
         WeatherForecastEvent: {
@@ -1932,6 +2291,411 @@ export interface components {
             /** Wind Direction Deg */
             wind_direction_deg: number;
         };
+        /** WorkflowAction */
+        WorkflowAction: {
+            /** Action Id */
+            action_id: string;
+            /** Candidate Id */
+            candidate_id: string;
+            /** Tool */
+            tool: string;
+            /** Input */
+            input: {
+                [key: string]: unknown;
+            };
+            /** Label */
+            label: string;
+            /** Rationale */
+            rationale: string;
+            /** Citation Ids */
+            citation_ids: string[];
+            /** Requires Approval */
+            requires_approval: boolean;
+        };
+        /** WorkflowActionResult */
+        WorkflowActionResult: {
+            /** Action Id */
+            action_id: string;
+            /** Tool */
+            tool: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "executed" | "unchanged" | "rejected" | "failed";
+            /** Message */
+            message: string;
+            /** Affected Entities */
+            affected_entities: string[];
+        };
+        /** WorkflowActionVerification */
+        WorkflowActionVerification: {
+            /** Action Id */
+            action_id: string;
+            /** Tool */
+            tool: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "verified" | "failed";
+            /** Checks */
+            checks: components["schemas"]["WorkflowCheck"][];
+        };
+        /** WorkflowApprovalOutput */
+        WorkflowApprovalOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "approval_gate";
+            /** Approval Id */
+            approval_id: string;
+            /** Action Ids */
+            action_ids: string[];
+            /** Decision */
+            decision: ("approve" | "reject") | null;
+            /** Note */
+            note: string | null;
+            /** Decided At */
+            decided_at: string | null;
+        };
+        /** WorkflowAssessmentOutput */
+        WorkflowAssessmentOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "assess";
+            /**
+             * Hazard
+             * @enum {string}
+             */
+            hazard: "landslide" | "flood";
+            /**
+             * Band
+             * @enum {string}
+             */
+            band: "normal" | "watch" | "warning" | "critical";
+            /** Confidence */
+            confidence: number;
+            /** Grounded */
+            grounded: boolean;
+            /** Cited Count */
+            cited_count: number;
+            /** Ungrounded Ids */
+            ungrounded_ids: string[];
+            /** Affected Zone Ids */
+            affected_zone_ids: string[];
+        };
+        /** WorkflowCheck */
+        WorkflowCheck: {
+            /** Name */
+            name: string;
+            /** Passed */
+            passed: boolean;
+            /** Expected */
+            expected: string;
+            /** Observed */
+            observed: string;
+        };
+        /** WorkflowChunk */
+        WorkflowChunk: {
+            /** Chunk Id */
+            chunk_id: string;
+            /** Document Id */
+            document_id: string;
+            /** Document Title */
+            document_title: string;
+            /** Section */
+            section: string;
+            /** Kind */
+            kind: string;
+            /** Similarity */
+            similarity: number;
+        };
+        /** WorkflowClaim */
+        WorkflowClaim: {
+            /** Text */
+            text: string;
+            /** Citation Ids */
+            citation_ids: string[];
+        };
+        /** WorkflowCompletionOutput */
+        WorkflowCompletionOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "complete";
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "completed" | "completed_with_failures" | "rejected";
+            /** Entities */
+            entities: components["schemas"]["WorkflowEntityState"][];
+        };
+        /** WorkflowDecision */
+        WorkflowDecision: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "reject";
+            /** Note */
+            note?: string | null;
+        };
+        /** WorkflowEntity */
+        WorkflowEntity: {
+            /** Table */
+            table: string;
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+        };
+        /** WorkflowEntityState */
+        WorkflowEntityState: {
+            /** Kind */
+            kind: string;
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Fields */
+            fields: {
+                [key: string]: unknown;
+            };
+        };
+        /** WorkflowEvidenceOutput */
+        WorkflowEvidenceOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "retrieve";
+            /** Queries */
+            queries: string[];
+            /** Chunks */
+            chunks: components["schemas"]["WorkflowChunk"][];
+        };
+        /** WorkflowExecutionOutput */
+        WorkflowExecutionOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "execute";
+            /** Results */
+            results: components["schemas"]["WorkflowActionResult"][];
+        };
+        /** WorkflowGraphOutput */
+        WorkflowGraphOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "query_graph";
+            start: components["schemas"]["WorkflowEntity"];
+            /** Entity Count */
+            entity_count: number;
+            /** Edge Count */
+            edge_count: number;
+            /** Paths */
+            paths: components["schemas"]["WorkflowPath"][];
+        };
+        /** WorkflowObserveOutput */
+        WorkflowObserveOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "observe";
+            /** Headline */
+            headline: string;
+            /** Signals */
+            signals: components["schemas"]["WorkflowSignal"][];
+        };
+        /**
+         * WorkflowPath
+         * @description ``nodes[i] --relations[i]--> nodes[i+1]``, each hop backed by the KG edge in ``citation_ids[i]``.
+         */
+        WorkflowPath: {
+            /** Nodes */
+            nodes: components["schemas"]["WorkflowEntity"][];
+            /** Relations */
+            relations: string[];
+            /** Citation Ids */
+            citation_ids: string[];
+        };
+        /** WorkflowPlanOutput */
+        WorkflowPlanOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "recommend";
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "ollama" | "mock";
+            /** Model */
+            model: string | null;
+            /** Fallback Reason */
+            fallback_reason: string | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Candidate Count */
+            candidate_count: number;
+            /** Actions */
+            actions: components["schemas"]["WorkflowAction"][];
+        };
+        /** WorkflowReasoningOutput */
+        WorkflowReasoningOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "reason";
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "ollama" | "mock";
+            /** Model */
+            model: string | null;
+            /** Fallback Reason */
+            fallback_reason: string | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Summary */
+            summary: string;
+            /** Claims */
+            claims: components["schemas"]["WorkflowClaim"][];
+        };
+        /** WorkflowReceiveOutput */
+        WorkflowReceiveOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "receive";
+            /** Event Id */
+            event_id: string;
+            /**
+             * Hazard
+             * @enum {string}
+             */
+            hazard: "landslide" | "flood";
+            /** Failure Kind */
+            failure_kind: string;
+            asset: components["schemas"]["WorkflowEntity"];
+            /** Zone Id */
+            zone_id: string;
+            /** Zone Name */
+            zone_name: string;
+            /** Description */
+            description: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Citation Id */
+            citation_id: string;
+        };
+        /** WorkflowRun */
+        WorkflowRun: {
+            /** Run Id */
+            run_id: string;
+            /** Trigger Event Id */
+            trigger_event_id: string;
+            /**
+             * Hazard
+             * @enum {string}
+             */
+            hazard: "landslide" | "flood";
+            /** Zone Id */
+            zone_id: string;
+            /** Asset Id */
+            asset_id: string;
+            /** Provider */
+            provider: string;
+            /** Model */
+            model: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Steps */
+            steps: components["schemas"]["WorkflowStep"][];
+        };
+        /** WorkflowSignal */
+        WorkflowSignal: {
+            /** Id */
+            id: string;
+            /** Event Type */
+            event_type: string;
+            /** Source */
+            source: string;
+            /** Zone Id */
+            zone_id: string | null;
+            /** Severity */
+            severity: string;
+            /** Summary */
+            summary: string;
+        };
+        /**
+         * WorkflowStep
+         * @description The ``agent.step`` payload: the latest state of one node of one run.
+         */
+        WorkflowStep: {
+            /** Run Id */
+            run_id: string;
+            /**
+             * Node
+             * @enum {string}
+             */
+            node: "receive" | "observe" | "query_graph" | "retrieve" | "reason" | "assess" | "recommend" | "approval_gate" | "execute" | "verify" | "complete";
+            /** Index */
+            index: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "done" | "waiting" | "failed";
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Finished At */
+            finished_at: string | null;
+            /** Duration Ms */
+            duration_ms: number | null;
+            /** Output */
+            output: (components["schemas"]["WorkflowReceiveOutput"] | components["schemas"]["WorkflowObserveOutput"] | components["schemas"]["WorkflowGraphOutput"] | components["schemas"]["WorkflowEvidenceOutput"] | components["schemas"]["WorkflowReasoningOutput"] | components["schemas"]["WorkflowAssessmentOutput"] | components["schemas"]["WorkflowPlanOutput"] | components["schemas"]["WorkflowApprovalOutput"] | components["schemas"]["WorkflowExecutionOutput"] | components["schemas"]["WorkflowVerificationOutput"] | components["schemas"]["WorkflowCompletionOutput"]) | null;
+            /** Error */
+            error: string | null;
+        };
+        /** WorkflowVerificationOutput */
+        WorkflowVerificationOutput: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            node: "verify";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "verified" | "partially_verified" | "failed";
+            /** Per Action */
+            per_action: components["schemas"]["WorkflowActionVerification"][];
+        };
         /**
          * WorldSnapshot
          * @description Frozen, JSON-safe export of the whole world (``sim.snapshot`` and ``GET /api/simulation/snapshot``).
@@ -1992,6 +2756,10 @@ export interface components {
             shelters: {
                 [key: string]: components["schemas"]["ShelterState"];
             };
+            /** Fires */
+            fires: {
+                [key: string]: components["schemas"]["FireState"];
+            };
         };
         /** XY */
         XY: {
@@ -2026,37 +2794,66 @@ export interface components {
              */
             water_trend: "rising" | "steady" | "falling";
         };
+        /** ZoneStateEvent */
+        ZoneStateEvent: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /**
+             * Sim Time
+             * Format: date-time
+             */
+            sim_time: string;
+            /** Source */
+            source: string;
+            /** Location */
+            location: string | null;
+            severity: components["schemas"]["Severity"];
+            /** Incident Id */
+            incident_id: string | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "zone.state";
+            payload: components["schemas"]["ZoneStatePayload"];
+        };
+        /**
+         * ZoneStatePayload
+         * @description One zone's risk indices after a tick (``gridline.threats.indices``): a signal, never a decision.
+         */
+        ZoneStatePayload: {
+            /** Zone Id */
+            zone_id: string;
+            /** Saturation */
+            saturation: number;
+            /** Rain 24H Mm */
+            rain_24h_mm: number;
+            /** Rain Intensity Mm H */
+            rain_intensity_mm_h: number;
+            /** Landslide Index */
+            landslide_index: number;
+            /** Flood Index */
+            flood_index: number;
+            band: components["schemas"]["Band"];
+            prev_band: components["schemas"]["Band"] | null;
+            /**
+             * Updated Sim Time
+             * Format: date-time
+             */
+            updated_sim_time: string;
+        };
         LlmStatus: {
             /** @enum {string} */
             provider: "anthropic" | "mock" | "none";
             model: string | null;
         };
         /** @enum {string} */
-        Band: "normal" | "watch" | "warning" | "critical";
-        /** @enum {string} */
         Hazard: "landslide" | "flood";
-        BandThresholds: {
-            watch: number;
-            warning: number;
-            critical: number;
-        };
-        Bands: {
-            landslide: components["schemas"]["BandThresholds"];
-            flood: components["schemas"]["BandThresholds"];
-        };
-        ZoneState: {
-            saturation: number;
-            rain_24h_mm: number;
-            rain_intensity_mm_h: number;
-            landslide_index: number;
-            flood_index: number;
-            band: components["schemas"]["Band"];
-            updated_sim_time: string;
-        };
-        ZoneStatePayload: components["schemas"]["ZoneState"] & {
-            zone_id: string;
-            prev_band?: components["schemas"]["Band"] | null;
-        };
         ThreatPayload: {
             incident_id: string;
             zone_id: string;
@@ -2398,17 +3195,6 @@ export interface components {
             location: string | null;
             severity: components["schemas"]["Severity"];
             incident_id: string | null;
-        };
-        ZoneStateEvent: components["schemas"]["PendingEventEnvelope"] & {
-            /** @constant */
-            event_type: "zone.state";
-            payload: components["schemas"]["ZoneStatePayload"];
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            event_type: "zone.state";
         };
         ThreatDetectedEvent: components["schemas"]["PendingEventEnvelope"] & {
             /** @constant */
@@ -2943,6 +3729,161 @@ export interface operations {
             };
         };
     };
+    trigger_api_simulation_trigger_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TriggerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Event"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_bands_api_detector_bands_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Bands"];
+                };
+            };
+        };
+    };
+    get_source_api_source_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceStatus"];
+                };
+            };
+        };
+    };
+    switch_source_api_source_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SourceSwitch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decideRunApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkflowDecision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkflowRun"];
+                };
+            };
+            /** @description No such run */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The run is not waiting for approval */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     getLlmStatus: {
         parameters: {
             query?: never;
@@ -2959,26 +3900,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LlmStatus"];
-                };
-            };
-        };
-    };
-    getDetectorBands: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Bands"];
                 };
             };
         };

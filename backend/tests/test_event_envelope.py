@@ -149,6 +149,8 @@ def test_injectable_types_are_state_changing_only() -> None:
     assert EventType.WEATHER_OBSERVATION not in INJECTABLE_TYPES
     assert EventType.SIM_TICK not in INJECTABLE_TYPES
     assert all(
-        t.startswith(("infrastructure.", "emergency.")) or t == "weather.forecast" for t in INJECTABLE_TYPES
+        t.startswith(("infrastructure.", "emergency.")) or t in ("weather.forecast", "weather.rainfall")
+        for t in INJECTABLE_TYPES
     )
+    assert EventType.WEATHER_RAINFALL in INJECTABLE_TYPES
     assert {t for t in EventType if t.startswith(("infrastructure.", "emergency."))} <= INJECTABLE_TYPES

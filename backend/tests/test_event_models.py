@@ -39,4 +39,10 @@ def test_every_simulated_event_round_trips_through_the_typed_union(city: City) -
 
 def test_snapshot_view_types_the_world_and_the_city() -> None:
     fields = SimSnapshotEvent.model_fields["payload"].annotation
-    assert fields is not None and set(fields.model_fields) == {"status", "world", "city"}  # type: ignore[union-attr]
+    assert fields is not None and set(fields.model_fields) == {
+        "status",
+        "world",
+        "city",
+        "source",
+        "agent_run",
+    }  # type: ignore[union-attr]

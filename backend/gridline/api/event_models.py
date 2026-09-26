@@ -11,6 +11,7 @@ from typing import Annotated, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel
 
+from gridline.agents.steps import WorkflowRun, WorkflowStep
 from gridline.api.city_map import CityMap
 from gridline.events import envelope
 from gridline.events import payloads as p
@@ -36,6 +37,8 @@ class SimSnapshotPayload(BaseModel):
     status: p.SimStatus
     world: WorldSnapshot
     city: CityMap
+    source: p.SourceStatus | None = None
+    agent_run: WorkflowRun | None = None
 
 
 class SimTickEvent(EventBase):
@@ -63,6 +66,21 @@ class ScenarioStageEvent(EventBase):
     payload: p.ScenarioStage
 
 
+class ScenarioTriggerEvent(EventBase):
+    event_type: Literal[EventType.SCENARIO_TRIGGER]
+    payload: p.ScenarioTrigger
+
+
+class ZoneStateEvent(EventBase):
+    event_type: Literal[EventType.ZONE_STATE]
+    payload: p.ZoneStatePayload
+
+
+class SourceStatusEvent(EventBase):
+    event_type: Literal[EventType.SOURCE_STATUS]
+    payload: p.SourceStatus
+
+
 class WeatherObservationEvent(EventBase):
     event_type: Literal[EventType.WEATHER_OBSERVATION]
     payload: p.WeatherObservation
@@ -71,6 +89,11 @@ class WeatherObservationEvent(EventBase):
 class WeatherForecastEvent(EventBase):
     event_type: Literal[EventType.WEATHER_FORECAST]
     payload: p.WeatherForecast
+
+
+class RainfallDriverEvent(EventBase):
+    event_type: Literal[EventType.WEATHER_RAINFALL]
+    payload: p.RainfallDriver
 
 
 class SoilObservationEvent(EventBase):
@@ -143,14 +166,28 @@ class ShelterCapacityEvent(EventBase):
     payload: p.ShelterCapacity
 
 
+class AgentStepEvent(EventBase):
+    event_type: Literal[EventType.AGENT_STEP]
+    payload: WorkflowStep
+
+
+class IndustrialFireEvent(EventBase):
+    event_type: Literal[EventType.EMERGENCY_FIRE]
+    payload: p.IndustrialFire
+
+
 EVENT_MODELS: dict[EventType, type[EventBase]] = {
     EventType.SIM_TICK: SimTickEvent,
     EventType.SIM_STATUS: SimStatusEvent,
     EventType.SIM_SNAPSHOT: SimSnapshotEvent,
     EventType.SIM_HEARTBEAT: HeartbeatEvent,
     EventType.SCENARIO_STAGE: ScenarioStageEvent,
+    EventType.SCENARIO_TRIGGER: ScenarioTriggerEvent,
+    EventType.ZONE_STATE: ZoneStateEvent,
+    EventType.SOURCE_STATUS: SourceStatusEvent,
     EventType.WEATHER_OBSERVATION: WeatherObservationEvent,
     EventType.WEATHER_FORECAST: WeatherForecastEvent,
+    EventType.WEATHER_RAINFALL: RainfallDriverEvent,
     EventType.ENVIRONMENT_SOIL: SoilObservationEvent,
     EventType.ENVIRONMENT_RIVER: RiverObservationEvent,
     EventType.ENVIRONMENT_DRAINAGE: DrainageObservationEvent,
@@ -165,6 +202,8 @@ EVENT_MODELS: dict[EventType, type[EventBase]] = {
     EventType.EMERGENCY_AMBULANCE: AmbulanceStatusEvent,
     EventType.EMERGENCY_HOSPITAL: HospitalCapacityEvent,
     EventType.EMERGENCY_SHELTER: ShelterCapacityEvent,
+    EventType.EMERGENCY_FIRE: IndustrialFireEvent,
+    EventType.AGENT_STEP: AgentStepEvent,
 }
 
 AnyEvent = Annotated[
@@ -173,8 +212,12 @@ AnyEvent = Annotated[
     | SimSnapshotEvent
     | HeartbeatEvent
     | ScenarioStageEvent
+    | ScenarioTriggerEvent
+    | ZoneStateEvent
+    | SourceStatusEvent
     | WeatherObservationEvent
     | WeatherForecastEvent
+    | RainfallDriverEvent
     | SoilObservationEvent
     | RiverObservationEvent
     | DrainageObservationEvent
@@ -188,7 +231,9 @@ AnyEvent = Annotated[
     | RescueTeamStatusEvent
     | AmbulanceStatusEvent
     | HospitalCapacityEvent
-    | ShelterCapacityEvent,
+    | ShelterCapacityEvent
+    | IndustrialFireEvent
+    | AgentStepEvent,
     Field(discriminator="event_type"),
 ]
 

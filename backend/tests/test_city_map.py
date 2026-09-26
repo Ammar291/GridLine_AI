@@ -83,6 +83,14 @@ def test_scenarios_and_injection_presets_are_listed(city_map: CityMap) -> None:
         "cascading_landslide_flood",
     ]
     assert city_map.injections and all(i.request.event_type for i in city_map.injections)
+    assert [t.id for t in city_map.triggers] == [
+        "heavy_rain",
+        "landslide",
+        "drainage_block",
+        "flash_flood",
+        "industrial_fire",
+        "cascading_disaster",
+    ]
 
 
 def test_every_zone_label_sits_inside_its_zone_clear_of_markers_and_the_lake(city_map: CityMap) -> None:

@@ -24,7 +24,7 @@ from gridline.events.payloads import (
     SimTick,
     WeatherForecast,
 )
-from gridline.events.types import INJECTABLE_TYPES, EventType, Severity
+from gridline.events.types import INJECTABLE_TYPES, Band, EventType, Severity
 from gridline.simulation import physics as ph
 from gridline.simulation.apply import apply_event
 from gridline.simulation.dynamics import apply_drivers, step_physics, weather_at
@@ -33,6 +33,7 @@ from gridline.simulation.schedule import ScriptSchedule
 from gridline.simulation.sensors import ENGINE_SOURCE, observe
 from gridline.simulation.severity import severity_for
 from gridline.simulation.world import WorldSnapshot, WorldState
+from gridline.threats.indices import zone_state_events
 
 SIM_START = datetime(2026, 7, 14, 6, 0, tzinfo=UTC)  # every scenario starts here (spec A6)
 REPORT_DEPTH_STEP_M = 0.1  # excavation progress reported every 10 cm
@@ -70,6 +71,7 @@ class SimulationEngine:
         self._counter = 0
         self._schedule = ScriptSchedule(())
         self._reported_depth: dict[str, float] = {}
+        self._bands: dict[str, Band] = {}  # each zone's band at the last tick
 
     # ---- lifecycle ----
 
@@ -79,6 +81,7 @@ class SimulationEngine:
         self._scenario, self._seed = chosen, seed
         self._rng = random.Random(seed)
         self._counter = 0
+        self._bands = {}
         self._world = WorldState.from_city(
             self.city,
             start=SIM_START,
@@ -153,6 +156,7 @@ class SimulationEngine:
         step_physics(world, self.city, scenario, tick, self._dt_h)
         events += self._scripted(tick)
         events += observe(world, self.city, self._rng, self.make_event)
+        events += zone_state_events(world, self.city, self._bands, self.make_event)
         stage = scenario.stages[world.stage_index]
         payload = SimTick(
             tick=tick,

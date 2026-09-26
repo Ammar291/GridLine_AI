@@ -8,8 +8,11 @@ touching any subsystem. This file is the set of rules that do not change.
 
 ## Non-negotiables
 
-1. **Synthetic data only.** Every place, person, sensor, policy, permit and historical event is invented.
-   Never import real-city, personal, or confidential data, not even as an example.
+1. **Two data modes, one pipeline.** DEMO mode (Nandipur) is synthetic: every place, person, sensor,
+   policy, permit and historical event is invented. LIVE mode (Kalyan-Dombivli) uses only real public
+   weather data (Open-Meteo, no key) and never fabricates a reading; a failed fetch is reported, not filled.
+   Both modes emit the same normalized events through `gridline/sources/`; nothing downstream of the bus
+   branches on the mode. Never import personal or confidential data.
 2. **One process, one database, one frontend.** FastAPI + PostgreSQL (pgvector) + React. No microservices,
    Kafka, Kubernetes, Celery, Redis, or any second runtime.
 3. **No hardcoded AI answers.** Every assessment, prediction and recommendation is produced from the
@@ -23,15 +26,15 @@ touching any subsystem. This file is the set of rules that do not change.
 6. **Verification reads the world, not the model.** A tool is verified by re-reading DB and simulation
    state against its declared post-condition. Failures route to re-plan; they are never hidden.
 7. **Runs offline.** With no `ANTHROPIC_API_KEY` the whole system still runs on the mock provider and
-   local embeddings. Never make a feature depend on network access.
+   local embeddings, and DEMO mode (the default) needs no network. Only LIVE mode fetches, and it degrades
+   to an explicit "unavailable" state when offline.
 8. **Do not overengineer.** Prefer a small typed function over an abstraction. Add a dependency only when
    it removes more code than it adds. YAGNI.
 
 ## How work is done here
 
-- **Model routing.** Claude Fable handles orchestration, design, planning, problem solving and review.
-  Coding tasks are delegated to Claude Opus 5.5 subagents (`model: "opus"` on the Agent tool) with a
-  complete, self-contained brief per task.
+- **Model routing.** Claude Opus 5.5 handles everything: orchestration, design, planning, review and
+  coding. Subagents, when used, run with `model: "opus"` and a complete, self-contained brief per task.
 - **Process.** New features start with the brainstorming skill; multi-step work gets a written plan
   (writing-plans) and is executed with subagent-driven development. Every implementation task follows
   test-driven development. Nothing is called done until verification-before-completion has been run

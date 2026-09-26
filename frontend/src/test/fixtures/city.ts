@@ -103,6 +103,14 @@ export const cityFixture: City = {
       request: { event_type: 'infrastructure.drainage_obstruction', location: null, payload: { channel_id: 'd7', blocked_fraction: 0.6, cause: 'fixture' }, source: 'operator:api', severity: null },
     },
   ],
+  triggers: [
+    { id: 'heavy_rain', label: 'Heavy Rain', description: 'fixture: rain over the city' },
+    { id: 'landslide', label: 'Landslide', description: 'fixture: cut slope in the rain' },
+    { id: 'drainage_block', label: 'Drainage Block', description: 'fixture: debris in D-7' },
+    { id: 'flash_flood', label: 'Flash Flood', description: 'fixture: cloudburst' },
+    { id: 'industrial_fire', label: 'Industrial Fire', description: 'fixture: warehouse fire' },
+    { id: 'cascading_disaster', label: 'Cascading Disaster', description: 'fixture: landslide, blockage, flood' },
+  ],
 };
 
 const conditions = { saturation: 0.4, rainfall_intensity_mm_h: 8, rain_24h_mm: 20, water_depth_cm: 0, water_trend: 'steady' as const };
@@ -132,4 +140,5 @@ export const worldFixture: WorldSnapshot = {
   ambulances: { a1: { status: 'available', location_zone_id: 'old_town' }, a2: { status: 'dispatched', location_zone_id: 'riverside' } },
   hospitals: { h1: { beds_occupied: 200, er_status: 'normal' }, h2: { beds_occupied: 30, er_status: 'normal' } },
   shelters: { s1: { status: 'closed', occupancy: 0 }, s2: { status: 'closed', occupancy: 0 } },
+  fires: {},
 };

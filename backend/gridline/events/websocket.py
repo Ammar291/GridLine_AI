@@ -9,12 +9,13 @@ import contextlib
 
 from fastapi import APIRouter, WebSocket
 
+from gridline.agents.steps import WorkflowRun
 from gridline.api.city import CityMapDep
 from gridline.api.city_map import CityMap
-from gridline.api.deps import BusDep, RunnerDep, SettingsDep
+from gridline.api.deps import AgentDep, BusDep, RunnerDep, SettingsDep, SourcesDep
 from gridline.events.bus import Subscription
 from gridline.events.envelope import Event, new_event
-from gridline.events.payloads import Heartbeat, SimSnapshot
+from gridline.events.payloads import Heartbeat, SimSnapshot, SourceStatus
 from gridline.events.types import EventType, Severity
 from gridline.simulation.runner import SimulationRunner
 from gridline.simulation.sensors import ENGINE_SOURCE
@@ -22,13 +23,20 @@ from gridline.simulation.sensors import ENGINE_SOURCE
 router = APIRouter()
 
 
-def snapshot_event(runner: SimulationRunner, city_map: CityMap) -> Event:
-    """Status, the whole world and the static city: everything a client needs before the live events."""
+def snapshot_event(
+    runner: SimulationRunner,
+    city_map: CityMap,
+    source: SourceStatus | None = None,
+    agent_run: WorkflowRun | None = None,
+) -> Event:
+    """Status, the whole world, the static city and the data mode: what a client needs before live events."""
     engine = runner.engine
     payload = SimSnapshot(
         status=engine.status_payload(runner.state),
         world=engine.snapshot().model_dump(mode="json"),
         city=city_map.model_dump(mode="json"),
+        source=source,
+        agent_run=agent_run,
     )
     return _frame(runner, EventType.SIM_SNAPSHOT, payload, "evt-snapshot")
 
@@ -66,12 +74,19 @@ async def event_stream(
     bus: BusDep,
     settings: SettingsDep,
     city_map: CityMapDep,
+    sources: SourcesDep,
+    agent: AgentDep,
     types: str | None = None,
 ) -> None:
     await websocket.accept()
     subscription = bus.subscribe(types.split(",") if types else None, maxsize=settings.event_queue_size)
     try:
-        await websocket.send_text(snapshot_event(runner, city_map).model_dump_json())
+        await websocket.send_text(
+            snapshot_event(runner, city_map, sources.status(), agent.current).model_dump_json()
+        )
+        for event in sources.replay():
+            if subscription.matches(event):
+                await websocket.send_text(event.model_dump_json())
         sender = asyncio.create_task(_forward(websocket, subscription, runner, settings.ws_heartbeat_seconds))
         receiver = asyncio.create_task(_until_disconnect(websocket))
         _, pending = await asyncio.wait({sender, receiver}, return_when=asyncio.FIRST_COMPLETED)

@@ -38,6 +38,8 @@ class Zone(Asset):
     )  # zone_yearly_stats impermeable_surface_pct for the as-of year
     area_km2: float = Field(gt=0)  # from the zone bbox
     drains_to_channel_id: str | None = None
+    population: int = Field(default=0, ge=0)  # zone_yearly_stats population for the as-of year
+    bbox: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 0.0)  # x0, y0, x1, y1 in metres
 
 
 class Slope(Asset):

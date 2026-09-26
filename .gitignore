@@ -31,3 +31,4 @@ pgdata/
 
 # Agent worktrees
 .claude/worktrees/
+CLAUDE.md

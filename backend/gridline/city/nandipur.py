@@ -166,6 +166,7 @@ def _zones(data: CityData) -> list[Zone]:
     permeability = {p.zone_id: p.permeability_class for p in data.soil_profiles}
     year = data.city.as_of_date.year
     impervious = {s.zone_id: s.impermeable_surface_pct for s in data.zone_yearly_stats if s.year == year}
+    population = {s.zone_id: s.population for s in data.zone_yearly_stats if s.year == year}
     zones: list[Zone] = []
     for z in data.zones:
         x0, y0, x1, y1 = z.bbox
@@ -180,6 +181,8 @@ def _zones(data: CityData) -> list[Zone]:
                 impervious_fraction=impervious[z.id] / 100,
                 area_km2=(x1 - x0) * (y1 - y0) / 1e6,
                 drains_to_channel_id=z.drains_to_channel_id,
+                population=population[z.id],
+                bbox=(x0, y0, x1, y1),
             )
         )
     return zones

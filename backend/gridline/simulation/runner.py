@@ -18,6 +18,7 @@ from gridline.events.payloads import RunnerState
 from gridline.events.types import EventType, Severity
 from gridline.simulation.engine import SimulationEngine
 from gridline.simulation.scenarios import ScenarioName, get_scenario
+from gridline.simulation.triggers import TriggerName, run_trigger
 
 logger = logging.getLogger(__name__)
 
@@ -147,6 +148,12 @@ class SimulationRunner:
         severity: Severity | None = None,
     ) -> list[Event]:
         events = self.engine.inject(event_type, payload, location=location, source=source, severity=severity)
+        self._publish(events)
+        return events
+
+    async def trigger(self, name: TriggerName) -> list[Event]:
+        """A DEMO control, in any runner state. No await inside: the tick loop cannot interleave the batch."""
+        events = run_trigger(self.engine, name)
         self._publish(events)
         return events
 

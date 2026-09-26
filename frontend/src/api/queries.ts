@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient, type UseMutationResult, type Use
 import { useApiClient } from './ApiClientProvider';
 import type { ApiError } from './client';
 import type {
-  Action, Approval, ApprovalDecision, ApprovalStatus, Bands, Chunk, City, Event, Incident, InjectRequest, LlmStatus,
-  SimulationStart, SimulationStatus,
+  Action, Approval, ApprovalDecision, ApprovalStatus, Bands, Chunk, City, DataMode, Event, Incident, InjectRequest, LlmStatus,
+  SimulationStart, SimulationStatus, SourceStatus, TriggerRequest,
 } from './types';
 
 export const queryKeys = {
@@ -29,7 +29,7 @@ export function useLlmStatus(): UseQueryResult<LlmStatus> {
   return useQuery({ queryKey: queryKeys.llm, queryFn: () => client.llmStatus(), refetchInterval: 15_000, retry: false });
 }
 
-/** PENDING (threat detector): index band thresholds for the timeline's threshold lines. */
+/** Index band thresholds for the timeline's threshold lines (GET /api/detector/bands). */
 export function useBands(): UseQueryResult<Bands> {
   const client = useApiClient();
   return useQuery({ queryKey: queryKeys.bands, queryFn: () => client.bands(), staleTime: Infinity, retry: false });
@@ -83,6 +83,7 @@ export interface SimulationControls {
   reset: UseMutationResult<SimulationStatus, ApiError, void>;
   setSpeed: UseMutationResult<SimulationStatus, ApiError, number>;
   inject: UseMutationResult<Event[], ApiError, InjectRequest>;
+  trigger: UseMutationResult<Event[], ApiError, TriggerRequest>;
 }
 
 export function useSimulationControls(): SimulationControls {
@@ -94,5 +95,12 @@ export function useSimulationControls(): SimulationControls {
     reset: useMutation<SimulationStatus, ApiError>({ mutationFn: () => client.simulation.reset() }),
     setSpeed: useMutation<SimulationStatus, ApiError, number>({ mutationFn: (s) => client.simulation.setSpeed(s) }),
     inject: useMutation<Event[], ApiError, InjectRequest>({ mutationFn: (b) => client.simulation.inject(b) }),
+    trigger: useMutation<Event[], ApiError, TriggerRequest>({ mutationFn: (b) => client.simulation.trigger(b) }),
   };
+}
+
+/** Switches LIVE / DEMO. The source.status event on the socket is what updates the dashboard. */
+export function useSetDataMode(): UseMutationResult<SourceStatus, ApiError, DataMode> {
+  const client = useApiClient();
+  return useMutation<SourceStatus, ApiError, DataMode>({ mutationFn: (mode) => client.setSource(mode) });
 }

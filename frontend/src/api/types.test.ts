@@ -17,14 +17,15 @@ describe('generated contract', () => {
   it('fixtures carry every event type of the contract', () => {
     expect(Object.keys(eventsFixture).sort()).toEqual([
       // backend (openapi.json)
-      'emergency.ambulance', 'emergency.hospital', 'emergency.rescue_team', 'emergency.shelter', 'environment.drainage',
+      'emergency.ambulance', 'emergency.fire', 'emergency.hospital', 'emergency.rescue_team', 'emergency.shelter', 'environment.drainage',
       'environment.river', 'environment.slope', 'environment.soil', 'environment.water_accumulation', 'infrastructure.bridge',
       'infrastructure.construction', 'infrastructure.drainage_obstruction', 'infrastructure.failure', 'infrastructure.road',
-      'scenario.stage', 'sim.heartbeat', 'sim.snapshot', 'sim.status', 'sim.tick', 'weather.forecast', 'weather.observation',
+      'scenario.stage', 'scenario.trigger', 'sim.heartbeat', 'sim.snapshot', 'sim.status', 'sim.tick', 'source.status', 'weather.forecast',
+      'weather.observation', 'weather.rainfall', 'zone.state', 'agent.step',
       // pending (openapi.pending.yaml)
       'action.executed', 'action.verified', 'agent.node.finished', 'agent.node.started', 'agent.run.finished', 'agent.run.started',
       'alert.issued', 'approval.decided', 'approval.requested', 'incident.closed', 'incident.opened', 'replan.triggered',
-      'threat.detected', 'threat.escalated', 'zone.state',
+      'threat.detected', 'threat.escalated',
     ].sort());
     expect(snapshotEventFixture.event_type).toBe('sim.snapshot');
   });

@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body
 
-from gridline.api.deps import RunnerDep
+from gridline.api.deps import DemoRunnerDep, RunnerDep
 from gridline.api.event_models import Event, typed_event
 from gridline.api.simulation_models import (
     AdvanceRequest,
@@ -14,6 +14,7 @@ from gridline.api.simulation_models import (
     SelectScenarioRequest,
     SimulationSpeed,
     SimulationStart,
+    TriggerRequest,
     scenario_infos,
 )
 from gridline.simulation.runner import SimulationStatus
@@ -44,7 +45,7 @@ async def select_scenario(body: SelectScenarioRequest, runner: RunnerDep) -> Sim
 
 @router.post("/start")
 async def start(
-    runner: RunnerDep, body: Annotated[SimulationStart | None, Body()] = None
+    runner: DemoRunnerDep, body: Annotated[SimulationStart | None, Body()] = None
 ) -> SimulationStatus:
     request = body or SimulationStart()
     return await runner.start(request.scenario, request.seed, request.speed)
@@ -56,7 +57,7 @@ async def pause(runner: RunnerDep) -> SimulationStatus:
 
 
 @router.post("/resume")
-async def resume(runner: RunnerDep) -> SimulationStatus:
+async def resume(runner: DemoRunnerDep) -> SimulationStatus:
     return await runner.resume()
 
 
@@ -67,7 +68,7 @@ async def reset(runner: RunnerDep) -> SimulationStatus:
 
 @router.post("/advance")
 async def advance(
-    runner: RunnerDep, body: Annotated[AdvanceRequest | None, Body()] = None
+    runner: DemoRunnerDep, body: Annotated[AdvanceRequest | None, Body()] = None
 ) -> AdvanceResponse:
     events = await runner.advance((body or AdvanceRequest()).ticks)
     return AdvanceResponse(events_emitted=len(events), status=runner.status())
@@ -79,9 +80,15 @@ async def set_speed(body: SimulationSpeed, runner: RunnerDep) -> SimulationStatu
 
 
 @router.post("/inject")
-async def inject(body: InjectRequest, runner: RunnerDep) -> list[Event]:
+async def inject(body: InjectRequest, runner: DemoRunnerDep) -> list[Event]:
     """Apply an operator event now; returns it plus any derived events (all published on the bus)."""
     events = await runner.inject(
         body.event_type, body.payload, location=body.location, source=body.source, severity=body.severity
     )
     return [typed_event(e) for e in events]
+
+
+@router.post("/trigger")
+async def trigger(body: TriggerRequest, runner: DemoRunnerDep) -> list[Event]:
+    """Press a DEMO control: announcement, injected events and one simulated hour, all on the bus."""
+    return [typed_event(e) for e in await runner.trigger(body.trigger)]

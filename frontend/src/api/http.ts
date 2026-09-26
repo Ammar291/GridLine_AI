@@ -7,6 +7,7 @@ import type {
   Bands,
   Chunk,
   City,
+  DataMode,
   Document,
   Event,
   Health,
@@ -16,6 +17,10 @@ import type {
   LlmStatus,
   SimulationStart,
   SimulationStatus,
+  SourceStatus,
+  TriggerRequest,
+  WorkflowDecision,
+  WorkflowRun,
 } from './types';
 
 async function request<T>(fetchImpl: typeof fetch, url: string, init?: RequestInit): Promise<T> {
@@ -81,11 +86,18 @@ export class HttpApiClient implements ApiClient {
     reset: (): Promise<SimulationStatus> => this.post('/simulation/reset'),
     setSpeed: (speed: number): Promise<SimulationStatus> => this.post('/simulation/speed', { speed }),
     inject: (body: InjectRequest): Promise<Event[]> => this.post('/simulation/inject', body),
+    trigger: (body: TriggerRequest): Promise<Event[]> => this.post('/simulation/trigger', body),
   };
+
+  source(): Promise<SourceStatus> { return this.get('/source'); }
+  setSource(mode: DataMode): Promise<SourceStatus> { return this.post('/source', { mode }); }
+  bands(): Promise<Bands> { return this.get('/detector/bands'); }
+  decideRunApproval(runId: string, body: WorkflowDecision): Promise<WorkflowRun> {
+    return this.post(`/agent/runs/${encodeURIComponent(runId)}/approval`, body);
+  }
 
   // ---- PENDING routes (see pending()) ----
   llmStatus(): Promise<LlmStatus> { return pending('GET /api/llm/status'); }
-  bands(): Promise<Bands> { return pending('GET /api/detector/bands'); }
   events(): Promise<Event[]> { return pending('GET /api/events'); }
   incidents(): Promise<IncidentSummary[]> { return pending('GET /api/incidents'); }
   incident(_id: string): Promise<Incident> { return pending('GET /api/incidents/{incident_id}'); }

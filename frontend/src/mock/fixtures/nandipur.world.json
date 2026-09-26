@@ -13,7 +13,8 @@
   "expected_total_mm": 60.0,
   "peak_intensity_mm_h": 12.0,
   "confidence": 0.7,
-  "summary": "Moderate monsoon rain over the eastern hills, about 60 mm in 24 h"
+  "summary": "Moderate monsoon rain over the eastern hills, about 60 mm in 24 h",
+  "hourly": []
  },
  "zones": {
   "Z-HV": {
@@ -457,5 +458,6 @@
    "status": "closed",
    "occupancy": 0
   }
- }
+ },
+ "fires": {}
 }

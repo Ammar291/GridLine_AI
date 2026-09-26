@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { IconPause, IconPlay, IconReset } from '@/components/ui/icons';
 import { fmtSimTimeSec, statusLabel } from '@/live/format';
 import { useLiveStore } from '@/live/liveStore';
+import { dataModeOf } from '@/live/liveWeather';
 import { ConnectionDot } from './ConnectionDot';
 import { ProviderBadge } from './ProviderBadge';
 
@@ -20,6 +21,7 @@ function errorText(label: string, err: unknown): string {
 export function ScenarioBar() {
   const sim = useLiveStore((s) => s.sim);
   const mode = useLiveStore((s) => s.mode);
+  const live = useLiveStore((s) => dataModeOf(s) === 'live');
   const connection = useLiveStore((s) => s.connection);
   const city = useCity();
   const llm = useLlmStatus();
@@ -30,10 +32,11 @@ export function ScenarioBar() {
   const scenarioId = picked ?? sim.scenario ?? scenarios[0]?.name ?? '';
   const chosen = scenarios.find((s) => s.name === scenarioId);
   const injections = city.data?.injections ?? [];
+  const triggers = city.data?.triggers ?? [];
 
   const labelled: [string, MutationState][] = [
     ['Start', controls.start], ['Pause', controls.pause], ['Resume', controls.resume],
-    ['Reset', controls.reset], ['Speed change', controls.setSpeed], ['Inject', controls.inject],
+    ['Reset', controls.reset], ['Speed change', controls.setSpeed], ['Inject', controls.inject], ['Demo event', controls.trigger],
   ];
   const failed = labelled.find(([, m]) => m.isError);
   const busy = labelled.some(([, m]) => m.isPending);
@@ -48,51 +51,76 @@ export function ScenarioBar() {
     }
   };
 
+  const status = (
+    <>
+      <ConnectionDot connection={connection} />
+      <ProviderBadge llm={llm.data ?? null} backend={mode === 'http' && connection === 'open'} />
+    </>
+  );
+  if (live) {
+    return (
+      <div className="flex items-center gap-3 h-11 px-4 bg-panel border-t border-line text-[12px]">
+        <span className="text-ink-2">Real weather, polled automatically. Scenario, speed and inject controls are available in DEMO mode.</span>
+        <div className="ml-auto flex items-center gap-4">{status}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-3 h-full px-4 bg-panel border-t border-line text-[12px]">
-      <label className="flex items-center gap-2">
-        <span className="text-ink-2">Scenario</span>
-        <select aria-label="Scenario" className={selectClass} value={scenarioId} disabled={sim.state !== 'idle' || scenarios.length === 0}
-          onChange={(e) => { setPicked(e.target.value); }}>
-          {scenarios.length === 0 && <option value={scenarioId}>Loading scenarios</option>}
-          {scenarios.map((s) => <option key={s.name} value={s.name} title={s.description}>{s.title}</option>)}
-        </select>
-      </label>
-      <Button variant="primary" size="sm" onClick={onPrimary} disabled={busy || scenarios.length === 0} className="w-20 justify-center">
-        {sim.state === 'running' ? <IconPause /> : <IconPlay />}
-        {sim.state === 'running' ? 'Pause' : sim.state === 'paused' ? 'Resume' : 'Start'}
-      </Button>
-      <Button size="sm" onClick={() => { controls.reset.mutate(); }} disabled={busy}>
-        <IconReset />
-        Reset
-      </Button>
-      <label className="flex items-center gap-2">
-        <span className="text-ink-2">Speed</span>
-        <select aria-label="Speed" className={selectClass} value={sim.speed}
-          onChange={(e) => { controls.setSpeed.mutate(Number(e.target.value)); }}>
-          {SPEEDS.map((s) => <option key={s} value={s}>{`${String(s)}×`}</option>)}
-        </select>
-      </label>
-      <label className="flex items-center gap-2">
-        <span className="text-ink-2">Inject</span>
-        <select aria-label="Inject" className={selectClass} value="" disabled={mode === 'mock' || injections.length === 0}
-          onChange={(e) => {
-            const preset = injections.find((i) => i.id === e.target.value);
-            if (preset) controls.inject.mutate(preset.request);
-          }}>
-          <option value="">Choose an event</option>
-          {injections.map((i) => <option key={i.id} value={i.id} title={i.description}>{i.label}</option>)}
-        </select>
-      </label>
-      {failed && <span role="alert" className="text-band-critical-text">{errorText(failed[0], failed[1].error)}</span>}
-      <div className="ml-auto flex items-center gap-4">
-        {sim.stage && <span className="text-ink-2" title="Scenario stage">{statusLabel(sim.stage)}</span>}
-        <span className="tnum text-ink" title="Simulation time">
-          <span className="text-ink-2 mr-1.5">Sim time</span>
-          {fmtSimTimeSec(sim.simTime)}
-        </span>
-        <ConnectionDot connection={connection} />
-        <ProviderBadge llm={llm.data ?? null} backend={mode === 'http' && connection === 'open'} />
+    <div className="flex flex-col bg-panel border-t border-line text-[12px]">
+      <div className="flex items-center gap-3 h-11 px-4">
+        <label className="flex items-center gap-2">
+          <span className="text-ink-2">Scenario</span>
+          <select aria-label="Scenario" className={selectClass} value={scenarioId} disabled={sim.state !== 'idle' || scenarios.length === 0}
+            onChange={(e) => { setPicked(e.target.value); }}>
+            {scenarios.length === 0 && <option value={scenarioId}>Loading scenarios</option>}
+            {scenarios.map((s) => <option key={s.name} value={s.name} title={s.description}>{s.title}</option>)}
+          </select>
+        </label>
+        <Button variant="primary" size="sm" onClick={onPrimary} disabled={busy || scenarios.length === 0} className="w-20 justify-center">
+          {sim.state === 'running' ? <IconPause /> : <IconPlay />}
+          {sim.state === 'running' ? 'Pause' : sim.state === 'paused' ? 'Resume' : 'Start'}
+        </Button>
+        <label className="flex items-center gap-2">
+          <span className="text-ink-2">Speed</span>
+          <select aria-label="Speed" className={selectClass} value={sim.speed}
+            onChange={(e) => { controls.setSpeed.mutate(Number(e.target.value)); }}>
+            {SPEEDS.map((s) => <option key={s} value={s}>{`${String(s)}×`}</option>)}
+          </select>
+        </label>
+        <label className="flex items-center gap-2">
+          <span className="text-ink-2">Inject</span>
+          <select aria-label="Inject" className={selectClass} value="" disabled={mode === 'mock' || injections.length === 0}
+            onChange={(e) => {
+              const preset = injections.find((i) => i.id === e.target.value);
+              if (preset) controls.inject.mutate(preset.request);
+            }}>
+            <option value="">Choose an event</option>
+            {injections.map((i) => <option key={i.id} value={i.id} title={i.description}>{i.label}</option>)}
+          </select>
+        </label>
+        {failed && <span role="alert" className="text-band-critical-text">{errorText(failed[0], failed[1].error)}</span>}
+        <div className="ml-auto flex items-center gap-4">
+          {sim.stage && <span className="text-ink-2" title="Scenario stage">{statusLabel(sim.stage)}</span>}
+          <span className="tnum text-ink" title="Simulation time">
+            <span className="text-ink-2 mr-1.5">Sim time</span>
+            {fmtSimTimeSec(sim.simTime)}
+          </span>
+          {status}
+        </div>
+      </div>
+      <div role="group" aria-label="Demo events" className="flex items-center gap-2 h-9 px-4 border-t border-line">
+        <span className="text-ink-2 mr-1">Demo events</span>
+        {triggers.map((t) => (
+          <Button key={t.id} size="sm" title={t.description} disabled={busy || mode === 'mock'}
+            onClick={() => { controls.trigger.mutate({ trigger: t.id }); }}>
+            {t.label}
+          </Button>
+        ))}
+        <Button size="sm" onClick={() => { controls.reset.mutate(); }} disabled={busy}>
+          <IconReset />
+          Reset
+        </Button>
       </div>
     </div>
   );

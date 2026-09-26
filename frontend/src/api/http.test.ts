@@ -40,6 +40,15 @@ describe('HttpApiClient', () => {
     expect(JSON.parse(f.mock.calls[0]?.[1]?.body as string)).toEqual(body);
     expect(events).toHaveLength(1);
   });
+  it('bands() and simulation.trigger() call the backend', async () => {
+    const f = fakeFetch(200, []);
+    const c = client(f);
+    await c.bands();
+    expect(f.mock.calls[0]?.[0]).toBe('/api/detector/bands');
+    await c.simulation.trigger({ trigger: 'flash_flood' });
+    expect(f.mock.calls[1]?.[0]).toBe('/api/simulation/trigger');
+    expect(JSON.parse(f.mock.calls[1]?.[1]?.body as string)).toEqual({ trigger: 'flash_flood' });
+  });
   it('throws ApiError with status and body on non-2xx', async () => {
     await expect(client(fakeFetch(500, { detail: 'boom' })).city()).rejects.toMatchObject<Partial<ApiError>>({ status: 500, body: { detail: 'boom' } });
   });
@@ -47,7 +56,7 @@ describe('HttpApiClient', () => {
     const f = fakeFetch(200, {});
     const c = client(f);
     for (const call of [
-      () => c.llmStatus(), () => c.bands(), () => c.events(), () => c.incidents(), () => c.incident('i'), () => c.approvals(),
+      () => c.llmStatus(), () => c.events(), () => c.incidents(), () => c.incident('i'), () => c.approvals(),
       () => c.decide('a', { decision: 'approve', approved_action_ids: [] }), () => c.actions(), () => c.action('a'), () => c.document('d'),
     ]) {
       await expect(call()).rejects.toMatchObject({ status: 501 });

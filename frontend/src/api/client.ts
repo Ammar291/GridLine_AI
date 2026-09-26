@@ -6,6 +6,7 @@ import type {
   Bands,
   Chunk,
   City,
+  DataMode,
   Document,
   Event,
   EventType,
@@ -16,6 +17,10 @@ import type {
   LlmStatus,
   SimulationStart,
   SimulationStatus,
+  SourceStatus,
+  TriggerRequest,
+  WorkflowDecision,
+  WorkflowRun,
 } from './types';
 
 export interface SocketHandlers {
@@ -41,11 +46,18 @@ export interface ApiClient {
     reset(): Promise<SimulationStatus>;
     setSpeed(speed: number): Promise<SimulationStatus>;
     inject(body: InjectRequest): Promise<Event[]>;
+    trigger(body: TriggerRequest): Promise<Event[]>;
   };
+  /** Which data source feeds the bus, and switching it at runtime. */
+  source(): Promise<SourceStatus>;
+  setSource(mode: DataMode): Promise<SourceStatus>;
   openSocket(handlers: SocketHandlers): SocketHandle;
+  /** Index band thresholds (GET /api/detector/bands). */
+  bands(): Promise<Bands>;
+  /** Approve or reject the live agent run waiting at its approval gate (POST /api/agent/runs/{run_id}/approval). */
+  decideRunApproval(runId: string, body: WorkflowDecision): Promise<WorkflowRun>;
   // PENDING (openapi.pending.yaml): later milestones. HttpApiClient answers these with 501 until the backend serves them.
   llmStatus(): Promise<LlmStatus>;
-  bands(): Promise<Bands>;
   events(q?: { since?: string; type?: EventType; limit?: number }): Promise<Event[]>;
   incidents(): Promise<IncidentSummary[]>;
   incident(id: string): Promise<Incident>;

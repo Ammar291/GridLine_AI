@@ -1232,5 +1232,37 @@
     "severity": null
    }
   }
+ ],
+ "triggers": [
+  {
+   "id": "heavy_rain",
+   "label": "Heavy Rain",
+   "description": "A monsoon cell brings 20 mm/h over the whole city for three hours"
+  },
+  {
+   "id": "landslide",
+   "label": "Landslide",
+   "description": "PR-HT2 cuts SL-HV-1 to its planned 6 m while 60 mm/h of rain falls on Hillview"
+  },
+  {
+   "id": "drainage_block",
+   "label": "Drainage Block",
+   "description": "Debris blocks 70 % of the Kalinadi drain D-7 above Riverside"
+  },
+  {
+   "id": "flash_flood",
+   "label": "Flash Flood",
+   "description": "A 70 mm/h cloudburst over Hillview and Riverside for two hours"
+  },
+  {
+   "id": "industrial_fire",
+   "label": "Industrial Fire",
+   "description": "A solvent warehouse catches fire in Mill Road Industrial"
+  },
+  {
+   "id": "cascading_disaster",
+   "label": "Cascading Disaster",
+   "description": "SL-HV-1 fails, its debris blocks D-7, then 40 mm/h of rain floods Riverside"
+  }
  ]
 }

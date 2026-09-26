@@ -30,6 +30,17 @@ describe('describeEvent', () => {
     expect(d(ev['environment.water_accumulation'])).toBe('Standing water in Riverside 12.5 cm, rising');
   });
 
+  it('DEMO controls: the announcement, operator rain and a fire', () => {
+    expect(d(ev['scenario.trigger'])).toBe('Demo event: Flash Flood');
+    expect(d(ev['weather.rainfall'])).toBe('Rain 70 mm/h for 2 h over Hillview, Riverside: fixture: cloudburst');
+    expect(d({ ...ev['weather.rainfall'], payload: { ...ev['weather.rainfall'].payload, zone_ids: [] } }))
+      .toBe('Rain 70 mm/h for 2 h over the whole city: fixture: cloudburst');
+    expect(d(ev['emergency.fire'])).toBe('Fire at fixture warehouse in Riverside: 80,000 people exposed in 2 zones');
+    expect(eventGroup('weather.rainfall')).toBe('city');
+    expect(eventGroup('emergency.fire')).toBe('city');
+    expect(eventGroup('scenario.trigger')).toBe('simulation');
+  });
+
   it('backend infrastructure and emergency events use the city names', () => {
     expect(d(ev['infrastructure.road'])).toBe('Hill Road blocked: fixture: debris');
     expect(d(ev['infrastructure.bridge'])).toBe('Kalinadi Bridge closed: fixture: river at danger level');

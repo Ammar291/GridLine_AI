@@ -96,21 +96,44 @@ def test_unmatched_prefix_yields_only_snapshot_and_heartbeats(client: TestClient
     assert frames[0]["event_id"] == "evt-heartbeat" and frames[0]["payload"]["tick"] == 2
 
 
+def test_snapshot_carries_the_data_mode_then_a_source_status(client: TestClient) -> None:
+    with client.websocket_connect("/ws") as ws:
+        snapshot = ws.receive_json()
+        status = ws.receive_json()
+    assert snapshot["payload"]["source"]["label"] == "DEMO — Nandipur"
+    assert status["event_type"] == "source.status" and status["payload"]["mode"] == "demo"
+
+
 def test_heartbeat_when_idle(client: TestClient) -> None:
     with client.websocket_connect("/ws") as ws:
         ws.receive_json()
+        assert ws.receive_json()["event_type"] == "source.status"
         heartbeat = ws.receive_json()
     assert heartbeat["event_type"] == "sim.heartbeat"
     assert set(heartbeat) == ENVELOPE
     assert heartbeat["payload"] == {"tick": 0, "sim_time": "2026-07-14T06:00:00Z"}
 
 
-def test_disconnect_unsubscribes(client: TestClient) -> None:
-    bus = client.app.state.bus  # type: ignore[attr-defined]
+def test_trigger_events_arrive_on_the_socket_in_order(client: TestClient) -> None:
     with client.websocket_connect("/ws") as ws:
         ws.receive_json()
-        assert bus.subscriber_count == 1
+        response = client.post("/api/simulation/trigger", json={"trigger": "cascading_disaster"})
+        ids = [e["event_id"] for e in response.json()]
+        received: list[str] = []
+        while len(received) < len(ids):
+            frame = ws.receive_json()
+            if frame["event_id"] in ids:
+                received.append(frame["event_id"])
+    assert received == ids
+
+
+def test_disconnect_unsubscribes(client: TestClient) -> None:
+    bus = client.app.state.bus  # type: ignore[attr-defined]
+    before = bus.subscriber_count  # the agent runner's own subscription
+    with client.websocket_connect("/ws") as ws:
+        ws.receive_json()
+        assert bus.subscriber_count == before + 1
     deadline = time.monotonic() + 2
-    while bus.subscriber_count and time.monotonic() < deadline:
+    while bus.subscriber_count > before and time.monotonic() < deadline:
         time.sleep(0.01)
-    assert bus.subscriber_count == 0
+    assert bus.subscriber_count == before

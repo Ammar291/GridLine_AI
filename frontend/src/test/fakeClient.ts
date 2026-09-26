@@ -6,10 +6,11 @@ export function fakeClient(overrides: Partial<ApiClient> = {}): ApiClient {
   const rejectMock = () => Promise.reject(new Error('not implemented'));
   return {
     mode: 'mock', health: rejectMock, city: () => Promise.resolve(cityFixture), chunk: rejectMock,
-    simulation: { start: rejectMock, pause: rejectMock, resume: rejectMock, reset: rejectMock, setSpeed: rejectMock, inject: rejectMock },
+    simulation: { start: rejectMock, pause: rejectMock, resume: rejectMock, reset: rejectMock, setSpeed: rejectMock, inject: rejectMock, trigger: rejectMock },
+    source: rejectMock, setSource: rejectMock,
     openSocket: () => ({ close: () => undefined }),
     llmStatus: rejectMock, bands: rejectMock, events: rejectMock, incidents: rejectMock, incident: rejectMock,
-    approvals: () => Promise.resolve([]), decide: rejectMock, actions: rejectMock, action: rejectMock, document: rejectMock,
+    approvals: () => Promise.resolve([]), decide: rejectMock, decideRunApproval: rejectMock, actions: rejectMock, action: rejectMock, document: rejectMock,
     ...overrides,
   };
 }

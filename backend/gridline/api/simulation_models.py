@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from gridline.events.types import EventType, Severity
 from gridline.simulation.runner import MAX_SPEED, MIN_SPEED, SimulationStatus, StageInfo
 from gridline.simulation.scenarios import SCENARIOS, ScenarioName
+from gridline.simulation.triggers import TriggerName
 
 
 class ScenarioInfo(BaseModel):
@@ -47,6 +48,10 @@ class InjectRequest(BaseModel):
     payload: dict[str, Any]
     source: str = "operator:api"
     severity: Severity | None = None
+
+
+class TriggerRequest(BaseModel):
+    trigger: TriggerName
 
 
 def scenario_infos() -> list[ScenarioInfo]:

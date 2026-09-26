@@ -39,6 +39,18 @@ describe('milestoneMarkers', () => {
     expect(markers).toEqual([{ id: 'm1', simTime: '2026-07-14T10:05:00', label: 'fixture: m1', kind: 'band' }]);
   });
 
+  it('snaps a milestone to the next reading row, and waits when there is none yet', () => {
+    const ms = [
+      milestone('t1', '2026-07-14T09:55:00', { kind: 'scenario' }),
+      milestone('t2', '2026-07-14T10:02:00', { kind: 'scenario' }),
+      milestone('t3', '2026-07-14T10:07:00', { kind: 'scenario' }),
+    ];
+    expect(milestoneMarkers(ms, 'hillview', rows).map((m) => [m.id, m.simTime])).toEqual([
+      ['t1', '2026-07-14T10:00:00'],
+      ['t2', '2026-07-14T10:05:00'],
+    ]);
+  });
+
   it('marks city-wide milestones (a scenario stage) on every zone', () => {
     const ms = [milestone('s1', '2026-07-14T10:05:00', { kind: 'scenario' })];
     expect(milestoneMarkers(ms, 'hillview', rows).map((m) => m.id)).toEqual(['s1']);

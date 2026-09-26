@@ -1,11 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScenarioBar } from './ScenarioBar';
 import { ProviderBadge } from './ProviderBadge';
 import { ModeBanner } from './ModeBanner';
 import { OverviewStrip } from '@/components/overview/OverviewStrip';
 import { ApiError } from '@/api/client';
-import type { SimulationStatus } from '@/api/types';
+import type { SimulationStatus, SourceStatus } from '@/api/types';
 import { useLiveStore } from '@/live/liveStore';
 import { initialSim, type SimState } from '@/live/types';
 import { cityFixture } from '@/test/fixtures/city';
@@ -78,6 +78,67 @@ describe('ScenarioBar', () => {
     await screen.findByRole('option', { name: 'Culvert blocked' });
     fireEvent.change(screen.getByRole('combobox', { name: 'Inject' }), { target: { value: 'culvert_blocked' } });
     await waitFor(() => { expect(inject).toHaveBeenCalledWith(cityFixture.injections[1]?.request); });
+  });
+
+  it('lists one demo event per backend trigger, then Reset, in a Demo events group', async () => {
+    renderWithProviders(<ScenarioBar />);
+    const group = await screen.findByRole('group', { name: 'Demo events' });
+    await within(group).findByRole('button', { name: 'Heavy Rain' });
+    expect(within(group).getAllByRole('button').map((b) => b.textContent)).toEqual([
+      'Heavy Rain', 'Landslide', 'Drainage Block', 'Flash Flood', 'Industrial Fire', 'Cascading Disaster', 'Reset',
+    ]);
+    expect(within(group).getByRole('button', { name: 'Flash Flood' })).toHaveAttribute('title', 'fixture: cloudburst');
+  });
+
+  it('disables the demo events in mock mode but keeps Reset', async () => {
+    renderWithProviders(<ScenarioBar />);
+    const group = await screen.findByRole('group', { name: 'Demo events' });
+    expect(await within(group).findByRole('button', { name: 'Heavy Rain' })).toBeDisabled();
+    expect(within(group).getByRole('button', { name: 'Reset' })).toBeEnabled();
+  });
+
+  it('in http mode each demo event posts its trigger', async () => {
+    useLiveStore.getState().setMode('http');
+    const trigger = vi.fn(() => Promise.resolve([]));
+    const client = fakeClient();
+    renderWithProviders(<ScenarioBar />, { ...client, mode: 'http', simulation: { ...client.simulation, trigger } });
+    for (const t of cityFixture.triggers) {
+      const button = await screen.findByRole('button', { name: t.label });
+      await waitFor(() => { expect(button).toBeEnabled(); });
+      fireEvent.click(button);
+      await waitFor(() => { expect(trigger).toHaveBeenLastCalledWith({ trigger: t.id }); });
+    }
+    expect(trigger).toHaveBeenCalledTimes(6);
+  });
+
+  it('disables every demo event while a request is pending', async () => {
+    useLiveStore.getState().setMode('http');
+    const trigger = vi.fn(() => new Promise<never>(() => undefined));
+    const client = fakeClient();
+    renderWithProviders(<ScenarioBar />, { ...client, mode: 'http', simulation: { ...client.simulation, trigger } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Landslide' }));
+    await waitFor(() => { expect(screen.getByRole('button', { name: 'Flash Flood' })).toBeDisabled(); });
+    fireEvent.click(screen.getByRole('button', { name: 'Flash Flood' }));
+    expect(trigger).toHaveBeenCalledTimes(1);
+  });
+
+  it('a failed demo event shows an inline error', async () => {
+    useLiveStore.getState().setMode('http');
+    const trigger = vi.fn(() => Promise.reject(new ApiError(409, null, 'live')));
+    const client = fakeClient();
+    renderWithProviders(<ScenarioBar />, { ...client, mode: 'http', simulation: { ...client.simulation, trigger } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Heavy Rain' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Demo event failed (409)');
+  });
+
+  it('shows no demo events in LIVE mode', () => {
+    const live: SourceStatus = {
+      mode: 'live', label: 'LIVE — Kalyan-Dombivli', city: 'Kalyan-Dombivli', provider: 'Open-Meteo', latitude: 19.235,
+      longitude: 73.13, poll_seconds: 300, last_updated: null, last_error: null,
+    };
+    useLiveStore.setState({ source: live });
+    renderWithProviders(<ScenarioBar />);
+    expect(screen.queryByRole('group', { name: 'Demo events' })).toBeNull();
   });
 });
 

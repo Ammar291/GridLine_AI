@@ -7,7 +7,7 @@ export type WorldEvent = EventOf<
   | 'weather.observation' | 'weather.forecast' | 'environment.soil' | 'environment.river' | 'environment.drainage'
   | 'environment.slope' | 'environment.water_accumulation' | 'infrastructure.road' | 'infrastructure.bridge'
   | 'infrastructure.drainage_obstruction' | 'infrastructure.construction' | 'infrastructure.failure'
-  | 'emergency.rescue_team' | 'emergency.ambulance' | 'emergency.hospital' | 'emergency.shelter'
+  | 'emergency.rescue_team' | 'emergency.ambulance' | 'emergency.hospital' | 'emergency.shelter' | 'weather.rainfall' | 'emergency.fire'
 >;
 
 const num = (v: number, digits = 1) => String(Number(v.toFixed(digits)));
@@ -129,6 +129,14 @@ export function applyWorldEvent(state: LiveState, e: WorldEvent): LiveState {
     case 'emergency.shelter': {
       const p = e.payload;
       return withWorld(state, (w) => ({ ...w, shelters: patch(w.shelters, p.shelter_id, { status: p.status, occupancy: p.occupancy }) }));
+    }
+    case 'weather.rainfall':
+      return state; // operator rain drives the simulation; its readings arrive as weather.observation
+    case 'emergency.fire': {
+      const p = e.payload;
+      const fire = { site: p.site, exposed_zone_ids: p.exposed_zone_ids, exposed_population: p.exposed_population };
+      const next = withWorld(state, (w) => ({ ...w, fires: { ...w.fires, [p.zone_id]: fire } }));
+      return addMilestone(next, e, { kind: 'infrastructure', label: `Fire: ${p.site}`, zoneId: p.zone_id });
     }
   }
 }

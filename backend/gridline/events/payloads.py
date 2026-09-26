@@ -6,12 +6,15 @@ event fails validation. Fields documented as "filled by the apply handler" may b
 
 from typing import Any, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, Field
 
-from gridline.events.types import EventType
+from gridline.agents.steps import WorkflowRun, WorkflowStep
+from gridline.events.payload_base import Payload
+from gridline.events.types import Band, EventType
 
 Trend = Literal["rising", "steady", "falling"]
 RunnerState = Literal["idle", "running", "paused"]
+DataMode = Literal["live", "demo"]
 RoadStatusValue = Literal["open", "blocked", "closed"]
 BridgeStatusValue = Literal["open", "restricted", "closed"]
 ProjectStatusValue = Literal["active", "halted"]
@@ -22,11 +25,6 @@ ErStatusValue = Literal["normal", "busy", "overwhelmed"]
 ShelterStatusValue = Literal["closed", "open", "full"]
 FailureAssetKind = Literal["slope", "channel", "bridge", "road", "power"]
 FailureKind = Literal["landslide", "culvert_collapse", "embankment_breach", "power_outage"]
-
-
-class Payload(BaseModel):
-    # A serialized payload carries every field, so the published (serialization) schema marks all required.
-    model_config = ConfigDict(extra="forbid", json_schema_serialization_defaults_required=True)
 
 
 class SimTick(Payload):
@@ -49,13 +47,30 @@ class SimStatus(Payload):
     stage: str
 
 
+class SourceStatus(Payload):
+    """Which data source feeds the bus: DEMO (the Nandipur simulation) or LIVE (real weather, real city)."""
+
+    mode: DataMode
+    label: str
+    city: str
+    provider: str
+    latitude: float | None = None
+    longitude: float | None = None
+    poll_seconds: float | None = None
+    last_updated: AwareDatetime | None = None
+    last_error: str | None = None
+
+
 class SimSnapshot(Payload):
     """``world`` is a ``WorldSnapshot`` dump and ``city`` the dashboard's ``CityMap`` dump (typed in the API's
-    ``SimSnapshotPayload``; kept as dicts here because those models import this module)."""
+    ``SimSnapshotPayload``; kept as dicts here because those models import this module). ``source`` says which
+    data source is active; ``world`` and ``city`` always describe the Nandipur simulation."""
 
     status: SimStatus
     world: dict[str, Any]
     city: dict[str, Any] = Field(default_factory=dict)
+    source: SourceStatus | None = None
+    agent_run: WorkflowRun | None = None  # the live agent workflow, so a client joining mid-run catches up
 
 
 class Heartbeat(Payload):
@@ -71,6 +86,29 @@ class ScenarioStage(Payload):
     tick: int = Field(ge=0)
 
 
+class ScenarioTrigger(Payload):
+    """An operator pressed a DEMO control; its injected events and one simulated hour follow on the bus."""
+
+    trigger: str
+    label: str
+    description: str
+    tick: int = Field(ge=0)
+
+
+class ZoneStatePayload(Payload):
+    """One zone's risk indices after a tick (``gridline.threats.indices``): a signal, never a decision."""
+
+    zone_id: str
+    saturation: float = Field(ge=0, le=1)
+    rain_24h_mm: float = Field(ge=0)
+    rain_intensity_mm_h: float = Field(ge=0)
+    landslide_index: float = Field(ge=0, le=1)
+    flood_index: float = Field(ge=0, le=1)
+    band: Band
+    prev_band: Band | None = None
+    updated_sim_time: AwareDatetime
+
+
 class WeatherObservation(Payload):
     """A rain gauge reports rainfall, the wind station wind and temperature; unmeasured fields are None."""
 
@@ -82,6 +120,12 @@ class WeatherObservation(Payload):
     wind_direction_deg: float | None = Field(default=None, ge=0, lt=360)
 
 
+class HourlyPrecipitation(Payload):
+    time: AwareDatetime
+    precipitation_mm: float = Field(ge=0)
+    probability: float | None = Field(default=None, ge=0, le=1)
+
+
 class WeatherForecast(Payload):
     issued_sim_time: AwareDatetime
     horizon_h: float = Field(gt=0)
@@ -89,6 +133,21 @@ class WeatherForecast(Payload):
     peak_intensity_mm_h: float = Field(ge=0)
     confidence: float = Field(ge=0, le=1)
     summary: str
+    hourly: list[HourlyPrecipitation] = Field(
+        default_factory=list[HourlyPrecipitation]
+    )  # live forecasts only
+
+
+class RainfallDriver(Payload):
+    """Operator rain: ``intensity_mm_h`` over ``zone_ids`` (empty means every zone) for ``duration_h`` hours.
+
+    A driver, not a reading: the scenario's rain resumes when it ends and is never lowered by it.
+    """
+
+    zone_ids: list[str] = Field(default_factory=list[str])
+    intensity_mm_h: float = Field(gt=0, le=200)
+    duration_h: float = Field(gt=0, le=24)
+    description: str = ""
 
 
 class SoilObservation(Payload):
@@ -196,14 +255,30 @@ class ShelterCapacity(Payload):
     occupancy: int = Field(ge=0)
 
 
+class IndustrialFire(Payload):
+    """A fire at a site in a zone; who is exposed is computed from the city by the apply handler."""
+
+    zone_id: str
+    site: str
+    description: str = ""
+    exposed_zone_ids: list[str] = Field(
+        default_factory=list[str]
+    )  # filled from the city by the apply handler
+    exposed_population: int = Field(default=0, ge=0)  # filled from the city by the apply handler
+
+
 PAYLOAD_MODELS: dict[EventType, type[Payload]] = {
     EventType.SIM_TICK: SimTick,
     EventType.SIM_STATUS: SimStatus,
     EventType.SIM_SNAPSHOT: SimSnapshot,
     EventType.SIM_HEARTBEAT: Heartbeat,
     EventType.SCENARIO_STAGE: ScenarioStage,
+    EventType.SCENARIO_TRIGGER: ScenarioTrigger,
+    EventType.ZONE_STATE: ZoneStatePayload,
+    EventType.SOURCE_STATUS: SourceStatus,
     EventType.WEATHER_OBSERVATION: WeatherObservation,
     EventType.WEATHER_FORECAST: WeatherForecast,
+    EventType.WEATHER_RAINFALL: RainfallDriver,
     EventType.ENVIRONMENT_SOIL: SoilObservation,
     EventType.ENVIRONMENT_RIVER: RiverObservation,
     EventType.ENVIRONMENT_DRAINAGE: DrainageObservation,
@@ -218,4 +293,6 @@ PAYLOAD_MODELS: dict[EventType, type[Payload]] = {
     EventType.EMERGENCY_AMBULANCE: AmbulanceStatus,
     EventType.EMERGENCY_HOSPITAL: HospitalCapacity,
     EventType.EMERGENCY_SHELTER: ShelterCapacity,
+    EventType.EMERGENCY_FIRE: IndustrialFire,
+    EventType.AGENT_STEP: WorkflowStep,
 }

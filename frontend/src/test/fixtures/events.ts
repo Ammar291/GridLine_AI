@@ -4,6 +4,7 @@ import { cityFixture, worldFixture } from './city';
 import { incidentFixture } from './incident';
 import { decidedApprovalFixture, pendingApprovalFixture } from './approval';
 import { executedActionFixture } from './action';
+import { stepOf } from './workflow';
 
 export const TS = '2026-09-26T10:31:04Z';
 export const SIM = '2026-07-14T10:31:04Z';
@@ -48,9 +49,31 @@ export const eventsFixture: { [K in EventType]: EventOf<K> } = {
     payload: { tick: 13, sim_time: SIM, scenario: 'hillside_landslide', stage: 'construction_and_rain', speed: 1, running: true },
   },
   'sim.heartbeat': { ...base('sim.heartbeat'), payload: { tick: 13, sim_time: SIM } },
+  'source.status': {
+    ...base('source.status', { source: 'source:manager' }),
+    payload: {
+      mode: 'demo', label: 'DEMO — Nandipur', city: 'Nandipur', provider: 'Synthetic simulation', latitude: null, longitude: null,
+      poll_seconds: null, last_updated: null, last_error: null,
+    },
+  },
   'scenario.stage': {
     ...base('scenario.stage', { source: 'scenario:hillside_landslide' }),
     payload: { scenario: 'hillside_landslide', stage_index: 2, stage: 'slope_creep', description: 'fixture: slope creep begins', tick: 96 },
+  },
+  'scenario.trigger': {
+    ...base('scenario.trigger', { source: 'operator:demo' }),
+    payload: { trigger: 'flash_flood', label: 'Flash Flood', description: 'fixture: cloudburst', tick: 13 },
+  },
+  'weather.rainfall': {
+    ...base('weather.rainfall', { source: 'operator:demo', severity: 'high' }),
+    payload: { zone_ids: ['hillview', 'riverside'], intensity_mm_h: 70, duration_h: 2, description: 'fixture: cloudburst' },
+  },
+  'emergency.fire': {
+    ...base('emergency.fire', { location: 'riverside', source: 'operator:demo', severity: 'critical' }),
+    payload: {
+      zone_id: 'riverside', site: 'fixture warehouse', description: 'fixture: fire', exposed_zone_ids: ['riverside', 'old_town'],
+      exposed_population: 80000,
+    },
   },
   'weather.observation': {
     ...base('weather.observation', { location: 'hillview', severity: 'high', source: 'sensor:RG-02' }),
@@ -62,7 +85,7 @@ export const eventsFixture: { [K in EventType]: EventOf<K> } = {
   'weather.forecast': {
     ...base('weather.forecast', { source: 'scenario:hillside_landslide', severity: 'moderate' }),
     payload: {
-      issued_sim_time: SIM, horizon_h: 24, expected_total_mm: 180, peak_intensity_mm_h: 40, confidence: 0.85, summary: 'fixture: heavy rain warning',
+      issued_sim_time: SIM, horizon_h: 24, expected_total_mm: 180, peak_intensity_mm_h: 40, confidence: 0.85, summary: 'fixture: heavy rain warning', hourly: [],
     },
   },
   'environment.soil': {
@@ -121,6 +144,7 @@ export const eventsFixture: { [K in EventType]: EventOf<K> } = {
     ...base('emergency.shelter', { location: 'market_ward' }),
     payload: { shelter_id: 's1', status: 'open', capacity: 400, occupancy: 120 },
   },
+  'agent.step': { ...base('agent.step', { source: 'agent:workflow' }), payload: stepOf('assess') },
   // ---- PENDING (later milestones) ----
   'zone.state': {
     ...base('zone.state', { location: 'hillview', severity: 'high', source: 'detector' }),
