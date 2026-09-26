@@ -1,0 +1,1019 @@
+{
+ "view_box": {
+  "x": 0,
+  "y": 0,
+  "width": 1200,
+  "height": 900
+ },
+ "zones": [
+  {
+   "id": "Z-HV",
+   "name": "Hillview",
+   "slope_deg": 32,
+   "soil_type": "colluvial silty clay over weathered phyllite",
+   "population": 18500,
+   "drains_to_channel_id": "D-7",
+   "svg_path": "M820 460 L1140 460 L1140 260 L820 260 Z",
+   "label_xy": {
+    "x": 980.0,
+    "y": 360.0
+   },
+   "state": {
+    "saturation": 0.42,
+    "rain_24h_mm": 38,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.18,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-TH",
+   "name": "Tekri Heights",
+   "slope_deg": 24,
+   "soil_type": "thin residual soil over quartzite",
+   "population": 4200,
+   "drains_to_channel_id": "D-7",
+   "svg_path": "M820 260 L1200 260 L1200 0 L820 0 Z",
+   "label_xy": {
+    "x": 1010.0,
+    "y": 130.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-RS",
+   "name": "Riverside",
+   "slope_deg": 3,
+   "soil_type": "alluvial silt and sand",
+   "population": 46000,
+   "drains_to_channel_id": "D-8",
+   "svg_path": "M760 570 L1140 570 L1140 460 L760 460 Z",
+   "label_xy": {
+    "x": 950.0,
+    "y": 515.0
+   },
+   "state": {
+    "saturation": 0.38,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.08,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-OT",
+   "name": "Old Town",
+   "slope_deg": 4,
+   "soil_type": "alluvial clay loam",
+   "population": 62000,
+   "drains_to_channel_id": "D-3",
+   "svg_path": "M480 570 L760 570 L760 440 L480 440 Z",
+   "label_xy": {
+    "x": 620.0,
+    "y": 505.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-MW",
+   "name": "Market Ward",
+   "slope_deg": 3,
+   "soil_type": "clay loam",
+   "population": 38000,
+   "drains_to_channel_id": "D-4",
+   "svg_path": "M480 440 L760 440 L760 320 L480 320 Z",
+   "label_xy": {
+    "x": 620.0,
+    "y": 380.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-SR",
+   "name": "Station Road",
+   "slope_deg": 2,
+   "soil_type": "silty loam over railway fill",
+   "population": 41000,
+   "drains_to_channel_id": "D-5",
+   "svg_path": "M180 520 L480 520 L480 300 L180 300 Z",
+   "label_xy": {
+    "x": 330.0,
+    "y": 410.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-CL",
+   "name": "Civil Lines",
+   "slope_deg": 6,
+   "soil_type": "lateritic gravel over shale",
+   "population": 21000,
+   "drains_to_channel_id": "D-2",
+   "svg_path": "M480 320 L820 320 L820 120 L480 120 Z",
+   "label_xy": {
+    "x": 650.0,
+    "y": 220.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-LK",
+   "name": "Lakeside",
+   "slope_deg": 1,
+   "soil_type": "lacustrine clay and peat",
+   "population": 34000,
+   "drains_to_channel_id": "D-11",
+   "svg_path": "M0 900 L360 900 L360 630 L0 630 Z",
+   "label_xy": {
+    "x": 180.0,
+    "y": 765.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-NC",
+   "name": "New Colony",
+   "slope_deg": 2,
+   "soil_type": "alluvial silt (former paddy)",
+   "population": 58000,
+   "drains_to_channel_id": "D-9",
+   "svg_path": "M360 900 L840 900 L840 630 L360 630 Z",
+   "label_xy": {
+    "x": 600.0,
+    "y": 765.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  },
+  {
+   "id": "Z-MI",
+   "name": "Mill Road Industrial",
+   "slope_deg": 2,
+   "soil_type": "alluvial sand and gravel",
+   "population": 22000,
+   "drains_to_channel_id": "D-12",
+   "svg_path": "M840 900 L1200 900 L1200 630 L840 630 Z",
+   "label_xy": {
+    "x": 1020.0,
+    "y": 765.0
+   },
+   "state": {
+    "saturation": 0.35,
+    "rain_24h_mm": 30,
+    "rain_intensity_mm_h": 12,
+    "landslide_index": 0.02,
+    "flood_index": 0.05,
+    "band": "normal",
+    "updated_sim_time": "2026-07-14T06:00:00"
+   }
+  }
+ ],
+ "roads": [
+  {
+   "id": "RD-01",
+   "name": "Hill Road",
+   "zone_ids": [
+    "Z-HV",
+    "Z-RS",
+    "Z-TH"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M960 460 L980 410 L1010 360 L1030 300 L1020 260 L1040 200"
+  },
+  {
+   "id": "RD-02",
+   "name": "Riverside Bypass",
+   "zone_ids": [
+    "Z-RS",
+    "Z-OT"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M760 555 L900 550 L1140 560 L1180 560"
+  },
+  {
+   "id": "RD-03",
+   "name": "Kalinadi Bridge Road",
+   "zone_ids": [
+    "Z-OT",
+    "Z-NC"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": true,
+   "svg_path": "M620 530 L620 600 L620 660"
+  },
+  {
+   "id": "RD-04",
+   "name": "Station Road",
+   "zone_ids": [
+    "Z-SR",
+    "Z-MW"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M220 400 L480 400 L600 400"
+  },
+  {
+   "id": "RD-05",
+   "name": "Bazaar Lane",
+   "zone_ids": [
+    "Z-OT"
+   ],
+   "status": "open",
+   "is_evacuation_route": false,
+   "is_bridge": false,
+   "svg_path": "M540 520 L620 510 L700 500"
+  },
+  {
+   "id": "RD-06",
+   "name": "Market Ward Main",
+   "zone_ids": [
+    "Z-MW"
+   ],
+   "status": "open",
+   "is_evacuation_route": false,
+   "is_bridge": false,
+   "svg_path": "M480 370 L760 370"
+  },
+  {
+   "id": "RD-07",
+   "name": "Lakeside Ring Road",
+   "zone_ids": [
+    "Z-LK"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M60 840 L300 840 L300 660 L60 660 Z"
+  },
+  {
+   "id": "RD-08",
+   "name": "Mill Road",
+   "zone_ids": [
+    "Z-MI"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M840 740 L1200 740"
+  },
+  {
+   "id": "RD-09",
+   "name": "New Colony Avenue",
+   "zone_ids": [
+    "Z-NC"
+   ],
+   "status": "open",
+   "is_evacuation_route": false,
+   "is_bridge": false,
+   "svg_path": "M360 780 L840 780"
+  },
+  {
+   "id": "RD-10",
+   "name": "Civil Lines Road",
+   "zone_ids": [
+    "Z-CL",
+    "Z-SR",
+    "Z-RS"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M480 280 L820 260 L860 340 L960 460"
+  },
+  {
+   "id": "RD-11",
+   "name": "Tekri Quarry Road",
+   "zone_ids": [
+    "Z-TH"
+   ],
+   "status": "open",
+   "is_evacuation_route": false,
+   "is_bridge": false,
+   "svg_path": "M1040 200 L1020 160 L1080 120 L1200 80"
+  },
+  {
+   "id": "RD-12",
+   "name": "Eastern Highway Link",
+   "zone_ids": [
+    "Z-MI",
+    "Z-RS"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": true,
+   "svg_path": "M1180 740 L1180 630 L1180 560"
+  },
+  {
+   "id": "RD-13",
+   "name": "Rail Underpass Road",
+   "zone_ids": [
+    "Z-SR"
+   ],
+   "status": "open",
+   "is_evacuation_route": false,
+   "is_bridge": false,
+   "svg_path": "M330 480 L330 390"
+  },
+  {
+   "id": "RD-14",
+   "name": "Lake Causeway",
+   "zone_ids": [
+    "Z-LK",
+    "Z-NC"
+   ],
+   "status": "open",
+   "is_evacuation_route": true,
+   "is_bridge": false,
+   "svg_path": "M280 670 L360 670 L420 700"
+  }
+ ],
+ "channels": [
+  {
+   "id": "D-2",
+   "name": "D-2 Civil Lines drain",
+   "design_capacity_m3s": 8,
+   "current_capacity_m3s": 8,
+   "blocked_fraction": 0.0,
+   "downstream_zone_id": "Z-MW",
+   "svg_path": "M650 260 L650 320 L630 400"
+  },
+  {
+   "id": "D-3",
+   "name": "D-3 Old Town main drain",
+   "design_capacity_m3s": 18,
+   "current_capacity_m3s": 14,
+   "blocked_fraction": 0.1,
+   "downstream_zone_id": "Z-OT",
+   "svg_path": "M600 460 L620 510 L620 585"
+  },
+  {
+   "id": "D-4",
+   "name": "D-4 Market Ward drain",
+   "design_capacity_m3s": 12,
+   "current_capacity_m3s": 10,
+   "blocked_fraction": 0.08,
+   "downstream_zone_id": "Z-OT",
+   "svg_path": "M630 350 L620 410 L610 460"
+  },
+  {
+   "id": "D-5",
+   "name": "D-5 Station Road drain",
+   "design_capacity_m3s": 9,
+   "current_capacity_m3s": 7.5,
+   "blocked_fraction": 0.12,
+   "downstream_zone_id": "Z-SR",
+   "svg_path": "M260 340 L330 440 L350 600"
+  },
+  {
+   "id": "D-7",
+   "name": "D-7 Kalinadi drain",
+   "design_capacity_m3s": 42,
+   "current_capacity_m3s": 27,
+   "blocked_fraction": 0.0,
+   "downstream_zone_id": "Z-RS",
+   "svg_path": "M1040 270 L990 370 L970 440 L950 510 L940 577"
+  },
+  {
+   "id": "D-8",
+   "name": "D-8 Riverside outfall drain",
+   "design_capacity_m3s": 15,
+   "current_capacity_m3s": 13,
+   "blocked_fraction": 0.12,
+   "downstream_zone_id": "Z-RS",
+   "svg_path": "M840 500 L880 540 L940 550"
+  },
+  {
+   "id": "D-9",
+   "name": "D-9 New Colony drain",
+   "design_capacity_m3s": 20,
+   "current_capacity_m3s": 20,
+   "blocked_fraction": 0.0,
+   "downstream_zone_id": "Z-NC",
+   "svg_path": "M420 720 L600 700 L740 640 L740 595"
+  },
+  {
+   "id": "D-11",
+   "name": "D-11 Lakeside pumped drain",
+   "design_capacity_m3s": 12,
+   "current_capacity_m3s": 9.5,
+   "blocked_fraction": 0.05,
+   "downstream_zone_id": "Z-LK",
+   "svg_path": "M220 700 L260 680 L300 665 L320 622"
+  },
+  {
+   "id": "D-12",
+   "name": "D-12 Mill Road industrial drain",
+   "design_capacity_m3s": 16,
+   "current_capacity_m3s": 12,
+   "blocked_fraction": 0.25,
+   "downstream_zone_id": "Z-MI",
+   "svg_path": "M900 680 L1020 700 L1080 660 L1080 576"
+  }
+ ],
+ "projects": [
+  {
+   "id": "PR-HT2",
+   "name": "Hillview Terrace Phase 2",
+   "zone_id": "Z-HV",
+   "status": "active",
+   "excavation_depth_m": 2.5,
+   "planned_depth_m": 6.0,
+   "permit_doc_id": "permit-ht-2026-014",
+   "xy": {
+    "x": 970.0,
+    "y": 355.0
+   }
+  },
+  {
+   "id": "PR-TQ",
+   "name": "Tekri Quarry expansion",
+   "zone_id": "Z-TH",
+   "status": "active",
+   "excavation_depth_m": 35,
+   "planned_depth_m": 45,
+   "permit_doc_id": null,
+   "xy": {
+    "x": 1060.0,
+    "y": 180.0
+   }
+  },
+  {
+   "id": "PR-MWM",
+   "name": "Market Ward Mall",
+   "zone_id": "Z-MW",
+   "status": "active",
+   "excavation_depth_m": 8.0,
+   "planned_depth_m": 8.0,
+   "permit_doc_id": null,
+   "xy": {
+    "x": 660.0,
+    "y": 400.0
+   }
+  }
+ ],
+ "sensors": [
+  {
+   "id": "RG-01",
+   "kind": "rain",
+   "zone_id": "Z-TH",
+   "unit": "mm/h",
+   "xy": {
+    "x": 1060.0,
+    "y": 160.0
+   }
+  },
+  {
+   "id": "RG-02",
+   "kind": "rain",
+   "zone_id": "Z-HV",
+   "unit": "mm/h",
+   "xy": {
+    "x": 970.0,
+    "y": 340.0
+   }
+  },
+  {
+   "id": "RG-03",
+   "kind": "rain",
+   "zone_id": "Z-OT",
+   "unit": "mm/h",
+   "xy": {
+    "x": 600.0,
+    "y": 500.0
+   }
+  },
+  {
+   "id": "RG-04",
+   "kind": "rain",
+   "zone_id": "Z-LK",
+   "unit": "mm/h",
+   "xy": {
+    "x": 180.0,
+    "y": 720.0
+   }
+  },
+  {
+   "id": "RG-05",
+   "kind": "rain",
+   "zone_id": "Z-NC",
+   "unit": "mm/h",
+   "xy": {
+    "x": 600.0,
+    "y": 760.0
+   }
+  },
+  {
+   "id": "SM-01",
+   "kind": "soil",
+   "zone_id": "Z-HV",
+   "unit": "%",
+   "xy": {
+    "x": 972.0,
+    "y": 344.0
+   }
+  },
+  {
+   "id": "SM-02",
+   "kind": "soil",
+   "zone_id": "Z-HV",
+   "unit": "%",
+   "xy": {
+    "x": 968.0,
+    "y": 360.0
+   }
+  },
+  {
+   "id": "SM-03",
+   "kind": "soil",
+   "zone_id": "Z-HV",
+   "unit": "%",
+   "xy": {
+    "x": 935.0,
+    "y": 380.0
+   }
+  },
+  {
+   "id": "SM-04",
+   "kind": "soil",
+   "zone_id": "Z-TH",
+   "unit": "%",
+   "xy": {
+    "x": 1060.0,
+    "y": 170.0
+   }
+  },
+  {
+   "id": "CL-D7",
+   "kind": "channel",
+   "zone_id": "Z-HV",
+   "unit": "m",
+   "xy": {
+    "x": 980.0,
+    "y": 410.0
+   }
+  },
+  {
+   "id": "CL-D3",
+   "kind": "channel",
+   "zone_id": "Z-OT",
+   "unit": "m",
+   "xy": {
+    "x": 620.0,
+    "y": 510.0
+   }
+  },
+  {
+   "id": "CL-D11",
+   "kind": "channel",
+   "zone_id": "Z-LK",
+   "unit": "m",
+   "xy": {
+    "x": 300.0,
+    "y": 665.0
+   }
+  }
+ ],
+ "crews": [
+  {
+   "id": "C-1",
+   "name": "Rescue Alpha",
+   "status": "available",
+   "location_zone_id": "Z-CL",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 580.0,
+    "y": 280.0
+   }
+  },
+  {
+   "id": "C-2",
+   "name": "Drainage Crew Old Town",
+   "status": "available",
+   "location_zone_id": "Z-OT",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 520.0,
+    "y": 460.0
+   }
+  },
+  {
+   "id": "C-3",
+   "name": "Road Maintenance Crew",
+   "status": "on_site",
+   "location_zone_id": "Z-SR",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 260.0,
+    "y": 440.0
+   }
+  },
+  {
+   "id": "C-4",
+   "name": "Hill Rescue Team",
+   "status": "available",
+   "location_zone_id": "Z-RS",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 960.0,
+    "y": 460.0
+   }
+  },
+  {
+   "id": "C-5",
+   "name": "Medical Response Team",
+   "status": "available",
+   "location_zone_id": "Z-CL",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 640.0,
+    "y": 240.0
+   }
+  },
+  {
+   "id": "C-6",
+   "name": "Electrical Repair Crew",
+   "status": "available",
+   "location_zone_id": "Z-CL",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 600.0,
+    "y": 220.0
+   }
+  },
+  {
+   "id": "C-7",
+   "name": "Boat Rescue Unit",
+   "status": "available",
+   "location_zone_id": "Z-LK",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 160.0,
+    "y": 660.0
+   }
+  },
+  {
+   "id": "C-8",
+   "name": "New Colony Volunteer Team",
+   "status": "available",
+   "location_zone_id": "Z-NC",
+   "target_zone_id": null,
+   "task": null,
+   "xy": {
+    "x": 540.0,
+    "y": 770.0
+   }
+  }
+ ],
+ "shelters": [
+  {
+   "id": "S-1",
+   "name": "Civil Lines Community Hall",
+   "status": "closed",
+   "capacity": 800,
+   "occupancy": 0,
+   "zone_id": "Z-CL",
+   "xy": {
+    "x": 620.0,
+    "y": 260.0
+   }
+  },
+  {
+   "id": "S-2",
+   "name": "Govt Higher Secondary School Market Ward",
+   "status": "closed",
+   "capacity": 600,
+   "occupancy": 0,
+   "zone_id": "Z-MW",
+   "xy": {
+    "x": 560.0,
+    "y": 360.0
+   }
+  },
+  {
+   "id": "S-3",
+   "name": "Station Road Sports Complex",
+   "status": "closed",
+   "capacity": 1500,
+   "occupancy": 0,
+   "zone_id": "Z-SR",
+   "xy": {
+    "x": 380.0,
+    "y": 340.0
+   }
+  },
+  {
+   "id": "S-4",
+   "name": "New Colony Community Centre",
+   "status": "closed",
+   "capacity": 400,
+   "occupancy": 0,
+   "zone_id": "Z-NC",
+   "xy": {
+    "x": 580.0,
+    "y": 790.0
+   }
+  },
+  {
+   "id": "S-5",
+   "name": "Riverside Primary School",
+   "status": "closed",
+   "capacity": 300,
+   "occupancy": 0,
+   "zone_id": "Z-RS",
+   "xy": {
+    "x": 920.0,
+    "y": 510.0
+   }
+  },
+  {
+   "id": "S-6",
+   "name": "Tekri Devi Temple Hall",
+   "status": "closed",
+   "capacity": 200,
+   "occupancy": 0,
+   "zone_id": "Z-TH",
+   "xy": {
+    "x": 1040.0,
+    "y": 220.0
+   }
+  },
+  {
+   "id": "S-7",
+   "name": "Lakeside Marriage Hall",
+   "status": "closed",
+   "capacity": 500,
+   "occupancy": 0,
+   "zone_id": "Z-LK",
+   "xy": {
+    "x": 100.0,
+    "y": 780.0
+   }
+  },
+  {
+   "id": "S-8",
+   "name": "Mill Road Workers' Club",
+   "status": "closed",
+   "capacity": 350,
+   "occupancy": 0,
+   "zone_id": "Z-MI",
+   "xy": {
+    "x": 980.0,
+    "y": 800.0
+   }
+  }
+ ],
+ "pump_depot": {
+  "zone_id": "Z-OT",
+  "xy": {
+   "x": 520.0,
+   "y": 460.0
+  },
+  "units": [
+   {
+    "id": "PU-M1",
+    "status": "at_depot",
+    "channel_id": null
+   },
+   {
+    "id": "PU-M2",
+    "status": "at_depot",
+    "channel_id": null
+   },
+   {
+    "id": "PU-M3",
+    "status": "at_depot",
+    "channel_id": null
+   },
+   {
+    "id": "PU-M4",
+    "status": "at_depot",
+    "channel_id": null
+   }
+  ]
+ },
+ "hospitals": [
+  {
+   "id": "H-1",
+   "name": "Nandipur District Hospital",
+   "zone_id": "Z-CL",
+   "beds": 420,
+   "xy": {
+    "x": 640.0,
+    "y": 240.0
+   }
+  },
+  {
+   "id": "H-2",
+   "name": "Riverside Community Hospital",
+   "zone_id": "Z-RS",
+   "beds": 80,
+   "xy": {
+    "x": 880.0,
+    "y": 520.0
+   }
+  },
+  {
+   "id": "H-3",
+   "name": "Railway Hospital",
+   "zone_id": "Z-SR",
+   "beds": 60,
+   "xy": {
+    "x": 280.0,
+    "y": 380.0
+   }
+  },
+  {
+   "id": "H-4",
+   "name": "Lakeview Hospital",
+   "zone_id": "Z-LK",
+   "beds": 120,
+   "xy": {
+    "x": 140.0,
+    "y": 680.0
+   }
+  },
+  {
+   "id": "H-5",
+   "name": "Mill Road Workers' Hospital",
+   "zone_id": "Z-MI",
+   "beds": 100,
+   "xy": {
+    "x": 1000.0,
+    "y": 710.0
+   }
+  }
+ ],
+ "map_features": [
+  {
+   "id": "R-1",
+   "kind": "river",
+   "svg_path": "M0 622.7 L50 624.1 L100 624.9 L150 624.9 L200 624.3 L250 623 L300 621 L350 618.5 L400 615.5 L450 612 L500 608.2 L550 604.1 L600 600 L650 595.9 L700 591.8 L750 588 L800 584.5 L850 581.5 L900 579 L950 577 L1000 575.7 L1050 575.1 L1100 575.1 L1150 575.9 L1200 577.3",
+   "label": "Kalinadi"
+  },
+  {
+   "id": "R-2",
+   "kind": "river",
+   "svg_path": "M1150 60 L1150 140 L1160 260 L1160 400 L1140 575",
+   "label": "Tekri Nala"
+  },
+  {
+   "id": "R-3",
+   "kind": "lake",
+   "svg_path": "M104 769 L119 797 L152 812 L190 814 L228 807 L261 788 L275 755 L270 722 L289 688 L270 684 L237 707 L204 707 L171 698 L138 717 L112 741 Z",
+   "label": "Nandi Lake"
+  },
+  {
+   "id": "HL-1-c1",
+   "kind": "hill_contour",
+   "svg_path": "M1050 40 A50 30 0 1 0 1150 40 A50 30 0 1 0 1050 40 Z",
+   "label": "Tekri Hill"
+  },
+  {
+   "id": "HL-1-c2",
+   "kind": "hill_contour",
+   "svg_path": "M1000 40 A100 60 0 1 0 1200 40 A100 60 0 1 0 1000 40 Z",
+   "label": null
+  },
+  {
+   "id": "HL-1-c3",
+   "kind": "hill_contour",
+   "svg_path": "M950 40 A150 90 0 1 0 1250 40 A150 90 0 1 0 950 40 Z",
+   "label": null
+  },
+  {
+   "id": "HL-2-c1",
+   "kind": "hill_contour",
+   "svg_path": "M1000 260 A40 30 0 1 0 1080 260 A40 30 0 1 0 1000 260 Z",
+   "label": "Hillview Ridge"
+  },
+  {
+   "id": "HL-2-c2",
+   "kind": "hill_contour",
+   "svg_path": "M950 260 A90 65 0 1 0 1130 260 A90 65 0 1 0 950 260 Z",
+   "label": null
+  },
+  {
+   "id": "HL-2-c3",
+   "kind": "hill_contour",
+   "svg_path": "M900 260 A140 100 0 1 0 1180 260 A140 100 0 1 0 900 260 Z",
+   "label": null
+  },
+  {
+   "id": "HL-3-c1",
+   "kind": "hill_contour",
+   "svg_path": "M510 250 A40 25 0 1 0 590 250 A40 25 0 1 0 510 250 Z",
+   "label": "Civil Lines Rise"
+  },
+  {
+   "id": "HL-3-c2",
+   "kind": "hill_contour",
+   "svg_path": "M470 250 A80 50 0 1 0 630 250 A80 50 0 1 0 470 250 Z",
+   "label": null
+  }
+ ],
+ "bands": {
+  "landslide": {
+   "watch": 0.35,
+   "warning": 0.55,
+   "critical": 0.75
+  },
+  "flood": {
+   "watch": 0.3,
+   "warning": 0.5,
+   "critical": 0.7
+  }
+ },
+ "scenarios": [
+  {
+   "id": "hillside_landslide",
+   "name": "Hillside landslide",
+   "injections": [
+    {
+     "id": "crew_route_blocked",
+     "label": "Crew route blocked"
+    },
+    {
+     "id": "culvert_blocked",
+     "label": "Culvert blocked"
+    }
+   ]
+  },
+  {
+   "id": "flash_flood",
+   "name": "Flash flood",
+   "injections": []
+  }
+ ]
+}
