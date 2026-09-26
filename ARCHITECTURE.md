@@ -1,7 +1,13 @@
 # GridLine AI — Architecture
 
 **AI-powered City Disaster Intelligence Brain** for the fictional city of **Nandipur**.
-Hackathon prototype. Status: **v0.1 design, awaiting review — nothing implemented yet.**
+Hackathon prototype. Status (2026-09-26): **partly built.**
+
+- **Implemented:** the city data layer (§4, §6), the RAG layer (§7), the simulation engine and live event
+  stream (§5, §12), the city operations tools (§10, §11), and the dashboard connected to the backend (§13).
+- **Not yet built:** the threat detector, the LangGraph agent, the approvals subsystem, the LLM providers and
+  event persistence (no `events` table). The sections on these are the design for later milestones and are
+  marked **Pending**. §18 tracks the milestones.
 
 All city data is synthetic. Nandipur, its districts, sensors, policies, history and people do not exist.
 
@@ -90,6 +96,11 @@ One FastAPI process and one PostgreSQL database. No microservices, no message br
 | REST API | Thin routers over the above | `gridline/api` |
 | Frontend | React dashboard: map, risk timeline, event feed, incident reasoning, approvals inbox, actions log, scenario controls | `frontend/` |
 
+**Built so far:** `city`, `simulation`, `events` (in-memory bus and WebSocket, no DB writer), `rag`, `tools`,
+`api` and the frontend. **Pending:** `threats`, `llm`, `agents`, `approvals` and the `events` table. The
+simulation runs in memory and needs no database. The tools write only to the database. The two are not
+coupled yet.
+
 ---
 
 ## 3. Data flow
@@ -98,11 +109,14 @@ One FastAPI process and one PostgreSQL database. No microservices, no message br
 
 1. Simulation advances the clock by one step and applies the scenario script (rainfall curve, excavation schedule).
 2. Physics-lite models update soil saturation per zone and flow/capacity per drainage channel.
-3. Sensors emit readings (`sensor.reading` events) with small deterministic noise.
-4. Threat detector recomputes landslide and flood indices per zone and applies band thresholds.
+3. Sensors emit typed observation events (`weather.observation`, `environment.soil`, `environment.drainage`,
+   `environment.river`, ...) with small deterministic noise.
+4. Threat detector recomputes landslide and flood indices per zone and applies band thresholds. **Pending.**
 5. Everything that changed is written to the DB and published on the event bus; the WebSocket fans it out.
+   Built: the bus and the WebSocket. The DB write is **pending**. Live state stays in the engine's in-memory
+   `WorldState`.
 
-**Incident flow (LLM calls happen here):**
+**Incident flow (LLM calls happen here). Pending:** it needs the threat detector, the agent and approvals.
 
 1. A zone index crosses into `watch` or a higher band, or jumps by more than a configured delta.
 2. Threat detector opens an `Incident` (or attaches to the open one for that zone) and asks the agent
@@ -123,10 +137,17 @@ so the model cannot re-recommend what is already done.
 
 ## 4. Database
 
-PostgreSQL 16 with the pgvector extension, via the `pgvector/pgvector:pg16` Docker image.
-SQLAlchemy 2.x async with the psycopg 3 driver; the LangGraph Postgres checkpointer uses the same driver
-and database. No Alembic: schema is created at startup, and `POST /api/simulation/reset` truncates
-dynamic tables and re-seeds.
+PostgreSQL 16 with the pgvector extension, via the `pgvector/pgvector:pg16` Docker image (host port 5433).
+SQLAlchemy 2.x async with the psycopg 3 driver. The LangGraph Postgres checkpointer (pending) will use the
+same driver and database. No Alembic: the seed CLI (`python -m gridline.db.seed [--reset]`) creates the
+schema, and the test suite creates its own. The app does not touch the schema. It connects lazily, and today
+only `GET /api/chunks/{id}` uses the database. `POST /api/simulation/reset` resets the in-memory engine only.
+
+**Built:** the city data layer's 38 seeded tables (the table below lists those the brain reads; the full
+catalogue is in `docs/superpowers/specs/2026-09-26-nandipur-city-data-layer-design.md` §5–§6), `chunks`, and
+the seven operations tables. **Pending:** `sensor_readings`, `zone_state`, `agent_runs`, `agent_steps`,
+`approvals`, `events` and the checkpointer tables. With no `events` table, event history
+(`GET /api/events`) is pending too, and events exist only on the in-memory bus.
 
 | Table | Purpose | Key columns |
 |---|---|---|
@@ -135,29 +156,29 @@ dynamic tables and re-seeds.
 | `drainage_channels` | Channels and culverts | id, name, design_capacity_m3s, current_capacity_m3s, blocked_fraction, downstream_zone_id |
 | `projects` | Construction projects | id, name, zone_id, status (active / halted / planned / completed), excavation_depth_m, planned_depth_m, permit_doc_id; live: depth_limit_m |
 | `sensors` | Rain gauges, soil moisture probes, channel level gauges | id, kind, zone_id, unit |
-| `sensor_readings` | Time series | sensor_id, sim_time, value |
+| `sensor_readings` | **Pending.** Time series | sensor_id, sim_time, value |
 | `crews` | Response crews (rescue, hill_rescue, boat, drainage, road, medical, electrical, volunteer) | id, kind, members, status, capabilities, location_zone_id; live: target_zone_id, task, incident_id, dispatched_at |
 | `ambulances` | Ambulances by base hospital | id, hospital_id, kind (ALS / BLS), status, location_zone_id; live: target_zone_id, destination_hospital_id, incident_id, dispatched_at |
 | `shelters`, `pump_units` | Shelters and pumps | id, status, zone / location, capacity_persons, current_occupancy, access_road_id; shelters live: opened_at, incident_id |
 | `hospitals`, `hospital_beds` | Hospitals and bed pools per type | hospital: id, zone_id, status, access_road_id; beds: id `<hospital>-<type>`, bed_type, total, available; live: reserved |
-| `zone_state` | Live derived state per zone | zone_id, saturation, rain_24h_mm, landslide_index, flood_index, band |
+| `zone_state` | **Pending.** Live derived state per zone | zone_id, saturation, rain_24h_mm, landslide_index, flood_index, band |
 | `incidents` | One per hazard episode (at most one open per zone and hazard) | id, zone_id, hazard, band, status, title, summary, opened_at, updated_at, closed_at |
-| `agent_runs` | One per graph invocation | id, incident_id, thread_id, trigger, status, started_at, finished_at |
-| `agent_steps` | Node outputs for the trace | run_id, node, started_at, finished_at, output_json, citations_json |
-| `approvals` | Pending / decided approval requests | id, run_id, incident_id, proposed_actions_json, status, decided_by, note |
+| `agent_runs` | **Pending.** One per graph invocation | id, incident_id, thread_id, trigger, status, started_at, finished_at |
+| `agent_steps` | **Pending.** Node outputs for the trace | run_id, node, started_at, finished_at, output_json, citations_json |
+| `approvals` | **Pending.** Pending / decided approval requests | id, run_id, incident_id, proposed_actions_json, status, decided_by, note |
 | `actions` | Audit trail: every attempted tool call, rejected and failed ones included | id, tool, status (executed / unchanged / rejected / failed), idempotency_key (unique, executed/unchanged only), actor, approval_id, run_id, incident_id (no FK), input_json, before_json, after_json, affected_entities_json, message, sim_time, executed_at, verification_json |
 | `alerts` | Public alerts issued | id, zone_id, level (advisory / warning / evacuate), message, incident_id, issued_at |
 | `evacuation_orders` | At most one active order per zone | id, zone_id, level (voluntary / mandatory), reason, shelter_id, incident_id, status (active / lifted), issued_at, updated_at |
 | `construction_restrictions` | Halts and depth limits on projects | id, project_id, kind (halt / depth_limit), max_depth_m, reason, incident_id, status, issued_at |
 | `tasks` | Inspection, monitoring, evacuation and emergency work | id, kind, title, description, priority, status, zone_id, target_kind, target_id, metric, interval_minutes, assigned_crew_id, incident_id, evacuation_order_id, created_by, created_at, completed_at |
 | `bed_reservations` | Beds held for an incident | id, hospital_id, hospital_bed_id, bed_type, incident_id, beds, status, created_at |
-| `documents`, `document_sections`, `chunks` | Corpus (seeded) and RAG index | documents: id, title, kind, source, zone_ids / hazards text[], content_hash, embedding_model; sections: id `<doc>#<section>`; chunks: id = citation id `<doc>#s4.2`, document_id, section_id, text, embedding `vector(384)`, kind, zone_ids, hazards (filter columns), metadata jsonb |
-| `events` | Append-only event log | id, ts, sim_time, type, incident_id, payload jsonb |
-| `checkpoints*` | LangGraph checkpointer tables | created by `AsyncPostgresSaver.setup()` |
+| `documents`, `document_sections`, `chunks` | Corpus (seeded) and RAG index | documents: id, title, kind, source, zone_ids / hazards text[], content_hash, embedding_model; sections: id `<doc>#<section>`; chunks: id = citation id `<doc>#s4.2`, document_id, section_id, text, embedding `vector(384)`, kind, zone_ids, hazards (filter columns), metadata jsonb (incl. `category`, the knowledge-category filter) |
+| `events` | **Pending.** Append-only event log | the envelope (§12): event_id, timestamp, sim_time, event_type, source, location, severity, incident_id, payload jsonb |
+| `checkpoints*` | **Pending.** LangGraph checkpointer tables | created by `AsyncPostgresSaver.setup()` |
 
-Indexes: `chunks.embedding` (HNSW, cosine), `events (ts)`, `sensor_readings (sensor_id, sim_time)`,
-`actions.idempotency_key` (unique), and partial unique indexes for one open incident per (zone, hazard) and
-one active evacuation order per zone.
+Indexes: `chunks.embedding` (HNSW, cosine), `actions.idempotency_key` (unique), and partial unique indexes
+for one open incident per (zone, hazard) and one active evacuation order per zone. Pending with their tables:
+`events (timestamp)`, `sensor_readings (sensor_id, sim_time)`.
 
 "Live" columns on seeded tables and the operations tables (`incidents`, `alerts`, `evacuation_orders`,
 `construction_restrictions`, `tasks`, `bed_reservations`, `actions`) are written only by the tool layer
@@ -168,15 +189,20 @@ one active evacuation order per zone.
 
 ## 5. Simulation and threat detection
 
+The simulation is built (`gridline/simulation`; design and implementation deviations in
+`docs/superpowers/specs/2026-09-26-simulation-and-events-design.md`). The threat detector is **pending**.
+
 **Clock.** Simulated time advances in fixed steps (default 5 simulated minutes per tick, one tick per real
 second, speed adjustable 0.25x to 10x, pausable). All timestamps in the system carry both wall time and
 `sim_time`.
 
 **Scenario scripts** are plain Python data: a rainfall intensity curve over sim time, a construction schedule
-(depth per day), optional scripted events (culvert partially blocked at t; landslide occurs at t if the index
-stays above threshold for N ticks), and failure injections for demoing re-planning (crew delayed because its
-route is closed). Two scenarios ship: `hillside_landslide` (primary) and `flash_flood` (secondary). Scenarios
-are deterministic given a seed.
+(excavation rate), named stages, and scripted events, some conditional on the world (the SL-HV-1 landslide
+fires only once the slope has actually moved 80 mm). Four scenarios ship: `normal_city`, `hillside_landslide`,
+`flash_flood` (secondary) and `cascading_landslide_flood` (primary, the default `SIM_DEFAULT_SCENARIO`).
+Operators inject disruptions through `POST /api/simulation/inject`. `GET /api/city` lists ready-made presets
+for re-planning demos (`gridline/api/injections.py`): D-7 culvert blocked, Hill Road blocked, rescue team C-4
+delayed, Kalinadi Bridge closed, forced SL-HV-1 slope failure. Scenarios are deterministic given a seed.
 
 **Physics-lite models** (small, unit-tested, documented in code):
 
@@ -186,11 +212,17 @@ are deterministic given a seed.
   overflow when `flow > current_capacity`.
 - Pumps add capacity to a channel; halting a project freezes excavation depth; a landslide event sets
   `blocked_fraction` on the downstream channel.
+- As built, the models are recalibrated to the data layer: per-slope saturation and creep driven by the
+  unsupported cut, ponding in downstream zones, a river rating curve and flap gates. Constants are named in
+  `simulation/physics.py`. Fixed pumps count toward channel capacity. Deploying mobile pumps is pending
+  (`deploy_pumps`, §10).
 
-**Sensors** sample the model state with seeded noise, giving the brain real telemetry to cite.
+**Sensors** sample the model state with seeded noise, giving the brain real telemetry to cite. Each
+observation carries a `severity`. This is a fixed-threshold sensor band taken from the policy numbers
+(`simulation/severity.py`), never a threat assessment.
 
-**Threat detector** runs after each tick and computes two transparent indices per zone, each a weighted sum
-of factors in [0, 1] with weights in a config file (not in prompts):
+**Threat detector (pending)** runs after each tick and computes two transparent indices per zone, each a
+weighted sum of factors in [0, 1] with weights in a config file (not in prompts):
 
 - `landslide_index` = f(antecedent rainfall, saturation, slope factor, excavation factor, history factor,
   recent infrastructure change factor).
@@ -207,21 +239,32 @@ produces the assessment, prediction and recommendation.
 
 ## 6. City data (synthetic seed)
 
-Kept small enough to hold in one head and cite precisely.
+Built as the city data layer: `backend/data/city/*.yaml` plus the corpus, validated and cross-checked before
+`python -m gridline.db.seed` writes anything. Design:
+`docs/superpowers/specs/2026-09-26-nandipur-city-data-layer-design.md`; usage: `backend/README.md`. The
+simulation builds its `City` from the same YAML (`gridline/city/nandipur.py`) without the database. The data
+is richer than first planned, but the demos turn on a few assets.
 
-- **Zones:** Hillview (hillside, slope 32°, construction site), Riverside (downstream of D-7, flood-prone),
-  Old Town, Market Ward, Station Road, Lakeside.
-- **Drainage:** D-7 "Kalinadi drain" (Hillview → Riverside; culvert narrowed in 2025), D-3 (Old Town),
-  D-11 (Lakeside).
-- **Roads:** Hill Road (only access to Hillview), Riverside Bypass (evacuation route), six others.
-- **Project:** Hillview Terrace Phase 2 (permit HT-2026-014; planned excavation 6 m; on a 32° slope).
-- **Sensors:** rain gauges RG-01..RG-04, soil probes SM-01..SM-03, channel gauges CL-D7, CL-D3.
-- **Assets:** crews C-1..C-3, shelters S-1..S-2, pump depot with four units.
-- **Corpus (Markdown with YAML front matter, about 25 documents):** Nandipur Disaster Management Policy
-  (thresholds, halt rules for slopes above 25°), landslide event reports (2014, 2019, 2022), flood report
-  (2021), infrastructure change log (2025 Hill Road widening; D-7 culvert narrowing), construction permit
-  HT-2026-014 with conditions, zone geotechnical profiles, SOPs (road closure, evacuation, crew dispatch,
-  pump deployment).
+- **Zones (10):** Hillview `Z-HV` (hillside, slope 32°, construction site), Riverside `Z-RS` (downstream of
+  D-7, flood-prone), Tekri Heights, Old Town, Market Ward, Station Road, Civil Lines, Lakeside, New Colony,
+  Mill Road Industrial.
+- **Water:** nine drainage channels, among them D-7 "Kalinadi drain" (Hillview → Riverside; its BR-4
+  culvert was narrowed in 2025), D-3 and the pumped D-11. Rivers: R-1 Kalinadi, R-2 Tekri Nala and
+  R-3 Nandi Lake.
+- **Roads:** 14 roads and 5 bridges. Hill Road `RD-01` is the only access to Hillview. Riverside Bypass
+  `RD-02` is an evacuation route. BR-1 is Kalinadi Bridge.
+- **Projects (9):** Hillview Terrace Phase 2 `PR-HT2` (permit HT-2026-014; planned excavation 6 m, 2.5 m at
+  the start; on slope SL-HV-1 at 32°).
+- **Sensors (16):** rain gauges RG-01..RG-05, soil probes SM-01..SM-04, channel gauges CL-D7, CL-D3 and
+  CL-D11, river gauges RV-01 and RV-02, weather station WS-01, and lake level LL-01.
+- **Assets:** crews C-1..C-8, 14 ambulances, hospitals H-1..H-5 with bed pools, shelters S-1..S-8, and nine
+  pump units (four mobile units at the depot).
+- **History:** 29 infrastructure changes (2018–2026), 17 historical incidents and 25 policy thresholds.
+- **Corpus (37 Markdown documents with YAML front matter):** the Disaster Management Policy (thresholds, halt
+  rules for slopes above 25°) and seven other policies, four SOPs, 17 post-incident reports, construction
+  permit HT-2026-014 with conditions, the 2018–2026 infrastructure change log, zone geotechnical and city
+  profiles, a D-7 condition survey, a BR-1 inspection, and the SL-HV-1 slope-stability and D-7
+  hydraulic-capacity studies.
 
 ---
 
@@ -230,28 +273,40 @@ Kept small enough to hold in one head and cite precisely.
 1. **Load.** `gridline/rag/ingest.py` (`uv run gridline-ingest`) parses `backend/data/corpus/*.md` with the
    seed's corpus parser and makes one chunk per numbered section, so chunk ids equal `document_sections` ids
    (a section over 350 words is split at paragraphs into extra `-p2`, `-p3` parts). Chunks carry `kind`,
-   `zone_ids`, `hazards` and metadata. Documents must be seeded first; files whose hash and embedder are
-   unchanged are skipped, so ids stay stable. Only `chunks` and the documents' fingerprint are written.
+   `zone_ids`, `hazards` and metadata (including the document's `category`). Documents must be seeded
+   first; files whose hash and embedder are unchanged are skipped, so ids stay stable. Only `chunks` and the
+   documents' fingerprint are written.
 2. **Embed.** fastembed `BAAI/bge-small-en-v1.5` (384-dim, ONNX, CPU, downloaded once), or the offline
    `hashed` embedder (`EMBEDDING_PROVIDER=auto|fastembed|hashed`; `auto` falls back to `hashed`). Stored in
    `chunks.embedding`; retrieval refuses to run when the live embedder differs from the indexed one.
-3. **Retrieve.** `retrieve(query, filters, top_k=8)`: cosine similarity in pgvector with optional any-of
-   filters `kinds, hazards, zone_ids, document_ids` (a chunk with empty `zone_ids`/`hazards` is city-wide /
-   all-hazard and matches every zone / hazard filter). The `retrieve` node issues two or three targeted
-   queries per incident (policy thresholds; history for this zone and hazard; recent changes affecting the
-   zone) and merges results. Stretch: add Postgres full-text search with reciprocal rank fusion if
-   dense-only retrieval misses exact identifiers such as permit numbers. Usage: `docs/rag.md`.
+3. **Retrieve.** `Retriever.retrieve(query, filters, top_k=8)`: cosine similarity in pgvector with optional
+   any-of filters `kinds, categories, hazards, zone_ids, document_ids`. Different fields intersect. A chunk
+   with empty `zone_ids`/`hazards` is city-wide / all-hazard and matches every zone / hazard filter. `kinds`
+   is a document's form (`policy, sop, report, permit, change_log, profile`). `categories` is what it is
+   about: every corpus document declares one of the brief's ten knowledge categories in its required
+   `category:` front matter (`policy, sop, procedure, incident_report, infrastructure_report,
+   engineering_report, construction_safety, evacuation, resource_rules, change_log`; reports, and only
+   reports, are `incident_report`). The category is stored in `chunks.metadata` and filtered on
+   `metadata->>'category'`. **Pending:** the `retrieve` node issues two or three targeted queries per
+   incident (policy thresholds; history for this zone and hazard; recent changes affecting the zone) and
+   merges results. Stretch: add Postgres full-text search with reciprocal rank fusion if dense-only
+   retrieval misses exact identifiers such as permit numbers. Usage and the category mapping: `docs/rag.md`.
 4. **Citation IDs.** Every retrieved chunk is presented to the model as `[doc-slug#section]`
    (e.g. `[dmp-2024#s4.2]`). Live inputs get IDs too: `[sensor:RG-02@sim_time]`, `[state:zone.hillview]`,
-   `[event:evt_123]`. The model may cite only IDs present in its input.
-5. **Grounding validator.** Structured outputs carry `claims: list[{text, citation_ids}]`. The validator
-   rejects unknown IDs and factual claims with no citation, retries once with the error fed back, and on a
-   second failure marks the step `ungrounded` and lowers confidence. The dashboard shows the source chunk
-   when a citation chip is clicked.
+   `[event:evt_123]`. The model may cite only IDs present in its input. Built: a chunk's id is its citation
+   id, and `GET /api/chunks/{chunk_id}` resolves it. Live-input ids are pending with the agent.
+5. **Grounding validator (pending).** Structured outputs carry `claims: list[{text, citation_ids}]`. The
+   validator rejects unknown IDs and factual claims with no citation, retries once with the error fed back,
+   and on a second failure marks the step `ungrounded` and lowers confidence. Built so far: its core check,
+   `validate_citation_ids(cited, allowed)` in `rag/citations.py`, and the dashboard's source drawer, which
+   shows the chunk behind a clicked citation chip.
 
 ---
 
 ## 8. LangGraph agent
+
+**Pending** (no `gridline/agents` yet; LangGraph is not a dependency yet). The tools it will call are built
+(§10).
 
 **State** (`TypedDict` with Pydantic models inside):
 
@@ -296,6 +351,9 @@ with the structured output and citations of each node, and writes `agent_steps` 
 ---
 
 ## 9. LLM provider layer
+
+**Pending** (no `gridline/llm` yet; the `anthropic` SDK is not a dependency yet). The dashboard's provider badge
+reads "No reasoner yet" until `GET /api/llm/status` exists.
 
 ```python
 class LLMProvider(Protocol):
@@ -380,7 +438,8 @@ executor expires the session first so it never decides on a stale identity map. 
 
 `halt_construction` is `create_construction_restriction(kind="halt")`; `dispatch_crew`, `issue_alert` and
 `schedule_inspection` became `dispatch_rescue_team`, `issue_preventive_alert` and `create_inspection_order`.
-**Pending:** `deploy_pumps(channel_id, units)` and publishing `action.executed` on the event bus.
+**Pending:** `deploy_pumps(channel_id, units)`, publishing `action.executed` on the event bus, and any caller.
+No API route or agent invokes the tools yet, and the registry is not on `app.state`.
 
 ---
 
@@ -404,49 +463,84 @@ existing ids come from `result.after`, our own audit data.
   `close_road` that no crew routes through it, dispatch that the crew reaches the target within
   `max_verify_ticks`, `deploy_pumps` that channel capacity rose by the expected amount.
 - A tool returns `verified` or `failed` with one `VerificationCheck(name, passed, expected, observed)` per
-  condition. The `verify` node polls per tick until all post-conditions hold or the tick budget is spent and
-  reports `verified`, `partially_verified` (list of failures) or `failed` for the plan. Anything but
-  `verified` routes to `replan` with the concrete failure (e.g. "crew C-4 target zone: expected Z-HV,
-  observed Z-RS"), which the next `recommend` must address.
-- The dashboard shows expected effect vs observed effect per action.
+  condition. The `verify` node (pending, §8) polls per tick until all post-conditions hold or the tick
+  budget is spent and reports `verified`, `partially_verified` (list of failures) or `failed` for the plan.
+  Anything but `verified` routes to `replan` with the concrete failure (e.g. "crew C-4 target zone:
+  expected Z-HV, observed Z-RS"), which the next `recommend` must address.
+- The dashboard's actions log shows expected effect vs observed effect per action. It is built, but it
+  stays empty until `/api/actions` and the `action.*` events exist.
 
 ---
 
 ## 12. Event bus, WebSocket and REST
 
-**Event bus** (`gridline/events/bus.py`): asyncio pub/sub; `publish(event)` writes the `events` row
-and puts the event on every bounded subscriber queue (drop-oldest for slow consumers). A single
-`EventBus` instance lives on `app.state`.
+**Event bus** (`gridline/events/bus.py`): asyncio pub/sub. `publish(event)` puts the event on every bounded
+subscriber queue whose event-type prefixes match (drop-oldest for slow consumers, `EVENT_QUEUE_SIZE`). A single
+`EventBus` instance lives on `app.state.bus`. **Pending:** a DB-writer subscriber that appends each event to
+the `events` table.
 
-**Envelope:** `{ id, ts, sim_time, type, incident_id?, payload }`.
+**Envelope** (`gridline/events/envelope.py`): `{ event_id, timestamp, sim_time, event_type, source,
+location?, severity, payload, incident_id? }`. `event_id` is engine-numbered (`evt-000123`). `timestamp` is
+wall time, and `sim_time` is simulated time. `severity` is one of `info / low / moderate / high / critical`,
+a sensor band and not a threat assessment. `payload` is validated against the payload model registered for
+`event_type` (`events/payloads.py`). For clients, `Event` in `gridline/api/event_models.py` is a Pydantic
+discriminated union on `event_type` with one typed envelope per type. It is exported in `/openapi.json`, and
+the WebSocket sends exactly these shapes.
 
-**Types:** `sim.tick`, `sensor.reading`, `zone.state`, `threat.detected`, `threat.escalated`,
-`incident.opened`, `incident.closed`, `agent.run.started`, `agent.node.started`, `agent.node.finished`,
-`agent.run.finished`, `approval.requested`, `approval.decided`, `action.executed`, `action.verified`,
-`replan.triggered`, `alert.issued`, `scenario.event`.
+**Types** (`gridline/events/types.py`). Built: `sim.tick`, `sim.status`, `sim.snapshot`, `sim.heartbeat`,
+`scenario.stage`, `weather.observation`, `weather.forecast`, `environment.soil`, `environment.river`,
+`environment.drainage`, `environment.slope`, `environment.water_accumulation`, `infrastructure.road`,
+`infrastructure.bridge`, `infrastructure.drainage_obstruction`, `infrastructure.construction`,
+`infrastructure.failure`, `emergency.rescue_team`, `emergency.ambulance`, `emergency.hospital`,
+`emergency.shelter`. Operators may inject `weather.forecast` and the `infrastructure.*` and `emergency.*`
+types. **Pending** (their contract is in `frontend/openapi.pending.yaml`): `zone.state`, `threat.detected`,
+`threat.escalated`, `incident.opened`, `incident.closed`, `agent.run.started`, `agent.node.started`,
+`agent.node.finished`, `agent.run.finished`, `approval.requested`, `approval.decided`, `action.executed`,
+`action.verified`, `replan.triggered`, `alert.issued`. The typed observation events replace the design's
+`sensor.reading`, and `scenario.stage` replaces `scenario.event`.
 
-**WebSocket `/ws`:** on connect sends `state.snapshot` (full city state, open incidents, pending approvals),
-then live events. Optional `?types=` filter. Heartbeat every 15 s.
+**WebSocket `/ws`** (`gridline/events/websocket.py`): the first frame is `sim.snapshot` with payload
+`{status, world, city}`: the runner status, the whole `WorldSnapshot` and the static `CityMap` (the same body as
+`GET /api/city`). Live events follow. A `sim.heartbeat` `{tick, sim_time}` is sent whenever no event arrives
+for `WS_HEARTBEAT_SECONDS` (15 s). `?types=weather.,environment.soil` subscribes by comma-separated
+event-type prefix. Empty segments are ignored, and snapshot and heartbeats are always sent. Client messages
+are ignored. **Pending:** open incidents and pending approvals in the snapshot.
 
-**REST** (all JSON, under `/api`):
+**REST** (all JSON, under `/api`). Every body is a Pydantic model. Invalid runner transitions return 409.
+Unknown scenarios or assets, non-injectable types and invalid payloads return 422.
 
 | Method / path | Purpose |
 |---|---|
-| `GET /health`, `GET /llm/status` | Liveness; active provider and model |
-| `GET /city` | Static city model plus live state |
-| `GET /events?since=&type=&limit=` | Event history |
+| `GET /health` | Liveness and version |
+| `GET /city` | Static city map: zones (SVG paths), roads, bridges, channels, slopes, projects, sensors, crews, shelters, hospitals, pump depot, map features, scenarios, inject presets. Live state is in `WorldSnapshot`, not here |
+| `GET /chunks/{chunk_id}` | Citation source: the stored chunk (404 when unknown, 503 when the database is unreachable) |
+| `GET /simulation/status`, `/scenarios`, `/snapshot` | Runner status; the four scenarios with their stages; the current `WorldSnapshot` |
+| `POST /simulation/scenario {scenario, seed?}` | Select a scenario (back to idle at tick 0) |
+| `POST /simulation/start {scenario?, seed?, speed?}`, `/pause`, `/resume`, `/reset` | Runner control (`reset` resets the engine only) |
+| `POST /simulation/advance {ticks}` | Step 1–1000 ticks while not running; returns `events_emitted` and status |
+| `POST /simulation/speed {speed}` | 0.25x–10x |
+| `POST /simulation/inject {event_type, payload, location?, source?, severity?}` | Apply an operator event now; returns it plus derived events (all published on the bus) |
+
+**Pending routes** (design; the frontend already codes against `openapi.pending.yaml`):
+
+| Method / path | Purpose |
+|---|---|
+| `GET /llm/status` | Active provider and model |
+| `GET /detector/bands` | Detector band thresholds for the risk timeline |
+| `GET /events?since=&type=&limit=` | Event history (needs the `events` table) |
 | `GET /incidents`, `GET /incidents/{id}` | Incidents with runs, steps, citations, actions |
 | `GET /approvals?status=`, `POST /approvals/{id}/decide` | Inbox; body `{decision: approve/reject/partial, approved_action_ids, note}` |
 | `GET /actions`, `GET /actions/{id}` | Executed actions with verification |
-| `GET /documents/{doc}`, `GET /chunks/{chunk_id}` | Citation sources |
-| `POST /simulation/start {scenario, speed, seed}`, `/pause`, `/resume`, `/reset`, `/inject {event}` | Demo control |
+| `GET /documents/{doc_id}` | Whole citation source document |
 
 ---
 
 ## 13. Frontend
 
-Vite + React 19 + TypeScript + Tailwind v4. TanStack Query for REST, a small Zustand store fed by the
-WebSocket for live state. Charts with Recharts. No router: one dashboard.
+Built and connected to the backend. Vite + React 19 + TypeScript + Tailwind v4. TanStack Query handles REST.
+A small Zustand store in `src/live` holds live state and is fed by the WebSocket: pure reducers apply the
+`sim.snapshot` and then each event, the socket reconnects with backoff, and an engine reset triggers a resync.
+Charts use Recharts. There is no router: one dashboard.
 
 Layout (desktop first, readable on a projector):
 
@@ -467,32 +561,73 @@ Layout (desktop first, readable on a projector):
   Scenario bar: scenario, start / pause / reset, speed, inject, provider badge
 ```
 
-Types for API payloads are generated from the backend OpenAPI schema (`openapi-typescript`) so the
-frontend and backend share one contract.
+As built, an overview strip and a mode/connection banner sit above the grid, and a "Why" drawer and a
+citation source drawer open over it. Against the live backend, the panels fed by pending subsystems (incident
+reasoning, approvals, actions) show empty states. The risk timeline plots the observations but has no
+detector indices or band lines yet.
+
+**Contract.** Payload types are generated, never hand-written. `npm run gen:api` runs two steps:
+`gen:contract` runs `backend/scripts/export_contract.py` (`gridline/api/contract.py`), which writes
+`frontend/openapi.json` and the mock fixtures `src/mock/fixtures/nandipur.{city,world}.json`, all built by the
+backend with no database or network. `gen:types` then runs `scripts/gen-api.mjs`, which merges `openapi.json`
+with the hand-written `openapi.pending.yaml` overlay for pending routes and events and generates
+`src/api/schema.d.ts` with `openapi-typescript`. `src/api/types.ts` re-exports the names. The overlay may only
+add: the merge fails if the backend already defines one of its paths, schemas or event types, so each entry
+is deleted when its backend lands. Drift test: `backend/tests/test_contract_export.py` fails when the
+committed `openapi.json` or fixtures differ from what the backend renders now.
+
+**Modes** (`VITE_API_MODE`; see `src/api/client.ts`):
+
+- `http` (the default, `npm run dev`). `HttpApiClient` calls `/api` and `/ws` through the Vite dev proxy
+  (`GRIDLINE_BACKEND_URL`, default `http://localhost:8000`). Pending routes are answered with a local 501 and
+  no request is sent.
+- `mock` (`npm run dev:mock`). `MockApiClient` serves the backend-generated fixtures and replays
+  `hillside_landslide` observations, plus scripted detector events for the pending detector panels. It
+  never fabricates agent, approval, action or verification output.
 
 ---
 
 ## 14. Configuration and local startup
 
-`backend/.env` (example committed as `.env.example`):
+`backend/.env` is optional (the example is committed as `backend/.env.example`). `gridline/config.py` reads it
+with `pydantic-settings`, and the defaults match the Docker database on host port **5433**:
 
 ```
 DATABASE_URL=postgresql+psycopg://gridline:gridline@localhost:5433/gridline
+TEST_DATABASE_URL=postgresql+psycopg://gridline:gridline@localhost:5433/gridline_test
 EMBEDDING_PROVIDER=auto       # auto | fastembed | hashed
 EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
-CORPUS_DIR=data/corpus
-LLM_PROVIDER=auto            # anthropic | mock | auto
-ANTHROPIC_API_KEY=           # optional
-LLM_MODEL=claude-opus-5
-LLM_EFFORT=medium
-SIM_TICK_SECONDS=1.0
+CORPUS_DIR=data/corpus        # relative to backend/
+RAG_TOP_K=8                   # reserved for the retrieve node
+DATA_DIR=data                 # holds city/ and corpus/
+SIM_TICK_SECONDS=1.0          # real seconds per tick at speed 1.0
 SIM_MINUTES_PER_TICK=5
-AUTO_APPROVE=false           # demo shortcut; still records approvals
+SIM_DEFAULT_SCENARIO=cascading_landslide_flood
+SIM_DEFAULT_SEED=42
+SIM_AUTOSTART=false
+WS_HEARTBEAT_SECONDS=15
+EVENT_QUEUE_SIZE=1000         # per-subscriber bus queue (drop-oldest)
 ```
 
-Startup: `scripts/dev.ps1` or `scripts/dev.sh` runs, in order, `docker compose up -d db`, `uv sync`,
-seed if the database is empty, then backend (`uvicorn`) and frontend (`vite`) concurrently.
-Backend on `:8000`, frontend on `:5173` proxying `/api` and `/ws`.
+**Pending** with the LLM, agent and approvals layers: `LLM_PROVIDER=auto` (anthropic | mock | auto),
+`ANTHROPIC_API_KEY` (optional), `LLM_MODEL=claude-opus-5`, `LLM_EFFORT=medium`, and `AUTO_APPROVE=false`
+(a demo shortcut that still records approvals).
+
+Other knobs: `GRIDLINE_DB_PORT` (docker-compose host port, default 5433). On the frontend,
+`GRIDLINE_BACKEND_URL` sets the Vite dev proxy target for `/api` and `/ws` (default
+`http://localhost:8000`), and `VITE_API_MODE=http|mock` picks the API client
+(`frontend/.env.development`, `frontend/.env.mock`).
+
+Startup (design): `scripts/dev.ps1` or `scripts/dev.sh` runs, in order, `docker compose up -d db`, `uv sync`,
+seed if the database is empty, then backend (`uvicorn`) and frontend (`vite`) concurrently. **Pending: the
+dev scripts do not exist yet.** Until they do, start the pieces by hand:
+
+```
+docker compose up -d db                                   # repo root; also creates gridline_test
+cd backend && uv sync && uv run python -m gridline.db.seed && uv run gridline-ingest
+cd backend && uv run uvicorn gridline.main:app            # :8000 (the simulation needs no database)
+cd frontend && npm install && npm run dev                 # :5173, proxies /api and /ws to the backend
+```
 
 ---
 
@@ -501,18 +636,20 @@ Backend on `:8000`, frontend on `:5173` proxying `/api` and `/ws`.
 | Layer | What is tested | How |
 |---|---|---|
 | Unit — simulation | Bucket model, channel overflow, scenario script application, determinism by seed | pytest, pure functions, no DB |
-| Unit — threat detector | Index math, band transitions with hysteresis, trigger and cooldown | pytest |
-| Unit — tools | `execute` mutates state as declared; `verify` passes on success and fails on injected failure | pytest + test DB (Postgres in Docker) |
-| Unit — RAG | Chunking, citation ID stability, retrieval returns the policy chunk for a threshold query on the seed corpus, grounding validator rejects unknown IDs | pytest + test DB |
-| Unit — mock provider | Fills every schema, cites only provided IDs, reflects changed inputs | pytest |
-| Integration — graph | Full run with `MockProvider`: reaches the `approval_gate` interrupt, resumes on decision, executes, verifies, re-plans on injected crew failure, stops after the re-plan limit | pytest-asyncio + test DB |
+| Unit — threat detector (pending) | Index math, band transitions with hysteresis, trigger and cooldown | pytest |
+| Unit — tools | `execute_action` mutates state as declared, audits every outcome, replays idempotency keys, refuses approval-required calls without an approval; `verify` passes on success and fails on injected failure | pytest + test DB (Postgres in Docker), `tests/tools/` |
+| Unit — RAG | Chunking, citation ID stability, embedder fallback, retrieval returns the policy chunk for a threshold query on the seed corpus, kind/category/hazard/zone filters, `validate_citation_ids` rejects unknown IDs (full grounding validator pending) | pytest + test DB |
+| Unit — mock provider (pending) | Fills every schema, cites only provided IDs, reflects changed inputs | pytest |
+| Integration — graph (pending) | Full run with `MockProvider`: reaches the `approval_gate` interrupt, resumes on decision, executes, verifies, re-plans on injected crew failure, stops after the re-plan limit | pytest-asyncio + test DB |
 | Integration — API | REST endpoints and WebSocket snapshot + event stream | httpx `ASGITransport`, Starlette WS test client |
-| Contract — Anthropic | Structured output round-trip against the real API for one node | pytest, skipped without `ANTHROPIC_API_KEY` |
-| Frontend | Citation chip opens the right source; approvals inbox posts the decision; store applies snapshot then events | Vitest + Testing Library |
-| Demo smoke | `scripts/demo_smoke.py` runs the primary scenario headless with the mock provider at 10x and asserts the final state: project halted, D-7 pumps deployed, alert issued, all actions verified | run before every demo |
+| Contract — Anthropic (pending) | Structured output round-trip against the real API for one node | pytest, skipped without `ANTHROPIC_API_KEY` |
+| Contract — frontend | Committed `frontend/openapi.json` and mock fixtures equal what the backend renders | `tests/test_contract_export.py` |
+| Frontend | Citation chip opens the right source; approvals inbox posts the decision; store applies snapshot then events; generated event union covers every backend and pending type | Vitest + Testing Library |
+| Demo smoke | Built (simulation only, no DB or network): `scripts/demo_smoke.py` replays `cascading_landslide_flood` (seed 42, 300 ticks) and asserts the stages in order, the SL-HV-1 landslide, D-7 blocked, Riverside flooded, the Kalinadi above warning, Hill Road and Riverside Bypass blocked, and that halting PR-HT2 at t=60 prevents the landslide. Pending, once the agent exists: run it with the mock provider and assert project halted, D-7 pumps deployed, alert issued, all actions verified | run before every demo |
 
 Invariants enforced by tests, not by convention: no LLM output enters state without schema validation and
-grounding; no state changes outside the tool registry; every event type has a documented payload model.
+grounding (from the agent milestone on); no state changes outside the tool registry; every event type has a
+documented payload model.
 
 ---
 
@@ -522,34 +659,53 @@ grounding; no state changes outside the tool registry; every event type has a do
 GridLine_AI/
 ├── ARCHITECTURE.md            this file
 ├── CLAUDE.md                  project constitution and working rules
-├── docker-compose.yml         postgres + pgvector
-├── scripts/                   dev.ps1, dev.sh, demo_smoke.py
+├── docker-compose.yml         postgres + pgvector on localhost:5433 (GRIDLINE_DB_PORT)
+├── docs/                      rag.md (RAG usage); superpowers/specs and plans per subsystem; screenshots/
+├── scripts/                   demo_smoke.py; db/init.sql (creates gridline_test, enables vector);
+│                              dev.ps1, dev.sh (pending)
 ├── backend/
-│   ├── pyproject.toml         uv-managed; fastapi, uvicorn, sqlalchemy, psycopg, pgvector, langgraph,
-│   │                          langgraph-checkpoint-postgres, anthropic, fastembed, pydantic-settings
-│   ├── data/corpus/           synthetic documents (Markdown + front matter)
-│   ├── data/city/             synthetic city seed (YAML)
+│   ├── pyproject.toml         uv-managed; fastapi, uvicorn, sqlalchemy, psycopg, pgvector, fastembed,
+│   │                          pydantic-settings, pyyaml, numpy (langgraph, langgraph-checkpoint-postgres,
+│   │                          anthropic: pending)
+│   ├── README.md              data layer, seed, ingest, simulation, tools, tests
+│   ├── data/city/             synthetic city seed (YAML, one file per area)
+│   ├── data/corpus/           37 synthetic documents (Markdown + front matter)
+│   ├── scripts/               export_contract.py: openapi.json + mock fixtures for the frontend
 │   ├── gridline/
-│   │   ├── main.py            app factory, lifespan (db, bus, simulation, agent runner)
-│   │   ├── config.py
-│   │   ├── db/                engine, models, seed, reset
-│   │   ├── city/              typed city model
-│   │   ├── simulation/        clock, physics, scenarios, sensors
-│   │   ├── threats/           indices, bands, detector
-│   │   ├── events/            bus, envelope models, websocket
-│   │   ├── rag/               chunker, embedder, store, retriever, citations, ingest, validator
-│   │   ├── llm/               provider protocol, anthropic, mock, prompts/
-│   │   ├── agents/            state, nodes/, graph, runner
-│   │   ├── tools/             base, registry, one module per tool
-│   │   ├── approvals/
-│   │   └── api/               routers
-│   └── tests/
+│   │   ├── main.py            app factory, lifespan (city, engine, bus, runner, city map, chunk store)
+│   │   ├── config.py          Settings from backend/.env
+│   │   ├── errors.py          typed errors mapped to 409 / 422
+│   │   ├── city/              data-layer record schemas, loader, consistency and reference checks, terrain;
+│   │   │                      the simulation's typed City (model.py) built by nandipur.py
+│   │   ├── db/                base, engine, models/ (one module per area, incl. knowledge, operations),
+│   │   │                      schema, seed/ (corpus parser, rows, CLI)
+│   │   ├── simulation/        engine, world, physics, dynamics, apply, sensors, severity, schedule, runner,
+│   │   │                      scenarios/
+│   │   ├── events/            types, payloads, envelope, bus, websocket (/ws)
+│   │   ├── rag/               chunker, embedder, models, store, retriever, citations, ingest
+│   │   ├── tools/             base, executor, registry, snapshot, views, vocab, common, one module per group
+│   │   ├── api/               routers: health, city, chunks, simulation; models and helpers: city_map,
+│   │   │                      map_geometry, map_labels, simulation_models, injections, event_models,
+│   │   │                      contract, deps, errors
+│   │   ├── threats/           pending: indices, bands, detector
+│   │   ├── llm/               pending: provider protocol, anthropic, mock, prompts/
+│   │   ├── agents/            pending: state, nodes/, graph, runner
+│   │   └── approvals/         pending
+│   └── tests/                 pytest; tools/ for the tool layer; fixtures/corpus for RAG
 └── frontend/
-    ├── package.json           vite, react, typescript, tailwindcss, @tanstack/react-query, zustand, recharts
+    ├── package.json           vite, react, typescript, tailwindcss, @tanstack/react-query, zustand, recharts,
+    │                          openapi-typescript
+    ├── openapi.json           backend contract (generated, do not edit)
+    ├── openapi.pending.yaml   hand-written contract of pending routes and events
+    ├── scripts/gen-api.mjs    merges both into src/api/schema.d.ts
     └── src/
-        ├── api/               generated types, query hooks
-        ├── ws/                socket client, store
-        ├── components/        Map, RiskTimeline, EventFeed, IncidentPanel, ApprovalsInbox, ActionsLog, ScenarioBar
+        ├── api/               ApiClient, HttpApiClient, generated schema.d.ts, types.ts, query hooks
+        ├── live/              WebSocket client, Zustand live store, pure event reducers, selectors
+        ├── mock/              MockApiClient, MockSocket, scripted replay, backend-generated fixtures
+        ├── components/        map, timeline, events, incident, approvals, actions, scenario, overview, why,
+        │                      layout, ui
+        ├── ui/                UI state (selection, layers, drawers)
+        ├── hooks/, styles/, test/
         └── App.tsx
 ```
 
@@ -559,7 +715,7 @@ GridLine_AI/
 
 - No microservices, Kafka, Kubernetes, Celery, Redis. One process, one database, one frontend.
 - No real GIS, weather feeds, or real-city data. No personal data anywhere, including in fake reports.
-- No auth, roles, or audit beyond the append-only event log.
+- No auth, roles, or audit beyond the append-only event log (pending) and the `actions` audit trail.
 - No hardcoded model answers. The deterministic parts are the simulation, the indices and the mock
   heuristic, all of which read live state and retrieved context.
 - No autonomous execution of approval-required actions, even in demo mode (`AUTO_APPROVE` records a
@@ -567,13 +723,18 @@ GridLine_AI/
 
 ---
 
-## 18. Implementation milestones (for the plan; not started)
+## 18. Implementation milestones (status 2026-09-26)
 
 1. Skeleton: compose file, backend app factory, DB models, seed, event bus, WebSocket, simulation loop,
-   `sim.tick` visible in a bare frontend.
-2. Threat detector and primary scenario producing band changes and incidents.
-3. RAG: corpus, embedding, retrieval, citation IDs, validator.
-4. LangGraph with `MockProvider` end to end, including interrupt, tools, verification, re-plan.
-5. `AnthropicProvider` with structured outputs and caching; grounding on real outputs.
-6. Dashboard panels; demo smoke script.
-7. Secondary scenario; polish; README.
+   `sim.tick` visible in a bare frontend. **Done**, except that the bus is not persisted (no `events`
+   table) and the `dev.ps1` / `dev.sh` start scripts are missing.
+2. Threat detector and primary scenario producing band changes and incidents. **Scenarios done** (all four).
+   **Detector pending.**
+3. RAG: corpus, embedding, retrieval, citation IDs, validator. **Done**, with the ten-category filter. The
+   grounding validator is pending beyond `validate_citation_ids`.
+4. LangGraph with `MockProvider` end to end, including interrupt, tools, verification, re-plan. **Tools and
+   per-tool verification done** (§10, §11). **Graph, mock provider and approvals pending.**
+5. `AnthropicProvider` with structured outputs and caching; grounding on real outputs. **Pending.**
+6. Dashboard panels; demo smoke script. **Done**: the dashboard is connected to the backend over generated
+   types, and the smoke script covers the simulation. Agent-driven panels wait on 4–5.
+7. Secondary scenario; polish; README. **Secondary scenario (`flash_flood`) and `backend/README.md` done.**

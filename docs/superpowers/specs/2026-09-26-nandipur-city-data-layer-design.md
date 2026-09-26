@@ -505,6 +505,18 @@ wind watch ≥ 62 km/h, warning ≥ 89, critical ≥ 118; road closure at water 
 
 ## 7. Corpus (33 Markdown documents in `backend/data/corpus/`)
 
+> **Revision (2026-09-26, RAG knowledge categories).** The corpus now has **37** documents. Four were added,
+> all `kind: profile` with version 1.0: `survey-d7-2026` (Kalinadi Drain D-7 Condition Survey 2026, NMC
+> Drainage Division), `inspection-br1-2025` (Kalinadi Bridge BR-1 Principal Inspection 2025, NMC Engineering
+> Department), `geotech-sl-hv-1-2025` (Geotechnical Assessment of Slope SL-HV-1 for Hillview Terrace Phase 2,
+> State Geological Survey) and `hydraulics-d7-2026` (Kalinadi Drain D-7 Hydraulic Capacity Study, NMC
+> Drainage Division). Every document's front matter now also carries a required `category`, one of ten:
+> `policy, sop, procedure, incident_report, infrastructure_report, engineering_report, construction_safety,
+> evacuation, resource_rules, change_log`. It is set explicitly per document, and reports, and only reports,
+> are `incident_report`. The mapping from document to category is in `docs/rag.md`. `test_corpus.py` (§8)
+> now expects 37 documents and all ten categories in use. The table below and "33" elsewhere in this spec
+> describe the original corpus.
+
 Front matter (YAML between `---` lines): `document_id`, `title`, `kind`, `source`, `version` (string),
 `effective_date`, `hazards`, `zone_ids`, `supersedes` (optional), `summary`; reports add an `incident:` block with
 every `historical_incidents` column except document_id, plus `impacts: [{asset_kind, asset_id, impact, detail,
