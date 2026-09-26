@@ -7,16 +7,21 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from gridline.db.engine import create_engine, session_factory
+from gridline.db.models import Document
 from gridline.db.schema import create_schema, drop_schema, truncate_corpus
 from gridline.db.seed import SeedSummary, reset_and_seed
+from gridline.db.seed.corpus import load_corpus
+from gridline.db.seed.rows import document_row
 
 LoopFactory = Callable[[], asyncio.AbstractEventLoop]
 
 DEFAULT_TEST_URL = "postgresql+psycopg://gridline:gridline@localhost:5433/gridline_test"
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+RAG_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "corpus"
 
 
 def pytest_asyncio_loop_factories(config: pytest.Config, item: pytest.Item) -> dict[str, LoopFactory]:
@@ -63,3 +68,23 @@ async def session(db_engine: AsyncEngine, seeded: SeedSummary) -> AsyncIterator[
     async with session_factory(db_engine)() as s:
         yield s
         await s.rollback()
+
+
+@pytest.fixture
+async def rag_documents(
+    db_engine: AsyncEngine, db_sessions: async_sessionmaker[AsyncSession]
+) -> AsyncIterator[async_sessionmaker[AsyncSession]]:
+    """``documents`` rows for the RAG test corpus (tests/fixtures/corpus), written as the seed writes them.
+
+    RAG ingestion never creates or deletes documents (the city seed owns them), so these three are added
+    here and removed afterwards (their chunks cascade); seeded Nandipur documents are left untouched.
+    """
+    docs = load_corpus(RAG_FIXTURES)
+    ids = [d.meta.document_id for d in docs]
+    async with db_engine.begin() as conn:
+        await conn.execute(delete(Document).where(Document.id.in_(ids)))
+    async with db_sessions() as s, s.begin():
+        s.add_all([document_row(d) for d in docs])
+    yield db_sessions
+    async with db_engine.begin() as conn:
+        await conn.execute(delete(Document).where(Document.id.in_(ids)))

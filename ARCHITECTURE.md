@@ -51,7 +51,8 @@ on D-7 after a 2025 road-widening project).
   deterministic heuristic reasoner that builds its answer from the same retrieved context and state; it is
   not canned text.
 - A4. Default model `claude-opus-5` at effort `medium` for demo latency, overridable by environment variable.
-- A5. Embeddings run locally (fastembed, ONNX, CPU) so RAG works offline and needs no key.
+- A5. Embeddings run locally (fastembed, ONNX, CPU) so RAG works offline and needs no key; with no model
+  download available, a deterministic hashed embedder takes over (`EMBEDDING_PROVIDER=auto`).
 - A6. Development happens on Windows; startup scripts ship for both PowerShell and bash.
 
 ---
@@ -143,7 +144,7 @@ dynamic tables and re-seeds.
 | `approvals` | Pending / decided approval requests | id, run_id, incident_id, proposed_actions_json, status, decided_by, note |
 | `actions` | Executed tool calls | id, run_id, tool, input_json, status, executed_at, verification_json |
 | `alerts` | Public alerts issued | id, zone_id, level, message, issued_at |
-| `documents`, `chunks` | RAG corpus | doc id, title, kind, source_path; chunk id, doc_id, section, text, embedding `vector(384)`, metadata jsonb |
+| `documents`, `document_sections`, `chunks` | Corpus (seeded) and RAG index | documents: id, title, kind, source, zone_ids / hazards text[], content_hash, embedding_model; sections: id `<doc>#<section>`; chunks: id = citation id `<doc>#s4.2`, document_id, section_id, text, embedding `vector(384)`, kind, zone_ids, hazards (filter columns), metadata jsonb |
 | `events` | Append-only event log | id, ts, sim_time, type, incident_id, payload jsonb |
 | `checkpoints*` | LangGraph checkpointer tables | created by `AsyncPostgresSaver.setup()` |
 
@@ -212,15 +213,20 @@ Kept small enough to hold in one head and cite precisely.
 
 ## 7. RAG
 
-1. **Load.** `gridline/rag/index.py` reads `backend/data/corpus/*.md`, splits by heading into chunks of
-   roughly 200–500 tokens, and stores chunks with metadata (`kind`, `zone_ids`, `hazards`, `date`, `section`).
-2. **Embed.** fastembed `BAAI/bge-small-en-v1.5` (384-dim, ONNX, CPU, downloaded once). Stored in
-   `chunks.embedding`.
-3. **Retrieve.** `retrieve(query, filters, k=8)`: cosine similarity in pgvector with optional metadata
-   filters (hazard, zone). The `retrieve` node issues two or three targeted queries per incident (policy
-   thresholds; history for this zone and hazard; recent changes affecting the zone) and merges results.
-   Stretch: add Postgres full-text search with reciprocal rank fusion if dense-only retrieval misses
-   exact identifiers such as permit numbers.
+1. **Load.** `gridline/rag/ingest.py` (`uv run gridline-ingest`) parses `backend/data/corpus/*.md` with the
+   seed's corpus parser and makes one chunk per numbered section, so chunk ids equal `document_sections` ids
+   (a section over 350 words is split at paragraphs into extra `-p2`, `-p3` parts). Chunks carry `kind`,
+   `zone_ids`, `hazards` and metadata. Documents must be seeded first; files whose hash and embedder are
+   unchanged are skipped, so ids stay stable. Only `chunks` and the documents' fingerprint are written.
+2. **Embed.** fastembed `BAAI/bge-small-en-v1.5` (384-dim, ONNX, CPU, downloaded once), or the offline
+   `hashed` embedder (`EMBEDDING_PROVIDER=auto|fastembed|hashed`; `auto` falls back to `hashed`). Stored in
+   `chunks.embedding`; retrieval refuses to run when the live embedder differs from the indexed one.
+3. **Retrieve.** `retrieve(query, filters, top_k=8)`: cosine similarity in pgvector with optional any-of
+   filters `kinds, hazards, zone_ids, document_ids` (a chunk with empty `zone_ids`/`hazards` is city-wide /
+   all-hazard and matches every zone / hazard filter). The `retrieve` node issues two or three targeted
+   queries per incident (policy thresholds; history for this zone and hazard; recent changes affecting the
+   zone) and merges results. Stretch: add Postgres full-text search with reciprocal rank fusion if
+   dense-only retrieval misses exact identifiers such as permit numbers. Usage: `docs/rag.md`.
 4. **Citation IDs.** Every retrieved chunk is presented to the model as `[doc-slug#section]`
    (e.g. `[dmp-2024#s4.2]`). Live inputs get IDs too: `[sensor:RG-02@sim_time]`, `[state:zone.hillview]`,
    `[event:evt_123]`. The model may cite only IDs present in its input.
@@ -412,7 +418,10 @@ frontend and backend share one contract.
 `backend/.env` (example committed as `.env.example`):
 
 ```
-DATABASE_URL=postgresql+psycopg://gridline:gridline@localhost:5432/gridline
+DATABASE_URL=postgresql+psycopg://gridline:gridline@localhost:5433/gridline
+EMBEDDING_PROVIDER=auto       # auto | fastembed | hashed
+EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+CORPUS_DIR=data/corpus
 LLM_PROVIDER=auto            # anthropic | mock | auto
 ANTHROPIC_API_KEY=           # optional
 LLM_MODEL=claude-opus-5
@@ -469,7 +478,7 @@ GridLine_AI/
 │   │   ├── simulation/        clock, physics, scenarios, sensors
 │   │   ├── threats/           indices, bands, detector
 │   │   ├── events/            bus, envelope models, websocket
-│   │   ├── rag/               corpus loader, embedder, retriever, citations, validator
+│   │   ├── rag/               chunker, embedder, store, retriever, citations, ingest, validator
 │   │   ├── llm/               provider protocol, anthropic, mock, prompts/
 │   │   ├── agents/            state, nodes/, graph, runner
 │   │   ├── tools/             base, registry, one module per tool

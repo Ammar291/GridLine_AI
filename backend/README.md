@@ -39,6 +39,17 @@ Before writing anything the seed validates every YAML record and corpus front ma
 (unknown keys fail) and checks every cross-reference. A bad id fails with the table, record and field named,
 for example `shelters S-5: school_id references unknown schools id 'SC-99'`.
 
+## RAG index
+
+```bash
+uv run gridline-ingest             # after seeding: chunk, embed and store the corpus in `chunks`
+```
+
+One chunk per corpus section, so citation ids like `dmp-2024#s4.2` resolve to a `chunks` row. Ingestion
+writes only `chunks` and each document's `content_hash`/`embedding_model`; unchanged files are skipped.
+`EMBEDDING_PROVIDER=auto` uses the local fastembed model when it can load and the offline `hashed` embedder
+otherwise. Usage, filters and the Python API: `../docs/rag.md`.
+
 ## Tests
 
 ```bash
@@ -49,7 +60,8 @@ uv run pyright && uv run ruff check . && uv run ruff format --check .
 
 Tests use `TEST_DATABASE_URL` (default `postgresql+psycopg://gridline:gridline@localhost:5433/gridline_test`).
 The schema is dropped and recreated once per test session and seeded once by the `seeded` fixture.
-`test_corpus.py` and `test_consistency.py` are pure Python and need no database.
+`test_corpus.py`, `test_consistency.py`, `test_chunker.py`, `test_embedder.py` and `test_citations.py` are
+pure Python and need no database.
 
 ## Data layout
 
@@ -77,5 +89,6 @@ Code map:
   `references.py` cross-reference checks
 - `gridline/db/models/` SQLAlchemy tables; `gridline/db/schema.py` create / drop
 - `gridline/db/seed/` corpus parser, row builders, `seed()` / `reset_and_seed()` and the CLI
+- `gridline/rag/` chunker, embedders, `ChunkStore`, `Retriever`, citations and `gridline-ingest`
 
 All places, organisations, people, assets and events are fictional.
