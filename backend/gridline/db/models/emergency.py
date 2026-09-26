@@ -1,5 +1,10 @@
-"""Hospitals, ambulances, fire, police, crews and shelters (spec §5.7)."""
+"""Hospitals, ambulances, fire, police, crews and shelters (spec §5.7).
 
+Columns under "live state" are written only by the city operations tools (``gridline/tools``); the seed leaves
+them ``NULL`` (or 0), so every YAML record still maps one-to-one onto its row.
+"""
+
+import datetime as dt
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey
@@ -47,6 +52,8 @@ class HospitalBed(Base):
     bed_type: Mapped[str]
     total: Mapped[int]
     available: Mapped[int]
+    # Live state: beds moved out of ``available`` by active bed_reservations.
+    reserved: Mapped[int] = mapped_column(default=0)
 
     hospital: Mapped[Hospital] = relationship(back_populates="beds")
 
@@ -59,6 +66,11 @@ class Ambulance(Base):
     kind: Mapped[str]
     status: Mapped[str]
     location_zone_id: Mapped[str] = mapped_column(ForeignKey("zones.id"))
+    # Live state (dispatch_ambulance).
+    target_zone_id: Mapped[str | None] = mapped_column(ForeignKey("zones.id"))
+    destination_hospital_id: Mapped[str | None] = mapped_column(ForeignKey("hospitals.id"))
+    incident_id: Mapped[str | None] = mapped_column(ForeignKey("incidents.id"))
+    dispatched_at: Mapped[dt.datetime | None]
 
 
 class FireStation(Base):
@@ -123,6 +135,11 @@ class Crew(Base):
     equipment: Mapped[str]
     baseline_response_min: Mapped[int]
     description: Mapped[str]
+    # Live state (dispatch_rescue_team).
+    target_zone_id: Mapped[str | None] = mapped_column(ForeignKey("zones.id"))
+    task: Mapped[str | None]
+    incident_id: Mapped[str | None] = mapped_column(ForeignKey("incidents.id"))
+    dispatched_at: Mapped[dt.datetime | None]
 
 
 class Shelter(Base):
@@ -147,5 +164,8 @@ class Shelter(Base):
     access_road_id: Mapped[str] = mapped_column(ForeignKey("roads.id"))
     managed_by: Mapped[str]
     description: Mapped[str]
+    # Live state (open_shelter / close_shelter).
+    opened_at: Mapped[dt.datetime | None]
+    incident_id: Mapped[str | None] = mapped_column(ForeignKey("incidents.id"))
 
     school: Mapped["School | None"] = relationship(foreign_keys=[school_id])

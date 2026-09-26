@@ -131,24 +131,38 @@ dynamic tables and re-seeds.
 | Table | Purpose | Key columns |
 |---|---|---|
 | `zones` | Districts / hillside zones | id, name, slope_deg, soil_type, catchment_id, drains_to_channel_id, svg_path |
-| `roads` | Road segments | id, name, zone_id, status (open / closed), is_evacuation_route |
+| `roads` | Road segments | id, name, zone_id, from_zone_id, to_zone_id, status (open / blocked / closed), is_evacuation_route, is_only_access; live: closure_reason, closed_at, incident_id |
 | `drainage_channels` | Channels and culverts | id, name, design_capacity_m3s, current_capacity_m3s, blocked_fraction, downstream_zone_id |
-| `projects` | Construction projects | id, name, zone_id, status (active / halted), excavation_depth_m, planned_depth_m, permit_doc_id |
+| `projects` | Construction projects | id, name, zone_id, status (active / halted / planned / completed), excavation_depth_m, planned_depth_m, permit_doc_id; live: depth_limit_m |
 | `sensors` | Rain gauges, soil moisture probes, channel level gauges | id, kind, zone_id, unit |
 | `sensor_readings` | Time series | sensor_id, sim_time, value |
-| `crews`, `shelters`, `pump_units` | Response assets | id, status, location_zone_id, capacity |
+| `crews` | Response crews (rescue, hill_rescue, boat, drainage, road, medical, electrical, volunteer) | id, kind, members, status, capabilities, location_zone_id; live: target_zone_id, task, incident_id, dispatched_at |
+| `ambulances` | Ambulances by base hospital | id, hospital_id, kind (ALS / BLS), status, location_zone_id; live: target_zone_id, destination_hospital_id, incident_id, dispatched_at |
+| `shelters`, `pump_units` | Shelters and pumps | id, status, zone / location, capacity_persons, current_occupancy, access_road_id; shelters live: opened_at, incident_id |
+| `hospitals`, `hospital_beds` | Hospitals and bed pools per type | hospital: id, zone_id, status, access_road_id; beds: id `<hospital>-<type>`, bed_type, total, available; live: reserved |
 | `zone_state` | Live derived state per zone | zone_id, saturation, rain_24h_mm, landslide_index, flood_index, band |
-| `incidents` | One per hazard episode | id, zone_id, hazard, band, status, opened_at, closed_at |
+| `incidents` | One per hazard episode (at most one open per zone and hazard) | id, zone_id, hazard, band, status, title, summary, opened_at, updated_at, closed_at |
 | `agent_runs` | One per graph invocation | id, incident_id, thread_id, trigger, status, started_at, finished_at |
 | `agent_steps` | Node outputs for the trace | run_id, node, started_at, finished_at, output_json, citations_json |
 | `approvals` | Pending / decided approval requests | id, run_id, incident_id, proposed_actions_json, status, decided_by, note |
-| `actions` | Executed tool calls | id, run_id, tool, input_json, status, executed_at, verification_json |
-| `alerts` | Public alerts issued | id, zone_id, level, message, issued_at |
+| `actions` | Audit trail: every attempted tool call, rejected and failed ones included | id, tool, status (executed / unchanged / rejected / failed), idempotency_key (unique, executed/unchanged only), actor, approval_id, run_id, incident_id (no FK), input_json, before_json, after_json, affected_entities_json, message, sim_time, executed_at, verification_json |
+| `alerts` | Public alerts issued | id, zone_id, level (advisory / warning / evacuate), message, incident_id, issued_at |
+| `evacuation_orders` | At most one active order per zone | id, zone_id, level (voluntary / mandatory), reason, shelter_id, incident_id, status (active / lifted), issued_at, updated_at |
+| `construction_restrictions` | Halts and depth limits on projects | id, project_id, kind (halt / depth_limit), max_depth_m, reason, incident_id, status, issued_at |
+| `tasks` | Inspection, monitoring, evacuation and emergency work | id, kind, title, description, priority, status, zone_id, target_kind, target_id, metric, interval_minutes, assigned_crew_id, incident_id, evacuation_order_id, created_by, created_at, completed_at |
+| `bed_reservations` | Beds held for an incident | id, hospital_id, hospital_bed_id, bed_type, incident_id, beds, status, created_at |
 | `documents`, `document_sections`, `chunks` | Corpus (seeded) and RAG index | documents: id, title, kind, source, zone_ids / hazards text[], content_hash, embedding_model; sections: id `<doc>#<section>`; chunks: id = citation id `<doc>#s4.2`, document_id, section_id, text, embedding `vector(384)`, kind, zone_ids, hazards (filter columns), metadata jsonb |
 | `events` | Append-only event log | id, ts, sim_time, type, incident_id, payload jsonb |
 | `checkpoints*` | LangGraph checkpointer tables | created by `AsyncPostgresSaver.setup()` |
 
-Indexes: `chunks.embedding` (HNSW, cosine), `events (ts)`, `sensor_readings (sensor_id, sim_time)`.
+Indexes: `chunks.embedding` (HNSW, cosine), `events (ts)`, `sensor_readings (sensor_id, sim_time)`,
+`actions.idempotency_key` (unique), and partial unique indexes for one open incident per (zone, hazard) and
+one active evacuation order per zone.
+
+"Live" columns on seeded tables and the operations tables (`incidents`, `alerts`, `evacuation_orders`,
+`construction_restrictions`, `tasks`, `bed_reservations`, `actions`) are written only by the tool layer
+(§10); the seed leaves them empty. The operations tables are listed in
+`gridline.db.models.OPERATIONS_TABLES`.
 
 ---
 
@@ -307,48 +321,93 @@ Prompts live in `gridline/llm/prompts/*.md` and are rendered with the same conte
 
 ## 10. Action execution
 
-**Tool contract** (`gridline/tools/base.py`):
+Implemented in `gridline/tools` (design: `docs/superpowers/specs/2026-09-26-city-operations-tools-design.md`).
+Tools are the only way the agent, and later the operator, changes the city. They change the **database**; the
+simulation will read those changes when it is coupled to the tools (crew travel, excavation freeze).
+
+**Contract** (`gridline/tools/base.py`):
 
 ```python
-class Tool(Protocol):
-    name: str
-    description: str
-    Input: type[BaseModel]              # JSON schema is given to the LLM and the frontend
-    requires_approval: bool
-    max_verify_ticks: int
-    async def execute(self, inp: Input, ctx: ToolContext) -> ActionResult: ...
-    async def verify(self, inp: Input, ctx: ToolContext) -> VerificationResult: ...
+class ActionTool[I: ActionInput, P]:      # I: Pydantic input, extra="forbid", has idempotency_key
+    name: str; description: str; approval_required: bool; Input: type[I]
+    def requires_approval(self, inp: I) -> bool                 # overridden only by issue_preventive_alert
+    async def check(self, inp: I, ctx: ToolContext) -> Plan[P]  # load rows (FOR UPDATE), validate city state,
+                                                                # raise ToolRejected(reason)
+    async def apply(self, inp: I, ctx: ToolContext, plan: Plan[P]) -> Applied   # mutate, never commit
+    async def verify(self, inp: I, ctx: ToolContext, result: ActionResult) -> VerificationResult
+
+class ReadTool[I: ReadInput, O]:          # typed views, never audited
+    async def run(self, inp: I, ctx: ToolContext) -> O
 ```
 
-| Tool | Effect on state | Approval |
-|---|---|---|
-| `issue_alert(zone_id, level, message)` | Inserts alert; broadcast | auto for `advisory`, required for `evacuate` |
-| `halt_construction(project_id, reason)` | Project status `halted`; simulation stops excavation | required |
-| `close_road(road_id, reason)` | Road status `closed`; simulation reroutes crews | required |
-| `deploy_pumps(channel_id, units)` | Raises channel capacity; depot units become `deployed` | required |
-| `dispatch_crew(crew_id, zone_id, task)` | Crew travels over open roads; arrives after N ticks | required |
-| `open_shelter(shelter_id)` | Shelter status `open` | required |
-| `schedule_inspection(asset_id, priority)` | Creates inspection task | auto |
+`ToolContext` carries the session, `actor` (agent / operator / system), `approval_id`, `run_id` and `sim_time`.
+Every action returns an `ActionResult`: `action_id, action_type, status (executed / unchanged / rejected /
+failed), before, after` (row snapshots keyed `"kind:id"`), `timestamp, sim_time, affected_entities, message,
+actor, approval_id, idempotency_key, incident_id, replayed`.
 
-Rules: tools are the only way the agent changes state; each action has an idempotency key
-(`action_id`); executions publish `action.executed`; failures are recorded, never hidden; the registry
-exports JSON schemas so `recommend` can only propose valid calls.
+**Executor** (`execute_action(tool, raw, ctx)` in `gridline/tools/executor.py`): validate input → replay an
+earlier request with the same `idempotency_key` (a key reused for another tool or input is rejected) → reject
+approval-required calls without `ctx.approval_id` → `check` → before snapshot → `apply` + flush → after
+snapshot → insert the `actions` row → commit. `ToolRejected` and validation errors give `rejected`, any other
+exception gives `failed`; both roll back first and are audited, and neither blocks a retry with the same key.
+"Unchanged" means the city was already in the requested state (for example closing a closed road). The
+executor expires the session first so it never decides on a stale identity map. `build_registry()` returns the
+21 tools; `describe()` exports each input's JSON schema for `recommend`.
+
+| Group | Tool | Effect on state | Approval |
+|---|---|---|---|
+| Resources | `get_available_rescue_teams(zone_id?)` | read: available crews of kind rescue, hill_rescue, boat | — |
+| | `dispatch_rescue_team(crew_id, zone_id, task, incident_id?)` | crew `dispatched` with target zone, task, incident; zone must have an open access road | required |
+| | `get_available_ambulances(zone_id?)` | read: available ambulances | — |
+| | `dispatch_ambulance(ambulance_id, zone_id, incident_id?, destination_hospital_id?)` | ambulance `dispatched`; zone and destination hospital reachable over open roads | required |
+| Shelters | `get_shelter_capacity(shelter_id?, zone_id?)` | read: status, capacity, occupancy, free places | — |
+| | `open_shelter(shelter_id, incident_id?)` | shelter `open`; its access road must be open | required |
+| | `close_shelter(shelter_id, reason)` | shelter `closed`; must be empty and not an active evacuation destination | required |
+| Hospitals | `get_hospital_capacity(hospital_id?, zone_id?)` | read: beds per type (total, available, reserved, occupied) | — |
+| | `reserve_hospital_beds(hospital_id, incident_id, beds, bed_type="general")` | `bed_reservations` row; beds move from `available` to `reserved` | required |
+| Roads | `get_road_status(road_id?, zone_id?)` | read: status, closure reason, route flags | — |
+| | `close_road(road_id, reason, incident_id?)` | road `closed` | required |
+| | `reopen_road(road_id, reason)` | road `open`; a `blocked` road must be cleared first | required |
+| Prevention | `create_inspection_order(target_kind, target_id, priority, reason, incident_id?)` | inspection task on a zone, road, bridge, channel, slope, project, shelter or hospital | auto |
+| | `create_monitoring_task(target_kind, target_id, metric, interval_minutes, reason, ...)` | monitoring task | auto |
+| | `create_construction_restriction(project_id, kind, max_depth_m?, reason, incident_id?)` | `halt` → project `halted`; `depth_limit` → tightest `depth_limit_m` | required |
+| | `issue_preventive_alert(zone_id, level, message, incident_id?)` | inserts alert | auto for `advisory`, required for `warning` / `evacuate` |
+| Evacuation | `create_evacuation_order(zone_id, level, reason, shelter_id?, incident_id?)` | active order; a higher level escalates it in place; shelter must be open and outside the zone | required |
+| | `create_evacuation_task(zone_id, description, priority, assigned_crew_id?)` | task on the zone's active order | auto |
+| Incidents | `create_incident(zone_id, hazard, band, title, summary)` | open incident (unchanged if one is open for the zone and hazard) | auto |
+| | `update_incident(incident_id, band?, status?, summary?)` | band, summary, or close | auto |
+| | `create_emergency_task(incident_id, title, description, priority, zone_id?, assigned_crew_id?)` | emergency task | auto |
+
+`halt_construction` is `create_construction_restriction(kind="halt")`; `dispatch_crew`, `issue_alert` and
+`schedule_inspection` became `dispatch_rescue_team`, `issue_preventive_alert` and `create_inspection_order`.
+**Pending:** `deploy_pumps(channel_id, units)` and publishing `action.executed` on the event bus.
 
 ---
 
 ## 11. Verification
 
-Verification is deterministic and reads state back from the database and simulation, never from the
-output of the model.
+Verification is deterministic and reads state back from the database (and, once coupled, the simulation),
+never from the output of the model. `execute_action` does not verify: the caller runs
+`tool.verify(inp, ctx, result)`, which re-reads rows with `populate_existing`, and stores the outcome on the
+audit row with `record_verification(session, action_id, result)` (`actions.verification_json`). Created or
+existing ids come from `result.after`, our own audit data.
 
-- Each tool declares a post-condition: `halt_construction` → project status is `halted` **and** excavation
-  depth unchanged over the next two ticks; `close_road` → road closed and no crew routes through it;
-  `deploy_pumps` → channel capacity increased by the expected amount; `dispatch_crew` → crew location equals
-  target within `max_verify_ticks`; `issue_alert` → alert row exists and was broadcast.
-- The `verify` node polls per tick until all post-conditions hold or the tick budget is spent.
-- Result: `verified`, `partially_verified` (list of failures), or `failed`. Anything but `verified`
-  routes to `replan` with the concrete failure (e.g. "crew C-2 blocked: Hill Road closed"), which the next
-  `recommend` must address.
+- Post-conditions: `dispatch_rescue_team` / `dispatch_ambulance` → status `dispatched` and target zone equals
+  the requested zone; `open_shelter` → `open`; `close_shelter` → `closed`; `close_road` → `closed`;
+  `reopen_road` → `open`; `reserve_hospital_beds` → reservation `active` with the requested beds and the bed
+  pool's `reserved` at least that many; `create_construction_restriction` → restriction `active` and project
+  `halted` (halt) or `depth_limit_m <= max_depth_m` (depth limit); `issue_preventive_alert` → alert row exists
+  with the level; `create_evacuation_order` → an `active` order at the requested level or higher; the task
+  tools → task `open` (monitoring also checks metric and interval); `create_incident` → incident `open` for
+  the zone and hazard; `update_incident` → every requested field has the requested value.
+- Once the simulation is coupled: `halt` also checks excavation depth unchanged over the next two ticks,
+  `close_road` that no crew routes through it, dispatch that the crew reaches the target within
+  `max_verify_ticks`, `deploy_pumps` that channel capacity rose by the expected amount.
+- A tool returns `verified` or `failed` with one `VerificationCheck(name, passed, expected, observed)` per
+  condition. The `verify` node polls per tick until all post-conditions hold or the tick budget is spent and
+  reports `verified`, `partially_verified` (list of failures) or `failed` for the plan. Anything but
+  `verified` routes to `replan` with the concrete failure (e.g. "crew C-4 target zone: expected Z-HV,
+  observed Z-RS"), which the next `recommend` must address.
 - The dashboard shows expected effect vs observed effect per action.
 
 ---

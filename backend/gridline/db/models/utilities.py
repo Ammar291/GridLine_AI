@@ -80,6 +80,8 @@ class Project(Base):
     y_m: Mapped[int]
     elevation_m: Mapped[float]
     description: Mapped[str]
+    # Live state: tightest active depth limit (create_construction_restriction); NULL in the seed.
+    depth_limit_m: Mapped[float | None]
 
     slope: Mapped["Slope | None"] = relationship()
     zone: Mapped["Zone"] = relationship()

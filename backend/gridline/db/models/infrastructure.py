@@ -84,6 +84,10 @@ class Road(Base):
     path: Mapped[list[list[int]]]
     min_elevation_m: Mapped[float]  # computed over path vertices
     description: Mapped[str]
+    # Live state written by close_road / reopen_road; NULL in the seed.
+    closure_reason: Mapped[str | None]
+    closed_at: Mapped[dt.datetime | None]
+    incident_id: Mapped[str | None] = mapped_column(ForeignKey("incidents.id"))
 
 
 class Bridge(Base):

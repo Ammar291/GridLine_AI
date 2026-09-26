@@ -26,6 +26,15 @@ from gridline.db.models.knowledge import (
     DocumentSection,
     PolicyThreshold,
 )
+from gridline.db.models.operations import (
+    Action,
+    Alert,
+    BedReservation,
+    ConstructionRestriction,
+    EvacuationOrder,
+    Incident,
+    Task,
+)
 from gridline.db.models.population import ResidentialArea, School, ZoneYearlyStats
 from gridline.db.models.utilities import (
     CriticalInfrastructure,
@@ -79,15 +88,33 @@ EXPECTED_TABLES: frozenset[str] = frozenset(
     }
 )
 
+# Tables written only by the city operations tools (gridline/tools); empty after seeding.
+OPERATIONS_TABLES: frozenset[str] = frozenset(
+    {
+        "incidents",
+        "alerts",
+        "evacuation_orders",
+        "construction_restrictions",
+        "tasks",
+        "bed_reservations",
+        "actions",
+    }
+)
+
 __all__ = [
     "EMBEDDING_DIMENSION",
     "EXPECTED_TABLES",
+    "OPERATIONS_TABLES",
+    "Action",
+    "Alert",
     "Ambulance",
     "Base",
+    "BedReservation",
     "Bridge",
     "Catchment",
     "Chunk",
     "City",
+    "ConstructionRestriction",
     "Crew",
     "CriticalInfrastructure",
     "Dam",
@@ -95,6 +122,7 @@ __all__ = [
     "DocumentSection",
     "DrainageChannel",
     "ElevationPoint",
+    "EvacuationOrder",
     "FireStation",
     "FireTruck",
     "FloodPlain",
@@ -104,6 +132,7 @@ __all__ = [
     "HistoricalIncidentImpact",
     "Hospital",
     "HospitalBed",
+    "Incident",
     "InfrastructureChange",
     "PoliceStation",
     "PolicyThreshold",
@@ -118,6 +147,7 @@ __all__ = [
     "Shelter",
     "SoilProfile",
     "Slope",
+    "Task",
     "Tunnel",
     "WaterFacility",
     "Zone",

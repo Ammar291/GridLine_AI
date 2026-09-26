@@ -4,21 +4,23 @@ import asyncio
 import os
 from collections.abc import AsyncIterator, Callable
 from pathlib import Path
+from typing import Any
 
 import psycopg
 import pytest
-from sqlalchemy import delete
+from sqlalchemy import bindparam, delete, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from gridline.city.model import City
 from gridline.city.nandipur import build_nandipur
 from gridline.config import Settings
 from gridline.db.engine import create_engine, session_factory
-from gridline.db.models import Document
+from gridline.db.models import OPERATIONS_TABLES, Base, Document
 from gridline.db.schema import create_schema, drop_schema, truncate_corpus
 from gridline.db.seed import SeedSummary, reset_and_seed
 from gridline.db.seed.corpus import load_corpus
 from gridline.db.seed.rows import document_row
+from gridline.tools.base import ToolContext
 
 LoopFactory = Callable[[], asyncio.AbstractEventLoop]
 
@@ -103,3 +105,71 @@ async def rag_documents(
     yield db_sessions
     async with db_engine.begin() as conn:
         await conn.execute(delete(Document).where(Document.id.in_(ids)))
+
+
+# --- city operations tools ----------------------------------------------------------------------------------
+# Tools commit for real, so a tool test starts and ends on the freshly seeded city. A reseed costs about a
+# second, so instead the live tables the tools write are restored row by row from a baseline read once after
+# seeding, and the operations tables are emptied children-first. These fixtures live here, not in
+# tests/tools/conftest.py, so they resolve however pytest is handed the test files.
+
+LIVE_TABLES = ("roads", "projects", "crews", "ambulances", "shelters", "hospital_beds")
+
+Baseline = dict[str, list[dict[str, Any]]]
+
+
+@pytest.fixture(scope="session")
+async def baseline(db_engine: AsyncEngine, seeded: SeedSummary) -> Baseline:
+    async with db_engine.connect() as conn:
+        tables = {name: Base.metadata.tables[name] for name in LIVE_TABLES}
+        return {
+            name: [dict(r) for r in (await conn.execute(select(t))).mappings()] for name, t in tables.items()
+        }
+
+
+async def restore(engine: AsyncEngine, baseline: Baseline) -> None:
+    """Put the live tables back to their seeded values and delete every operations row."""
+    async with engine.begin() as conn:
+        for name, rows in baseline.items():
+            table = Base.metadata.tables[name]
+            cols = [c.name for c in table.columns if not c.primary_key]
+            stmt = (
+                table.update()
+                .where(table.c.id == bindparam("pk_"))
+                .values({c: bindparam(f"v_{c}") for c in cols})
+            )
+            await conn.execute(stmt, [{"pk_": r["id"], **{f"v_{c}": r[c] for c in cols}} for r in rows])
+        for table in reversed(Base.metadata.sorted_tables):
+            if table.name in OPERATIONS_TABLES:
+                await conn.execute(table.delete())
+
+
+@pytest.fixture
+async def tool_session(db_engine: AsyncEngine, baseline: Baseline) -> AsyncIterator[AsyncSession]:
+    """The session tools run on, over a freshly restored city; the city is restored again afterwards.
+
+    Not autouse: pytest-asyncio cannot run an async autouse fixture for a sync test that follows async ones,
+    and pure tests need no database.
+    """
+    await restore(db_engine, baseline)
+    async with session_factory(db_engine)() as s:
+        yield s
+    await restore(db_engine, baseline)
+
+
+@pytest.fixture
+async def check_session(db_engine: AsyncEngine, tool_session: AsyncSession) -> AsyncIterator[AsyncSession]:
+    """A second session, used only to read state back (proves the commit reached the database)."""
+    async with session_factory(db_engine)() as s:
+        yield s
+
+
+@pytest.fixture
+def ctx(tool_session: AsyncSession) -> ToolContext:
+    """An approved agent call on the tool session."""
+    return ToolContext(session=tool_session, approval_id="apr_test", run_id="run_test")
+
+
+@pytest.fixture
+def ctx_no_approval(tool_session: AsyncSession) -> ToolContext:
+    return ToolContext(session=tool_session)

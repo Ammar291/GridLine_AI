@@ -63,6 +63,27 @@ scenarios, snapshot, scenario, start, pause, resume, reset, advance, speed, inje
 (`?types=weather.,environment.soil` filters by event-type prefix). Design and deviations:
 `docs/superpowers/specs/2026-09-26-simulation-and-events-design.md`.
 
+## City operations tools
+
+`gridline/tools` holds the 21 typed tools through which the agent changes the city (roads, rescue teams,
+ambulances, shelters, hospital beds, prevention, evacuation, incidents). Each action validates its input and
+the current city state, changes PostgreSQL in one transaction, writes an `actions` audit row and returns an
+`ActionResult` with before/after state; approval-required tools refuse without an `approval_id`.
+
+```python
+from gridline.tools.base import ToolContext
+from gridline.tools.executor import execute_action
+from gridline.tools.registry import build_registry
+
+registry = build_registry()
+async with sessions() as session:
+    ctx = ToolContext(session=session, actor="operator", approval_id="apr_1")
+    result = await execute_action(registry.action("close_road"), {"road_id": "RD-01", "reason": "slope"}, ctx)
+```
+
+The operations tables start empty after seeding. Contract, catalogue and post-conditions: ARCHITECTURE.md
+§10-§11 and `../docs/superpowers/specs/2026-09-26-city-operations-tools-design.md`.
+
 ## Tests
 
 ```bash
@@ -72,7 +93,9 @@ uv run pyright && uv run ruff check . && uv run ruff format --check .
 ```
 
 Tests use `TEST_DATABASE_URL` (default `postgresql+psycopg://gridline:gridline@localhost:5433/gridline_test`).
-The schema is dropped and recreated once per test session and seeded once by the `seeded` fixture.
+The schema is dropped and recreated once per test session and seeded once by the `seeded` fixture. Tool tests
+commit for real on `tool_session`; it restores the seeded live columns and empties the operations tables
+before and after each test, and `check_session` reads results back through a second connection.
 `test_corpus.py`, `test_consistency.py`, `test_chunker.py`, `test_embedder.py` and `test_citations.py` are
 pure Python and need no database.
 
