@@ -1,0 +1,881 @@
+dams:
+  - id: DM-1
+    name: Kalinadi Barrage
+    kind: barrage
+    river_id: R-1
+    channel_id: null
+    zone_id: null
+    x_m: 400
+    y_m: 2760
+    year_built: 1985
+    height_m: 9
+    storage_mcm: 4.2
+    spillway_capacity_m3s: 1800
+    gates: 12
+    condition: fair
+    silted_pct: 35
+    closes_at_river_stage_m: null
+    downstream_zone_ids: [Z-LK, Z-NC, Z-OT, Z-RS, Z-MI]
+    operator: Kalinadi Irrigation Division
+    description: >-
+      Twelve-gate barrage on the Kalinadi (R-1) at the western edge of the city, upstream of every riverine zone. Its
+      pond feeds the TU-2 intake tunnel to the water treatment plant (WF-1); during the 2021 flood it released
+      1,650 m3/s. About a third of its storage is lost to silt.
+  - id: DM-2
+    name: Nandi Lake Regulator
+    kind: gated_weir
+    river_id: R-3
+    channel_id: D-11
+    zone_id: Z-LK
+    x_m: 3000
+    y_m: 2350
+    year_built: 1996
+    height_m: 3.5
+    storage_mcm: 1.9
+    spillway_capacity_m3s: 40
+    gates: 2
+    condition: fair
+    silted_pct: 20
+    closes_at_river_stage_m: 2.5
+    downstream_zone_ids: [Z-LK]
+    operator: NMC Drainage Division
+    description: >-
+      Two-gate weir holding Nandi Lake (R-3) and controlling the D-11 outfall to the Kalinadi. The gates close at a
+      Kalinadi stage of 2.5 m to stop backflow, after which the basin drains only through the D-11 pumps
+      (PU-L1..PU-L3) beside it. Level sensor CL-D11 is mounted on the structure.
+  - id: DM-3
+    name: Tekri check dams
+    kind: check_dam
+    river_id: R-2
+    channel_id: null
+    zone_id: Z-TH
+    x_m: 11500
+    y_m: 7600
+    year_built: 2008
+    height_m: 4
+    storage_mcm: 0.06
+    spillway_capacity_m3s: 25
+    gates: 0
+    condition: fair
+    silted_pct: 60
+    closes_at_river_stage_m: null
+    downstream_zone_ids: [Z-RS]
+    operator: NMC Engineering Department
+    description: >-
+      A series of ungated gabion check dams on the Tekri Nala (R-2) in the SL-TH-2 gully, built to hold back
+      sediment and slow flash runoff towards Riverside. They are now about 60 % silted.
+
+power_substations:
+  - id: PS-1
+    name: Civil Lines Grid Substation
+    zone_id: Z-CL
+    x_m: 6000
+    y_m: 6800
+    voltage_kv: "132/33"
+    capacity_mva: 150
+    year_built: 1972
+    serves_zone_ids: [Z-HV, Z-TH, Z-RS, Z-OT, Z-MW, Z-SR, Z-CL, Z-LK, Z-NC, Z-MI]
+    fed_from_substation_id: null
+    flood_protected: true
+    platform_raised_m: 0
+    status: normal
+    description: >-
+      The city's grid supply point on the Civil Lines Rise (HL-3), feeding the 33/11 kV substations PS-2 to PS-5 and
+      directly supplying the District Hospital (H-1) and the water treatment plant (WF-1).
+  - id: PS-2
+    name: Riverside Substation
+    zone_id: Z-RS
+    x_m: 8600
+    y_m: 3700
+    voltage_kv: "33/11"
+    capacity_mva: 40
+    year_built: 1998
+    serves_zone_ids: [Z-RS, Z-HV, Z-TH]
+    fed_from_substation_id: PS-1
+    flood_protected: false
+    platform_raised_m: 0
+    status: normal
+    description: >-
+      Distribution substation on the Riverside flood plain (FP-1) supplying Riverside, Hillview and Tekri Heights,
+      including Riverside Community Hospital (H-2) and the raw-water intake WF-2. It was flooded in 2021, causing a
+      38-hour outage.
+  - id: PS-3
+    name: Mill Road Substation
+    zone_id: Z-MI
+    x_m: 10400
+    y_m: 1400
+    voltage_kv: "33/11"
+    capacity_mva: 60
+    year_built: 1980
+    serves_zone_ids: [Z-MI]
+    fed_from_substation_id: PS-1
+    flood_protected: false
+    platform_raised_m: 0
+    status: normal
+    description: >-
+      Industrial substation on Mill Road (RD-08) supplying Mill Road Industrial, the Workers' Hospital (H-5) and the
+      sewage treatment plant (WF-6). A partial flood bund was added in 2022 but does not enclose the whole site.
+  - id: PS-4
+    name: Station Road Substation
+    zone_id: Z-SR
+    x_m: 3000
+    y_m: 5400
+    voltage_kv: "33/11"
+    capacity_mva: 50
+    year_built: 1965
+    serves_zone_ids: [Z-SR, Z-OT, Z-MW]
+    fed_from_substation_id: PS-1
+    flood_protected: true
+    platform_raised_m: 0
+    status: normal
+    description: >-
+      The oldest distribution substation, on the older alluvial terrace in Station Road, supplying Station Road, Old
+      Town and Market Ward, including the Railway Hospital and the Old Town overhead tanks (WF-4).
+  - id: PS-5
+    name: New Colony Substation
+    zone_id: Z-NC
+    x_m: 5200
+    y_m: 1000
+    voltage_kv: "33/11"
+    capacity_mva: 40
+    year_built: 2021
+    serves_zone_ids: [Z-NC, Z-LK]
+    fed_from_substation_id: PS-1
+    flood_protected: true
+    platform_raised_m: 1.2
+    status: normal
+    description: >-
+      Commissioned in 2021 on a platform raised 1.2 m above the South Bank plain (FP-2). It supplies New Colony and
+      Lakeside, including the D-11 pumps (PU-L1..PU-L3), Lakeview Hospital (H-4) and the booster station WF-5.
+
+water_facilities:
+  - id: WF-1
+    name: Kalinadi Water Treatment Plant
+    kind: treatment_plant
+    zone_id: Z-CL
+    x_m: 5200
+    y_m: 6400
+    capacity_mld: 120
+    storage_ml: null
+    year_built: 1985
+    year_expanded: null
+    serves_zone_ids: [Z-HV, Z-TH, Z-RS, Z-OT, Z-MW, Z-SR, Z-CL, Z-LK, Z-NC, Z-MI]
+    substation_id: PS-1
+    backup_power_hours: 24
+    flood_exposure: none
+    description: >-
+      The main treatment plant on the Civil Lines Rise, fed with raw water from the Kalinadi Barrage (DM-1) through
+      the TU-2 intake tunnel and powered from PS-1.
+  - id: WF-2
+    name: Riverside Raw-Water Intake
+    kind: intake
+    zone_id: Z-RS
+    x_m: 8200
+    y_m: 3450
+    capacity_mld: 40
+    storage_ml: null
+    year_built: 1998
+    year_expanded: null
+    serves_zone_ids: [Z-RS, Z-HV]
+    substation_id: PS-2
+    backup_power_hours: 0
+    flood_exposure: high
+    description: >-
+      River intake and package treatment on the Riverside riverbank supplying Riverside and Hillview, including
+      Riverside Community Hospital (H-2). It has no backup power and was out of service for 4 days after flooding in
+      2021.
+  - id: WF-3
+    name: Tekri Hill Reservoir
+    kind: reservoir
+    zone_id: Z-TH
+    x_m: 9900
+    y_m: 6500
+    capacity_mld: null
+    storage_ml: 12
+    year_built: 1990
+    year_expanded: 2022
+    serves_zone_ids: [Z-HV, Z-RS]
+    substation_id: null
+    backup_power_hours: null
+    flood_exposure: none
+    description: >-
+      Gravity storage reservoir on the lower flank of Tekri Hill, about 400 m upslope of the Hillview Terrace slope
+      (SL-HV-1), supplying Hillview and Riverside. Expanded from 8 to 12 ML in 2022; a minor leak found in August 2023
+      was repaired.
+  - id: WF-4
+    name: Old Town Overhead Tanks
+    kind: storage
+    zone_id: Z-OT
+    x_m: 5600
+    y_m: 4200
+    capacity_mld: null
+    storage_ml: 4
+    year_built: 1955
+    year_expanded: null
+    serves_zone_ids: [Z-OT]
+    substation_id: PS-4
+    backup_power_hours: null
+    flood_exposure: low
+    description: >-
+      Elevated tanks supplying Old Town mains and fire hydrants, refilled by pumps powered from PS-4. Low tank levels
+      reduced hydrant pressure during the 2015 Market Ward fire.
+  - id: WF-5
+    name: New Colony Booster Station
+    kind: pumping_station
+    zone_id: Z-NC
+    x_m: 5600
+    y_m: 1400
+    capacity_mld: 20
+    storage_ml: null
+    year_built: 2021
+    year_expanded: null
+    serves_zone_ids: [Z-NC]
+    substation_id: PS-5
+    backup_power_hours: 8
+    flood_exposure: moderate
+    description: >-
+      Booster pumping station built with the New Colony Housing Scheme (PR-NCH) on the South Bank plain (FP-2),
+      powered from PS-5.
+  - id: WF-6
+    name: Mill Road Sewage Treatment Plant
+    kind: sewage_treatment
+    zone_id: Z-MI
+    x_m: 11200
+    y_m: 800
+    capacity_mld: 45
+    storage_ml: null
+    year_built: 2005
+    year_expanded: null
+    serves_zone_ids: [Z-MI, Z-NC]
+    substation_id: PS-3
+    backup_power_hours: 4
+    flood_exposure: high
+    description: >-
+      Sewage treatment plant for Mill Road Industrial and New Colony on the South Bank plain, powered from PS-3. It
+      flooded in 2021 and untreated sewage contaminated parts of New Colony.
+
+projects:
+  - id: PR-HT2
+    name: Hillview Terrace Phase 2
+    kind: residential
+    zone_id: Z-HV
+    slope_id: SL-HV-1
+    status: active
+    start_date: "2026-03-02"
+    planned_end_date: "2027-06-30"
+    completed_date: null
+    excavation_depth_m: 2.5
+    planned_depth_m: 6.0
+    area_m2: 18500
+    permit_number: HT-2026-014
+    permit_doc_id: permit-ht-2026-014
+    developer: Nandi Hills Developers
+    flood_plain_id: null
+    nearest_channel_id: D-7
+    distance_to_channel_m: 60
+    hazard_review_status: approved_with_conditions
+    x_m: 9700
+    y_m: 5450
+    description: >-
+      Apartment blocks being excavated into the Hillview Terrace slope (SL-HV-1) under permit HT-2026-014, 60 m from
+      D-7 and about 400 m below the Tekri Hill Reservoir (WF-3). Excavation has reached 2.5 m of a planned 6.0 m;
+      soil probes SM-01 and SM-02 and rain gauge RG-02 monitor the site.
+  - id: PR-HT1
+    name: Hillview Terrace Phase 1
+    kind: residential
+    zone_id: Z-HV
+    slope_id: SL-HV-2
+    status: completed
+    start_date: "2020-10-05"
+    planned_end_date: "2022-06-30"
+    completed_date: "2022-11-10"
+    excavation_depth_m: 4.0
+    planned_depth_m: 4.0
+    area_m2: 14000
+    permit_number: HT-2020-007
+    permit_doc_id: null
+    developer: Nandi Hills Developers
+    flood_plain_id: null
+    nearest_channel_id: D-7
+    distance_to_channel_m: 140
+    hazard_review_status: none
+    x_m: 9350
+    y_m: 5150
+    description: >-
+      First phase of Hillview Terrace, cut into slope SL-HV-2. Work was halted for four months after the July 2022
+      cut-slope failure (HI-2022-LS-01) and completed after a 6 m retaining wall was built.
+  - id: PR-HRW
+    name: Hill Road Widening
+    kind: road
+    zone_id: Z-HV
+    slope_id: null
+    status: completed
+    start_date: "2024-09-15"
+    planned_end_date: "2025-04-30"
+    completed_date: "2025-05-20"
+    excavation_depth_m: null
+    planned_depth_m: null
+    area_m2: 9600
+    permit_number: RW-2024-031
+    permit_doc_id: null
+    developer: NMC Roads Division
+    flood_plain_id: null
+    nearest_channel_id: D-7
+    distance_to_channel_m: 0
+    hazard_review_status: none
+    x_m: 9800
+    y_m: 4900
+    description: >-
+      Widened the lower 1.6 km of Hill Road (RD-01) from two to four lanes and replaced the BR-4 culvert over D-7 with
+      a smaller 2.4 x 1.8 m box culvert. No hydraulic review of the new culvert was carried out.
+  - id: PR-NCH
+    name: New Colony Housing Scheme
+    kind: residential
+    zone_id: Z-NC
+    slope_id: null
+    status: completed
+    start_date: "2019-02-01"
+    planned_end_date: "2023-03-31"
+    completed_date: "2023-08-25"
+    excavation_depth_m: null
+    planned_depth_m: null
+    area_m2: 1450000
+    permit_number: NHB-2018-002
+    permit_doc_id: null
+    developer: Nandipur Housing Board
+    flood_plain_id: FP-2
+    nearest_channel_id: D-9
+    distance_to_channel_m: 0
+    hazard_review_status: none
+    x_m: 6000
+    y_m: 1300
+    description: >-
+      Planned township of three sectors built in phases (2019, 2021, 2023) on former paddy land on the South Bank
+      plain (FP-2), drained by D-9 and served by PS-5 and WF-5.
+  - id: PR-EB2
+    name: Eastern Bridge
+    kind: bridge
+    zone_id: Z-MI
+    slope_id: null
+    status: completed
+    start_date: "2021-01-10"
+    planned_end_date: "2023-03-31"
+    completed_date: "2023-04-15"
+    excavation_depth_m: null
+    planned_depth_m: null
+    area_m2: 30400
+    permit_number: null
+    permit_doc_id: null
+    developer: Vandara State Highways Corporation
+    flood_plain_id: FP-2
+    nearest_channel_id: D-12
+    distance_to_channel_m: 900
+    hazard_review_status: approved
+    x_m: 11000
+    y_m: 2500
+    description: >-
+      Construction of the Eastern Bridge (BR-2) and the Eastern Highway Link (RD-12) from Mill Road Industrial to the
+      Riverside Bypass (RD-02), giving the city a second Kalinadi crossing.
+  - id: PR-D3R
+    name: D-3 desilting and relining
+    kind: drainage
+    zone_id: Z-OT
+    slope_id: null
+    status: active
+    start_date: "2025-01-15"
+    planned_end_date: "2026-12-31"
+    completed_date: null
+    excavation_depth_m: null
+    planned_depth_m: null
+    area_m2: 10200
+    permit_number: null
+    permit_doc_id: null
+    developer: NMC Drainage Division
+    flood_plain_id: FP-3
+    nearest_channel_id: D-3
+    distance_to_channel_m: 0
+    hazard_review_status: approved
+    x_m: 6200
+    y_m: 3700
+    description: >-
+      Desilting and relining of the 1890 Old Town main drain (D-3). Phase 1 desilting in 2025 raised capacity from 12
+      to 14 m3/s; relining continues to the end of 2026. The BR-5 arch is not being altered.
+  - id: PR-TQ
+    name: Tekri Quarry expansion
+    kind: quarry
+    zone_id: Z-TH
+    slope_id: SL-TH-1
+    status: active
+    start_date: "2019-06-15"
+    planned_end_date: "2029-12-31"
+    completed_date: null
+    excavation_depth_m: 35
+    planned_depth_m: 45
+    area_m2: 62000
+    permit_number: TQ-2019-3
+    permit_doc_id: null
+    developer: Tekri Stone Aggregates Ltd
+    flood_plain_id: null
+    nearest_channel_id: D-7
+    distance_to_channel_m: 350
+    hazard_review_status: pending
+    x_m: 10600
+    y_m: 7200
+    description: >-
+      Expansion of the Tekri Quarry face (SL-TH-1) on Tekri Hill, reached by Tekri Quarry Road (RD-11). A hazard
+      review was ordered after the 2024 bench slide (HI-2024-LS-01) sent debris into the D-7 head reach.
+  - id: PR-RSE
+    name: Riverside embankment raising
+    kind: embankment
+    zone_id: Z-RS
+    slope_id: null
+    status: planned
+    start_date: "2027-01-01"
+    planned_end_date: "2028-06-30"
+    completed_date: null
+    excavation_depth_m: null
+    planned_depth_m: null
+    area_m2: 45000
+    permit_number: null
+    permit_doc_id: null
+    developer: NMC Engineering Department
+    flood_plain_id: FP-1
+    nearest_channel_id: D-8
+    distance_to_channel_m: 200
+    hazard_review_status: none
+    x_m: 9000
+    y_m: 3400
+    description: >-
+      Planned raising and completion of the partial Riverside Bypass embankment protecting the Riverside plain (FP-1)
+      along RD-02.
+  - id: PR-MWM
+    name: Market Ward Mall
+    kind: commercial
+    zone_id: Z-MW
+    slope_id: null
+    status: active
+    start_date: "2024-06-03"
+    planned_end_date: "2026-12-31"
+    completed_date: null
+    excavation_depth_m: 8.0
+    planned_depth_m: 8.0
+    area_m2: 12500
+    permit_number: MW-2024-011
+    permit_doc_id: null
+    developer: Bazaar Square Realty
+    flood_plain_id: null
+    nearest_channel_id: D-4
+    distance_to_channel_m: 25
+    hazard_review_status: approved_with_conditions
+    x_m: 6600
+    y_m: 5000
+    description: >-
+      Shopping mall with an 8 m basement 25 m from the Market Ward drain D-4. Construction dewatering discharges
+      about 0.4 m3/s into D-4, which flows on into D-3.
+
+critical_infrastructure:
+  - id: CI-01
+    name: Nandipur District Hospital
+    category: health
+    asset_kind: hospital
+    asset_id: H-1
+    zone_id: Z-CL
+    tier: 1
+    backup_power_hours: 72
+    depends_on_substation_id: PS-1
+    depends_on_water_facility_id: WF-1
+    access_road_id: RD-10
+    flood_exposure: none
+    notes: The city's tertiary referral hospital on the Civil Lines Rise; receives patients transferred from H-2 and H-5.
+  - id: CI-02
+    name: Riverside Community Hospital
+    category: health
+    asset_kind: hospital
+    asset_id: H-2
+    zone_id: Z-RS
+    tier: 1
+    backup_power_hours: 12
+    depends_on_substation_id: PS-2
+    depends_on_water_facility_id: WF-2
+    access_road_id: RD-02
+    flood_exposure: high
+    notes: Only hospital on the north-bank flood plain east of Old Town; nearest hospital to Hillview and Riverside.
+  - id: CI-03
+    name: Mill Road Workers' Hospital
+    category: health
+    asset_kind: hospital
+    asset_id: H-5
+    zone_id: Z-MI
+    tier: 2
+    backup_power_hours: 48
+    depends_on_substation_id: PS-3
+    depends_on_water_facility_id: WF-1
+    access_road_id: RD-08
+    flood_exposure: moderate
+    notes: Holds the city's only burn unit.
+  - id: CI-04
+    name: Civil Lines Grid Substation
+    category: power
+    asset_kind: power_substation
+    asset_id: PS-1
+    zone_id: Z-CL
+    tier: 1
+    backup_power_hours: null
+    depends_on_substation_id: null
+    depends_on_water_facility_id: null
+    access_road_id: RD-10
+    flood_exposure: none
+    notes: Grid supply point feeding all four 33/11 kV substations (PS-2 to PS-5).
+  - id: CI-05
+    name: Riverside Substation
+    category: power
+    asset_kind: power_substation
+    asset_id: PS-2
+    zone_id: Z-RS
+    tier: 1
+    backup_power_hours: null
+    depends_on_substation_id: PS-1
+    depends_on_water_facility_id: null
+    access_road_id: RD-02
+    flood_exposure: high
+    notes: Supplies Riverside, Hillview and Tekri Heights, including H-2 and WF-2; not flood protected.
+  - id: CI-06
+    name: New Colony Substation
+    category: power
+    asset_kind: power_substation
+    asset_id: PS-5
+    zone_id: Z-NC
+    tier: 2
+    backup_power_hours: null
+    depends_on_substation_id: PS-1
+    depends_on_water_facility_id: null
+    access_road_id: RD-09
+    flood_exposure: low
+    notes: Raised 1.2 m platform; powers the D-11 pumping station and Lakeview Hospital (H-4).
+  - id: CI-07
+    name: Kalinadi Water Treatment Plant
+    category: water
+    asset_kind: water_facility
+    asset_id: WF-1
+    zone_id: Z-CL
+    tier: 1
+    backup_power_hours: 24
+    depends_on_substation_id: PS-1
+    depends_on_water_facility_id: null
+    access_road_id: RD-10
+    flood_exposure: none
+    notes: Main city water supply; raw water arrives from DM-1 through the TU-2 tunnel.
+  - id: CI-08
+    name: Riverside Raw-Water Intake
+    category: water
+    asset_kind: water_facility
+    asset_id: WF-2
+    zone_id: Z-RS
+    tier: 2
+    backup_power_hours: 0
+    depends_on_substation_id: PS-2
+    depends_on_water_facility_id: null
+    access_road_id: RD-02
+    flood_exposure: high
+    notes: Supplies Riverside and Hillview including H-2; no backup power.
+  - id: CI-09
+    name: Tekri Hill Reservoir
+    category: water
+    asset_kind: water_facility
+    asset_id: WF-3
+    zone_id: Z-TH
+    tier: 2
+    backup_power_hours: null
+    depends_on_substation_id: null
+    depends_on_water_facility_id: null
+    access_road_id: RD-01
+    flood_exposure: none
+    notes: Slope hazard - 12 ML gravity reservoir about 400 m upslope of SL-HV-1 and the PR-HT2 excavation.
+  - id: CI-10
+    name: Kalinadi Bridge
+    category: transport
+    asset_kind: bridge
+    asset_id: BR-1
+    zone_id: Z-OT
+    tier: 1
+    backup_power_hours: null
+    depends_on_substation_id: null
+    depends_on_water_facility_id: null
+    access_road_id: RD-03
+    flood_exposure: high
+    notes: Main river crossing between Old Town and the south bank; closes at RV-01 5.0 m; pier 3 scour since 2021.
+  - id: CI-11
+    name: Hill Road
+    category: transport
+    asset_kind: road
+    asset_id: RD-01
+    zone_id: Z-HV
+    tier: 1
+    backup_power_hours: null
+    depends_on_substation_id: null
+    depends_on_water_facility_id: null
+    access_road_id: RD-01
+    flood_exposure: moderate
+    notes: Only paved access to Hillview and Tekri Heights; crosses D-7 at BR-4.
+  - id: CI-12
+    name: Kalinadi drain D-7
+    category: drainage
+    asset_kind: drainage_channel
+    asset_id: D-7
+    zone_id: Z-HV
+    tier: 1
+    backup_power_hours: null
+    depends_on_substation_id: null
+    depends_on_water_facility_id: null
+    access_road_id: RD-01
+    flood_exposure: high
+    notes: Carries all Hillview and Tekri runoff through Riverside to the Kalinadi; capacity limited by BR-4.
+  - id: CI-13
+    name: D-11 Lakeside pumping station
+    category: drainage
+    asset_kind: pump_unit
+    asset_id: PU-L1
+    zone_id: Z-LK
+    tier: 2
+    backup_power_hours: null
+    depends_on_substation_id: PS-5
+    depends_on_water_facility_id: null
+    access_road_id: RD-14
+    flood_exposure: high
+    notes: Represents the D-11 pumping station (PU-L1, PU-L2, PU-L3) beside DM-2; the only drainage for Lakeside when the regulator gates are shut.
+  - id: CI-14
+    name: Central Fire Station
+    category: emergency
+    asset_kind: fire_station
+    asset_id: FS-1
+    zone_id: Z-MW
+    tier: 1
+    backup_power_hours: null
+    depends_on_substation_id: PS-4
+    depends_on_water_facility_id: WF-1
+    access_road_id: RD-06
+    flood_exposure: low
+    notes: Main fire station covering the north bank including Hillview and Tekri Heights via Hill Road.
+  - id: CI-15
+    name: Station Road rail underpass
+    category: transport
+    asset_kind: tunnel
+    asset_id: TU-1
+    zone_id: Z-SR
+    tier: 3
+    backup_power_hours: null
+    depends_on_substation_id: PS-4
+    depends_on_water_facility_id: null
+    access_road_id: RD-13
+    flood_exposure: high
+    notes: Floods when D-5 surcharges; sump pumps PU-T1 and PU-T2.
+
+sensors:
+  - id: RG-01
+    kind: rain_gauge
+    name: Tekri rain gauge
+    zone_id: Z-TH
+    x_m: 10600
+    y_m: 7400
+    unit: mm
+    installed_year: 2010
+    channel_id: null
+    slope_id: null
+    river_id: null
+    status: active
+    description: Tipping-bucket rain gauge near the Tekri Quarry (SL-TH-1) in Tekri Heights, covering the D-7 head and R-2 catchment.
+  - id: RG-02
+    kind: rain_gauge
+    name: Hillview rain gauge
+    zone_id: Z-HV
+    x_m: 9700
+    y_m: 5600
+    unit: mm
+    installed_year: 2016
+    channel_id: null
+    slope_id: null
+    river_id: null
+    status: active
+    description: Rain gauge above the Hillview Terrace slope (SL-HV-1) and the PR-HT2 site in Hillview.
+  - id: RG-03
+    kind: rain_gauge
+    name: Old Town rain gauge
+    zone_id: Z-OT
+    x_m: 6000
+    y_m: 4000
+    unit: mm
+    installed_year: 2008
+    channel_id: null
+    slope_id: null
+    river_id: null
+    status: active
+    description: Rain gauge in Old Town near the D-3 drain and the Bazaar Lane quarter.
+  - id: RG-04
+    kind: rain_gauge
+    name: Lakeside rain gauge
+    zone_id: Z-LK
+    x_m: 1800
+    y_m: 1800
+    unit: mm
+    installed_year: 2012
+    channel_id: null
+    slope_id: null
+    river_id: null
+    status: active
+    description: Rain gauge on the northern shore of Nandi Lake (R-3) in Lakeside.
+  - id: RG-05
+    kind: rain_gauge
+    name: New Colony rain gauge
+    zone_id: Z-NC
+    x_m: 6000
+    y_m: 1400
+    unit: mm
+    installed_year: 2021
+    channel_id: null
+    slope_id: null
+    river_id: null
+    status: active
+    description: Rain gauge in New Colony between Sectors 1 and 2, in the D-9 catchment.
+  - id: SM-01
+    kind: soil_moisture
+    name: SL-HV-1 upper soil moisture probe
+    zone_id: Z-HV
+    x_m: 9720
+    y_m: 5560
+    unit: saturation fraction
+    installed_year: 2020
+    channel_id: null
+    slope_id: SL-HV-1
+    river_id: null
+    status: active
+    description: Soil moisture probe at 1.5 m depth on the upper part of the Hillview Terrace slope (SL-HV-1), above the PR-HT2 excavation.
+  - id: SM-02
+    kind: soil_moisture
+    name: SL-HV-1 toe soil moisture probe
+    zone_id: Z-HV
+    x_m: 9680
+    y_m: 5400
+    unit: saturation fraction
+    installed_year: 2020
+    channel_id: null
+    slope_id: SL-HV-1
+    river_id: null
+    status: active
+    description: Soil moisture probe near the toe of SL-HV-1, below the PR-HT2 excavation and towards D-7.
+  - id: SM-03
+    kind: soil_moisture
+    name: SL-HV-2 soil moisture probe
+    zone_id: Z-HV
+    x_m: 9350
+    y_m: 5200
+    unit: saturation fraction
+    installed_year: 2020
+    channel_id: null
+    slope_id: SL-HV-2
+    river_id: null
+    status: active
+    description: Soil moisture probe behind the Hillview Terrace Phase 1 retaining wall on SL-HV-2.
+  - id: SM-04
+    kind: soil_moisture
+    name: SL-TH-1 crest soil moisture probe
+    zone_id: Z-TH
+    x_m: 10600
+    y_m: 7300
+    unit: saturation fraction
+    installed_year: 2024
+    channel_id: null
+    slope_id: SL-TH-1
+    river_id: null
+    status: active
+    description: Soil moisture probe on the crest of the Tekri Quarry face (SL-TH-1), above the PR-TQ benches.
+  - id: CL-D7
+    kind: channel_level
+    name: D-7 level at BR-4
+    zone_id: Z-HV
+    x_m: 9800
+    y_m: 4900
+    unit: m
+    installed_year: 2016
+    channel_id: D-7
+    slope_id: null
+    river_id: null
+    status: active
+    description: Ultrasonic water-level sensor on the upstream face of the BR-4 culvert under Hill Road (RD-01).
+  - id: CL-D3
+    kind: channel_level
+    name: D-3 level at BR-5
+    zone_id: Z-OT
+    x_m: 6200
+    y_m: 3900
+    unit: m
+    installed_year: 2012
+    channel_id: D-3
+    slope_id: null
+    river_id: null
+    status: active
+    description: Water-level sensor at the Bazaar arch bridge (BR-5) on D-3 in Old Town.
+  - id: CL-D11
+    kind: channel_level
+    name: D-11 level at DM-2
+    zone_id: Z-LK
+    x_m: 3000
+    y_m: 2350
+    unit: m
+    installed_year: 2017
+    channel_id: D-11
+    slope_id: null
+    river_id: null
+    status: active
+    description: Water-level sensor at the Nandi Lake Regulator (DM-2) and the D-11 pumping station.
+  - id: RV-01
+    kind: river_level
+    name: Kalinadi at Kalinadi Bridge
+    zone_id: Z-OT
+    x_m: 6200
+    y_m: 3300
+    unit: m
+    installed_year: 1985
+    channel_id: null
+    slope_id: null
+    river_id: R-1
+    status: active
+    description: Reference river stage gauge on Kalinadi Bridge (BR-1), gauge zero 207.0 m; flood stage 4.2 m, danger 5.5 m.
+  - id: RV-02
+    kind: river_level
+    name: Kalinadi at barrage
+    zone_id: null
+    x_m: 400
+    y_m: 2760
+    unit: m
+    installed_year: 1985
+    channel_id: null
+    slope_id: null
+    river_id: R-1
+    status: active
+    description: River stage gauge at the Kalinadi Barrage (DM-1), upstream of the city.
+  - id: WS-01
+    kind: wind
+    name: Civil Lines wind station
+    zone_id: Z-CL
+    x_m: 6000
+    y_m: 6800
+    unit: km/h
+    installed_year: 2014
+    channel_id: null
+    slope_id: null
+    river_id: null
+    status: active
+    description: Anemometer on the Civil Lines Grid Substation (PS-1) mast, measuring mean wind and gusts.
+  - id: LL-01
+    kind: lake_level
+    name: Nandi Lake level
+    zone_id: Z-LK
+    x_m: 2000
+    y_m: 1600
+    unit: m
+    installed_year: 2017
+    channel_id: null
+    slope_id: null
+    river_id: R-3
+    status: active
+    description: Lake level gauge in Nandi Lake (R-3), read against the regulated level of about 208.5 m held by DM-2.

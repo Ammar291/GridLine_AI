@@ -1,0 +1,1988 @@
+# Nandipur population (synthetic). Spec section 5.8. density_per_km2 and elevation_m are computed at seed time.
+
+zone_yearly_stats:
+- id: Z-HV-2018
+  zone_id: Z-HV
+  year: 2018
+  population: 11200
+  households: 2605
+  children_under_5: 1142
+  elderly_over_65: 762
+  persons_with_disability: 269
+  informal_settlement_population: 900
+  low_income_households: 532
+  impermeable_surface_pct: 22
+  built_up_pct: 28
+  green_cover_pct: 60
+  avg_building_storeys: 2.0
+
+- id: Z-HV-2019
+  zone_id: Z-HV
+  year: 2019
+  population: 11650
+  households: 2709
+  children_under_5: 1182
+  elderly_over_65: 786
+  persons_with_disability: 280
+  informal_settlement_population: 1000
+  low_income_households: 565
+  impermeable_surface_pct: 23
+  built_up_pct: 29
+  green_cover_pct: 59
+  avg_building_storeys: 2.1
+
+- id: Z-HV-2020
+  zone_id: Z-HV
+  year: 2020
+  population: 12100
+  households: 2814
+  children_under_5: 1222
+  elderly_over_65: 811
+  persons_with_disability: 290
+  informal_settlement_population: 1150
+  low_income_households: 608
+  impermeable_surface_pct: 24
+  built_up_pct: 30
+  green_cover_pct: 58
+  avg_building_storeys: 2.2
+
+- id: Z-HV-2021
+  zone_id: Z-HV
+  year: 2021
+  population: 12550
+  households: 2919
+  children_under_5: 1261
+  elderly_over_65: 835
+  persons_with_disability: 301
+  informal_settlement_population: 1300
+  low_income_households: 651
+  impermeable_surface_pct: 25
+  built_up_pct: 31
+  green_cover_pct: 57
+  avg_building_storeys: 2.3
+
+- id: Z-HV-2022
+  zone_id: Z-HV
+  year: 2022
+  population: 16200
+  households: 3767
+  children_under_5: 1620
+  elderly_over_65: 1069
+  persons_with_disability: 389
+  informal_settlement_population: 1450
+  low_income_households: 797
+  impermeable_surface_pct: 29
+  built_up_pct: 35
+  green_cover_pct: 53
+  avg_building_storeys: 2.4
+
+- id: Z-HV-2023
+  zone_id: Z-HV
+  year: 2023
+  population: 16750
+  households: 3895
+  children_under_5: 1667
+  elderly_over_65: 1097
+  persons_with_disability: 402
+  informal_settlement_population: 1600
+  low_income_households: 843
+  impermeable_surface_pct: 31
+  built_up_pct: 37
+  green_cover_pct: 51
+  avg_building_storeys: 2.4
+
+- id: Z-HV-2024
+  zone_id: Z-HV
+  year: 2024
+  population: 17300
+  households: 4023
+  children_under_5: 1713
+  elderly_over_65: 1124
+  persons_with_disability: 415
+  informal_settlement_population: 1750
+  low_income_households: 889
+  impermeable_surface_pct: 33
+  built_up_pct: 39
+  green_cover_pct: 49
+  avg_building_storeys: 2.5
+
+- id: Z-HV-2025
+  zone_id: Z-HV
+  year: 2025
+  population: 17850
+  households: 4151
+  children_under_5: 1758
+  elderly_over_65: 1151
+  persons_with_disability: 428
+  informal_settlement_population: 1900
+  low_income_households: 935
+  impermeable_surface_pct: 36
+  built_up_pct: 42
+  green_cover_pct: 46
+  avg_building_storeys: 2.6
+
+- id: Z-HV-2026
+  zone_id: Z-HV
+  year: 2026
+  population: 18500
+  households: 4302
+  children_under_5: 1813
+  elderly_over_65: 1184
+  persons_with_disability: 444
+  informal_settlement_population: 2600
+  low_income_households: 1086
+  impermeable_surface_pct: 36
+  built_up_pct: 42
+  green_cover_pct: 46
+  avg_building_storeys: 2.7
+
+- id: Z-TH-2018
+  zone_id: Z-TH
+  year: 2018
+  population: 3100
+  households: 721
+  children_under_5: 329
+  elderly_over_65: 260
+  persons_with_disability: 81
+  informal_settlement_population: 400
+  low_income_households: 320
+  impermeable_surface_pct: 6
+  built_up_pct: 9
+  green_cover_pct: 79
+  avg_building_storeys: 1.2
+
+- id: Z-TH-2019
+  zone_id: Z-TH
+  year: 2019
+  population: 3230
+  households: 751
+  children_under_5: 341
+  elderly_over_65: 273
+  persons_with_disability: 84
+  informal_settlement_population: 440
+  low_income_households: 337
+  impermeable_surface_pct: 6.8
+  built_up_pct: 9.8
+  green_cover_pct: 78.2
+  avg_building_storeys: 1.2
+
+- id: Z-TH-2020
+  zone_id: Z-TH
+  year: 2020
+  population: 3360
+  households: 781
+  children_under_5: 353
+  elderly_over_65: 286
+  persons_with_disability: 87
+  informal_settlement_population: 480
+  low_income_households: 355
+  impermeable_surface_pct: 7.5
+  built_up_pct: 10.5
+  green_cover_pct: 77.5
+  avg_building_storeys: 1.2
+
+- id: Z-TH-2021
+  zone_id: Z-TH
+  year: 2021
+  population: 3490
+  households: 812
+  children_under_5: 365
+  elderly_over_65: 298
+  persons_with_disability: 91
+  informal_settlement_population: 510
+  low_income_households: 371
+  impermeable_surface_pct: 8.2
+  built_up_pct: 11.2
+  green_cover_pct: 76.8
+  avg_building_storeys: 1.3
+
+- id: Z-TH-2022
+  zone_id: Z-TH
+  year: 2022
+  population: 3620
+  households: 842
+  children_under_5: 376
+  elderly_over_65: 311
+  persons_with_disability: 94
+  informal_settlement_population: 550
+  low_income_households: 389
+  impermeable_surface_pct: 9.0
+  built_up_pct: 12.0
+  green_cover_pct: 76.0
+  avg_building_storeys: 1.3
+
+- id: Z-TH-2023
+  zone_id: Z-TH
+  year: 2023
+  population: 3760
+  households: 874
+  children_under_5: 389
+  elderly_over_65: 325
+  persons_with_disability: 98
+  informal_settlement_population: 590
+  low_income_households: 407
+  impermeable_surface_pct: 9.8
+  built_up_pct: 12.8
+  green_cover_pct: 75.2
+  avg_building_storeys: 1.3
+
+- id: Z-TH-2024
+  zone_id: Z-TH
+  year: 2024
+  population: 3900
+  households: 907
+  children_under_5: 402
+  elderly_over_65: 339
+  persons_with_disability: 101
+  informal_settlement_population: 620
+  low_income_households: 424
+  impermeable_surface_pct: 10.5
+  built_up_pct: 13.5
+  green_cover_pct: 74.5
+  avg_building_storeys: 1.3
+
+- id: Z-TH-2025
+  zone_id: Z-TH
+  year: 2025
+  population: 4040
+  households: 940
+  children_under_5: 414
+  elderly_over_65: 354
+  persons_with_disability: 105
+  informal_settlement_population: 660
+  low_income_households: 442
+  impermeable_surface_pct: 11.2
+  built_up_pct: 14.2
+  green_cover_pct: 73.8
+  avg_building_storeys: 1.4
+
+- id: Z-TH-2026
+  zone_id: Z-TH
+  year: 2026
+  population: 4200
+  households: 977
+  children_under_5: 428
+  elderly_over_65: 370
+  persons_with_disability: 109
+  informal_settlement_population: 700
+  low_income_households: 462
+  impermeable_surface_pct: 12
+  built_up_pct: 15
+  green_cover_pct: 73
+  avg_building_storeys: 1.4
+
+- id: Z-RS-2018
+  zone_id: Z-RS
+  year: 2018
+  population: 39500
+  households: 9186
+  children_under_5: 3950
+  elderly_over_65: 2844
+  persons_with_disability: 988
+  informal_settlement_population: 6800
+  low_income_households: 3470
+  impermeable_surface_pct: 48
+  built_up_pct: 54
+  green_cover_pct: 38
+  avg_building_storeys: 2.0
+
+- id: Z-RS-2019
+  zone_id: Z-RS
+  year: 2019
+  population: 40300
+  households: 9372
+  children_under_5: 4010
+  elderly_over_65: 2912
+  persons_with_disability: 1008
+  informal_settlement_population: 7120
+  low_income_households: 3574
+  impermeable_surface_pct: 48.9
+  built_up_pct: 54.9
+  green_cover_pct: 37.1
+  avg_building_storeys: 2.0
+
+- id: Z-RS-2020
+  zone_id: Z-RS
+  year: 2020
+  population: 41100
+  households: 9558
+  children_under_5: 4069
+  elderly_over_65: 2980
+  persons_with_disability: 1028
+  informal_settlement_population: 7450
+  low_income_households: 3680
+  impermeable_surface_pct: 49.8
+  built_up_pct: 55.8
+  green_cover_pct: 36.2
+  avg_building_storeys: 2.1
+
+- id: Z-RS-2021
+  zone_id: Z-RS
+  year: 2021
+  population: 41900
+  households: 9744
+  children_under_5: 4127
+  elderly_over_65: 3048
+  persons_with_disability: 1048
+  informal_settlement_population: 7780
+  low_income_households: 3786
+  impermeable_surface_pct: 50.6
+  built_up_pct: 56.6
+  green_cover_pct: 35.4
+  avg_building_storeys: 2.1
+
+- id: Z-RS-2022
+  zone_id: Z-RS
+  year: 2022
+  population: 42700
+  households: 9930
+  children_under_5: 4185
+  elderly_over_65: 3117
+  persons_with_disability: 1068
+  informal_settlement_population: 8100
+  low_income_households: 3890
+  impermeable_surface_pct: 51.5
+  built_up_pct: 57.5
+  green_cover_pct: 34.5
+  avg_building_storeys: 2.1
+
+- id: Z-RS-2023
+  zone_id: Z-RS
+  year: 2023
+  population: 43500
+  households: 10116
+  children_under_5: 4241
+  elderly_over_65: 3186
+  persons_with_disability: 1088
+  informal_settlement_population: 8420
+  low_income_households: 3994
+  impermeable_surface_pct: 52.4
+  built_up_pct: 58.4
+  green_cover_pct: 33.6
+  avg_building_storeys: 2.2
+
+- id: Z-RS-2024
+  zone_id: Z-RS
+  year: 2024
+  population: 44300
+  households: 10302
+  children_under_5: 4297
+  elderly_over_65: 3256
+  persons_with_disability: 1108
+  informal_settlement_population: 8750
+  low_income_households: 4100
+  impermeable_surface_pct: 53.2
+  built_up_pct: 59.2
+  green_cover_pct: 32.8
+  avg_building_storeys: 2.2
+
+- id: Z-RS-2025
+  zone_id: Z-RS
+  year: 2025
+  population: 45100
+  households: 10488
+  children_under_5: 4352
+  elderly_over_65: 3326
+  persons_with_disability: 1128
+  informal_settlement_population: 9080
+  low_income_households: 4206
+  impermeable_surface_pct: 54.1
+  built_up_pct: 60.1
+  green_cover_pct: 31.9
+  avg_building_storeys: 2.3
+
+- id: Z-RS-2026
+  zone_id: Z-RS
+  year: 2026
+  population: 46000
+  households: 10698
+  children_under_5: 4416
+  elderly_over_65: 3404
+  persons_with_disability: 1150
+  informal_settlement_population: 9400
+  low_income_households: 4316
+  impermeable_surface_pct: 55
+  built_up_pct: 61
+  green_cover_pct: 31
+  avg_building_storeys: 2.3
+
+- id: Z-OT-2018
+  zone_id: Z-OT
+  year: 2018
+  population: 64000
+  households: 14884
+  children_under_5: 5504
+  elderly_over_65: 7296
+  persons_with_disability: 1856
+  informal_settlement_population: 3000
+  low_income_households: 4428
+  impermeable_surface_pct: 78
+  built_up_pct: 84
+  green_cover_pct: 10
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2019
+  zone_id: Z-OT
+  year: 2019
+  population: 63750
+  households: 14826
+  children_under_5: 5451
+  elderly_over_65: 7307
+  persons_with_disability: 1849
+  informal_settlement_population: 2950
+  low_income_households: 4404
+  impermeable_surface_pct: 78.2
+  built_up_pct: 84.2
+  green_cover_pct: 9.8
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2020
+  zone_id: Z-OT
+  year: 2020
+  population: 63500
+  households: 14767
+  children_under_5: 5398
+  elderly_over_65: 7318
+  persons_with_disability: 1842
+  informal_settlement_population: 2900
+  low_income_households: 4379
+  impermeable_surface_pct: 78.5
+  built_up_pct: 84.5
+  green_cover_pct: 9.5
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2021
+  zone_id: Z-OT
+  year: 2021
+  population: 63250
+  households: 14709
+  children_under_5: 5345
+  elderly_over_65: 7329
+  persons_with_disability: 1834
+  informal_settlement_population: 2850
+  low_income_households: 4355
+  impermeable_surface_pct: 78.8
+  built_up_pct: 84.8
+  green_cover_pct: 9.2
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2022
+  zone_id: Z-OT
+  year: 2022
+  population: 63000
+  households: 14651
+  children_under_5: 5292
+  elderly_over_65: 7340
+  persons_with_disability: 1827
+  informal_settlement_population: 2800
+  low_income_households: 4330
+  impermeable_surface_pct: 79.0
+  built_up_pct: 85.0
+  green_cover_pct: 9.0
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2023
+  zone_id: Z-OT
+  year: 2023
+  population: 62750
+  households: 14593
+  children_under_5: 5240
+  elderly_over_65: 7350
+  persons_with_disability: 1820
+  informal_settlement_population: 2750
+  low_income_households: 4306
+  impermeable_surface_pct: 79.2
+  built_up_pct: 85.2
+  green_cover_pct: 8.8
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2024
+  zone_id: Z-OT
+  year: 2024
+  population: 62500
+  households: 14535
+  children_under_5: 5187
+  elderly_over_65: 7359
+  persons_with_disability: 1812
+  informal_settlement_population: 2700
+  low_income_households: 4281
+  impermeable_surface_pct: 79.5
+  built_up_pct: 85.5
+  green_cover_pct: 8.5
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2025
+  zone_id: Z-OT
+  year: 2025
+  population: 62250
+  households: 14477
+  children_under_5: 5136
+  elderly_over_65: 7369
+  persons_with_disability: 1805
+  informal_settlement_population: 2650
+  low_income_households: 4257
+  impermeable_surface_pct: 79.8
+  built_up_pct: 85.8
+  green_cover_pct: 8.2
+  avg_building_storeys: 3.0
+
+- id: Z-OT-2026
+  zone_id: Z-OT
+  year: 2026
+  population: 62000
+  households: 14419
+  children_under_5: 5084
+  elderly_over_65: 7378
+  persons_with_disability: 1798
+  informal_settlement_population: 2600
+  low_income_households: 4233
+  impermeable_surface_pct: 80
+  built_up_pct: 86
+  green_cover_pct: 8
+  avg_building_storeys: 3.0
+
+- id: Z-MW-2018
+  zone_id: Z-MW
+  year: 2018
+  population: 33000
+  households: 7674
+  children_under_5: 2838
+  elderly_over_65: 2970
+  persons_with_disability: 759
+  informal_settlement_population: 1200
+  low_income_households: 1298
+  impermeable_surface_pct: 82
+  built_up_pct: 87
+  green_cover_pct: 7
+  avg_building_storeys: 4.0
+
+- id: Z-MW-2019
+  zone_id: Z-MW
+  year: 2019
+  population: 33600
+  households: 7814
+  children_under_5: 2873
+  elderly_over_65: 3037
+  persons_with_disability: 773
+  informal_settlement_population: 1190
+  low_income_households: 1315
+  impermeable_surface_pct: 82.8
+  built_up_pct: 87.8
+  green_cover_pct: 6.2
+  avg_building_storeys: 4.0
+
+- id: Z-MW-2020
+  zone_id: Z-MW
+  year: 2020
+  population: 34200
+  households: 7953
+  children_under_5: 2907
+  elderly_over_65: 3104
+  persons_with_disability: 787
+  informal_settlement_population: 1180
+  low_income_households: 1333
+  impermeable_surface_pct: 83.5
+  built_up_pct: 88.5
+  green_cover_pct: 5.5
+  avg_building_storeys: 4.1
+
+- id: Z-MW-2021
+  zone_id: Z-MW
+  year: 2021
+  population: 34800
+  households: 8093
+  children_under_5: 2941
+  elderly_over_65: 3171
+  persons_with_disability: 800
+  informal_settlement_population: 1160
+  low_income_households: 1349
+  impermeable_surface_pct: 84.2
+  built_up_pct: 89.2
+  green_cover_pct: 4.8
+  avg_building_storeys: 4.1
+
+- id: Z-MW-2022
+  zone_id: Z-MW
+  year: 2022
+  population: 35400
+  households: 8233
+  children_under_5: 2974
+  elderly_over_65: 3239
+  persons_with_disability: 814
+  informal_settlement_population: 1150
+  low_income_households: 1367
+  impermeable_surface_pct: 85.0
+  built_up_pct: 90.0
+  green_cover_pct: 4.0
+  avg_building_storeys: 4.2
+
+- id: Z-MW-2023
+  zone_id: Z-MW
+  year: 2023
+  population: 36000
+  households: 8372
+  children_under_5: 3006
+  elderly_over_65: 3308
+  persons_with_disability: 828
+  informal_settlement_population: 1140
+  low_income_households: 1384
+  impermeable_surface_pct: 85.8
+  built_up_pct: 90.8
+  green_cover_pct: 3.2
+  avg_building_storeys: 4.2
+
+- id: Z-MW-2024
+  zone_id: Z-MW
+  year: 2024
+  population: 36600
+  households: 8512
+  children_under_5: 3038
+  elderly_over_65: 3376
+  persons_with_disability: 842
+  informal_settlement_population: 1120
+  low_income_households: 1400
+  impermeable_surface_pct: 86.5
+  built_up_pct: 91.5
+  green_cover_pct: 2.5
+  avg_building_storeys: 4.2
+
+- id: Z-MW-2025
+  zone_id: Z-MW
+  year: 2025
+  population: 37300
+  households: 8674
+  children_under_5: 3077
+  elderly_over_65: 3455
+  persons_with_disability: 858
+  informal_settlement_population: 1110
+  low_income_households: 1421
+  impermeable_surface_pct: 87.2
+  built_up_pct: 92.2
+  green_cover_pct: 1.8
+  avg_building_storeys: 4.3
+
+- id: Z-MW-2026
+  zone_id: Z-MW
+  year: 2026
+  population: 38000
+  households: 8837
+  children_under_5: 3116
+  elderly_over_65: 3534
+  persons_with_disability: 874
+  informal_settlement_population: 1100
+  low_income_households: 1442
+  impermeable_surface_pct: 88
+  built_up_pct: 93
+  green_cover_pct: 1
+  avg_building_storeys: 4.3
+
+- id: Z-SR-2018
+  zone_id: Z-SR
+  year: 2018
+  population: 37000
+  households: 8605
+  children_under_5: 3404
+  elderly_over_65: 2997
+  persons_with_disability: 925
+  informal_settlement_population: 4500
+  low_income_households: 2730
+  impermeable_surface_pct: 61
+  built_up_pct: 67
+  green_cover_pct: 25
+  avg_building_storeys: 2.4
+
+- id: Z-SR-2019
+  zone_id: Z-SR
+  year: 2019
+  population: 37500
+  households: 8721
+  children_under_5: 3431
+  elderly_over_65: 3047
+  persons_with_disability: 938
+  informal_settlement_population: 4590
+  low_income_households: 2773
+  impermeable_surface_pct: 61.6
+  built_up_pct: 67.6
+  green_cover_pct: 24.4
+  avg_building_storeys: 2.4
+
+- id: Z-SR-2020
+  zone_id: Z-SR
+  year: 2020
+  population: 38000
+  households: 8837
+  children_under_5: 3458
+  elderly_over_65: 3097
+  persons_with_disability: 950
+  informal_settlement_population: 4680
+  low_income_households: 2815
+  impermeable_surface_pct: 62.2
+  built_up_pct: 68.2
+  green_cover_pct: 23.8
+  avg_building_storeys: 2.5
+
+- id: Z-SR-2021
+  zone_id: Z-SR
+  year: 2021
+  population: 38500
+  households: 8953
+  children_under_5: 3484
+  elderly_over_65: 3147
+  persons_with_disability: 962
+  informal_settlement_population: 4760
+  low_income_households: 2855
+  impermeable_surface_pct: 62.9
+  built_up_pct: 68.9
+  green_cover_pct: 23.1
+  avg_building_storeys: 2.5
+
+- id: Z-SR-2022
+  zone_id: Z-SR
+  year: 2022
+  population: 39000
+  households: 9070
+  children_under_5: 3510
+  elderly_over_65: 3198
+  persons_with_disability: 975
+  informal_settlement_population: 4850
+  low_income_households: 2898
+  impermeable_surface_pct: 63.5
+  built_up_pct: 69.5
+  green_cover_pct: 22.5
+  avg_building_storeys: 2.5
+
+- id: Z-SR-2023
+  zone_id: Z-SR
+  year: 2023
+  population: 39500
+  households: 9186
+  children_under_5: 3535
+  elderly_over_65: 3249
+  persons_with_disability: 988
+  informal_settlement_population: 4940
+  low_income_households: 2940
+  impermeable_surface_pct: 64.1
+  built_up_pct: 70.1
+  green_cover_pct: 21.9
+  avg_building_storeys: 2.5
+
+- id: Z-SR-2024
+  zone_id: Z-SR
+  year: 2024
+  population: 40000
+  households: 9302
+  children_under_5: 3560
+  elderly_over_65: 3300
+  persons_with_disability: 1000
+  informal_settlement_population: 5020
+  low_income_households: 2980
+  impermeable_surface_pct: 64.8
+  built_up_pct: 70.8
+  green_cover_pct: 21.2
+  avg_building_storeys: 2.5
+
+- id: Z-SR-2025
+  zone_id: Z-SR
+  year: 2025
+  population: 40500
+  households: 9419
+  children_under_5: 3584
+  elderly_over_65: 3351
+  persons_with_disability: 1012
+  informal_settlement_population: 5110
+  low_income_households: 3023
+  impermeable_surface_pct: 65.4
+  built_up_pct: 71.4
+  green_cover_pct: 20.6
+  avg_building_storeys: 2.6
+
+- id: Z-SR-2026
+  zone_id: Z-SR
+  year: 2026
+  population: 41000
+  households: 9535
+  children_under_5: 3608
+  elderly_over_65: 3403
+  persons_with_disability: 1025
+  informal_settlement_population: 5200
+  low_income_households: 3065
+  impermeable_surface_pct: 66
+  built_up_pct: 72
+  green_cover_pct: 20
+  avg_building_storeys: 2.6
+
+- id: Z-CL-2018
+  zone_id: Z-CL
+  year: 2018
+  population: 18500
+  households: 4302
+  children_under_5: 1591
+  elderly_over_65: 2035
+  persons_with_disability: 500
+  informal_settlement_population: 300
+  low_income_households: 271
+  impermeable_surface_pct: 35
+  built_up_pct: 40
+  green_cover_pct: 50
+  avg_building_storeys: 2.3
+
+- id: Z-CL-2019
+  zone_id: Z-CL
+  year: 2019
+  population: 18800
+  households: 4372
+  children_under_5: 1607
+  elderly_over_65: 2087
+  persons_with_disability: 508
+  informal_settlement_population: 300
+  low_income_households: 274
+  impermeable_surface_pct: 35.8
+  built_up_pct: 40.8
+  green_cover_pct: 49.2
+  avg_building_storeys: 2.3
+
+- id: Z-CL-2020
+  zone_id: Z-CL
+  year: 2020
+  population: 19100
+  households: 4442
+  children_under_5: 1624
+  elderly_over_65: 2139
+  persons_with_disability: 516
+  informal_settlement_population: 300
+  low_income_households: 278
+  impermeable_surface_pct: 36.5
+  built_up_pct: 41.5
+  green_cover_pct: 48.5
+  avg_building_storeys: 2.4
+
+- id: Z-CL-2021
+  zone_id: Z-CL
+  year: 2021
+  population: 19400
+  households: 4512
+  children_under_5: 1639
+  elderly_over_65: 2192
+  persons_with_disability: 524
+  informal_settlement_population: 300
+  low_income_households: 281
+  impermeable_surface_pct: 37.2
+  built_up_pct: 42.2
+  green_cover_pct: 47.8
+  avg_building_storeys: 2.4
+
+- id: Z-CL-2022
+  zone_id: Z-CL
+  year: 2022
+  population: 19700
+  households: 4581
+  children_under_5: 1655
+  elderly_over_65: 2246
+  persons_with_disability: 532
+  informal_settlement_population: 300
+  low_income_households: 285
+  impermeable_surface_pct: 38.0
+  built_up_pct: 43.0
+  green_cover_pct: 47.0
+  avg_building_storeys: 2.5
+
+- id: Z-CL-2023
+  zone_id: Z-CL
+  year: 2023
+  population: 20000
+  households: 4651
+  children_under_5: 1670
+  elderly_over_65: 2300
+  persons_with_disability: 540
+  informal_settlement_population: 300
+  low_income_households: 288
+  impermeable_surface_pct: 38.8
+  built_up_pct: 43.8
+  green_cover_pct: 46.2
+  avg_building_storeys: 2.5
+
+- id: Z-CL-2024
+  zone_id: Z-CL
+  year: 2024
+  population: 20300
+  households: 4721
+  children_under_5: 1685
+  elderly_over_65: 2355
+  persons_with_disability: 548
+  informal_settlement_population: 300
+  low_income_households: 292
+  impermeable_surface_pct: 39.5
+  built_up_pct: 44.5
+  green_cover_pct: 45.5
+  avg_building_storeys: 2.5
+
+- id: Z-CL-2025
+  zone_id: Z-CL
+  year: 2025
+  population: 20600
+  households: 4791
+  children_under_5: 1700
+  elderly_over_65: 2410
+  persons_with_disability: 556
+  informal_settlement_population: 300
+  low_income_households: 295
+  impermeable_surface_pct: 40.2
+  built_up_pct: 45.2
+  green_cover_pct: 44.8
+  avg_building_storeys: 2.6
+
+- id: Z-CL-2026
+  zone_id: Z-CL
+  year: 2026
+  population: 21000
+  households: 4884
+  children_under_5: 1722
+  elderly_over_65: 2478
+  persons_with_disability: 567
+  informal_settlement_population: 300
+  low_income_households: 300
+  impermeable_surface_pct: 41
+  built_up_pct: 46
+  green_cover_pct: 44
+  avg_building_storeys: 2.6
+
+- id: Z-LK-2018
+  zone_id: Z-LK
+  year: 2018
+  population: 29000
+  households: 6744
+  children_under_5: 2784
+  elderly_over_65: 2320
+  persons_with_disability: 754
+  informal_settlement_population: 5600
+  low_income_households: 2660
+  impermeable_surface_pct: 40
+  built_up_pct: 45
+  green_cover_pct: 41
+  avg_building_storeys: 1.7
+
+- id: Z-LK-2019
+  zone_id: Z-LK
+  year: 2019
+  population: 29600
+  households: 6884
+  children_under_5: 2827
+  elderly_over_65: 2375
+  persons_with_disability: 770
+  informal_settlement_population: 5810
+  low_income_households: 2733
+  impermeable_surface_pct: 41.1
+  built_up_pct: 46.1
+  green_cover_pct: 39.9
+  avg_building_storeys: 1.8
+
+- id: Z-LK-2020
+  zone_id: Z-LK
+  year: 2020
+  population: 30200
+  households: 7023
+  children_under_5: 2869
+  elderly_over_65: 2431
+  persons_with_disability: 785
+  informal_settlement_population: 6020
+  low_income_households: 2805
+  impermeable_surface_pct: 42.2
+  built_up_pct: 47.2
+  green_cover_pct: 38.8
+  avg_building_storeys: 1.8
+
+- id: Z-LK-2021
+  zone_id: Z-LK
+  year: 2021
+  population: 30800
+  households: 7163
+  children_under_5: 2911
+  elderly_over_65: 2487
+  persons_with_disability: 801
+  informal_settlement_population: 6240
+  low_income_households: 2880
+  impermeable_surface_pct: 43.4
+  built_up_pct: 48.4
+  green_cover_pct: 37.6
+  avg_building_storeys: 1.9
+
+- id: Z-LK-2022
+  zone_id: Z-LK
+  year: 2022
+  population: 31400
+  households: 7302
+  children_under_5: 2952
+  elderly_over_65: 2543
+  persons_with_disability: 816
+  informal_settlement_population: 6450
+  low_income_households: 2952
+  impermeable_surface_pct: 44.5
+  built_up_pct: 49.5
+  green_cover_pct: 36.5
+  avg_building_storeys: 1.9
+
+- id: Z-LK-2023
+  zone_id: Z-LK
+  year: 2023
+  population: 32000
+  households: 7442
+  children_under_5: 2992
+  elderly_over_65: 2600
+  persons_with_disability: 832
+  informal_settlement_population: 6660
+  low_income_households: 3025
+  impermeable_surface_pct: 45.6
+  built_up_pct: 50.6
+  green_cover_pct: 35.4
+  avg_building_storeys: 2.0
+
+- id: Z-LK-2024
+  zone_id: Z-LK
+  year: 2024
+  population: 32600
+  households: 7581
+  children_under_5: 3032
+  elderly_over_65: 2657
+  persons_with_disability: 848
+  informal_settlement_population: 6880
+  low_income_households: 3099
+  impermeable_surface_pct: 46.8
+  built_up_pct: 51.8
+  green_cover_pct: 34.2
+  avg_building_storeys: 2.0
+
+- id: Z-LK-2025
+  zone_id: Z-LK
+  year: 2025
+  population: 33300
+  households: 7744
+  children_under_5: 3080
+  elderly_over_65: 2722
+  persons_with_disability: 866
+  informal_settlement_population: 7090
+  low_income_households: 3178
+  impermeable_surface_pct: 47.9
+  built_up_pct: 52.9
+  green_cover_pct: 33.1
+  avg_building_storeys: 2.0
+
+- id: Z-LK-2026
+  zone_id: Z-LK
+  year: 2026
+  population: 34000
+  households: 7907
+  children_under_5: 3128
+  elderly_over_65: 2788
+  persons_with_disability: 884
+  informal_settlement_population: 7300
+  low_income_households: 3256
+  impermeable_surface_pct: 49
+  built_up_pct: 54
+  green_cover_pct: 32
+  avg_building_storeys: 2.1
+
+- id: Z-NC-2018
+  zone_id: Z-NC
+  year: 2018
+  population: 9000
+  households: 2093
+  children_under_5: 972
+  elderly_over_65: 594
+  persons_with_disability: 198
+  informal_settlement_population: 800
+  low_income_households: 400
+  impermeable_surface_pct: 14
+  built_up_pct: 19
+  green_cover_pct: 73
+  avg_building_storeys: 1.3
+
+- id: Z-NC-2019
+  zone_id: Z-NC
+  year: 2019
+  population: 23100
+  households: 5372
+  children_under_5: 2483
+  elderly_over_65: 1510
+  persons_with_disability: 508
+  informal_settlement_population: 1180
+  low_income_households: 864
+  impermeable_surface_pct: 24
+  built_up_pct: 29
+  green_cover_pct: 63
+  avg_building_storeys: 1.5
+
+- id: Z-NC-2020
+  zone_id: Z-NC
+  year: 2020
+  population: 23200
+  households: 5395
+  children_under_5: 2482
+  elderly_over_65: 1502
+  persons_with_disability: 510
+  informal_settlement_population: 1550
+  low_income_households: 936
+  impermeable_surface_pct: 26
+  built_up_pct: 31
+  green_cover_pct: 61
+  avg_building_storeys: 1.6
+
+- id: Z-NC-2021
+  zone_id: Z-NC
+  year: 2021
+  population: 41300
+  households: 9605
+  children_under_5: 4398
+  elderly_over_65: 2648
+  persons_with_disability: 909
+  informal_settlement_population: 1920
+  low_income_households: 1510
+  impermeable_surface_pct: 40
+  built_up_pct: 45
+  green_cover_pct: 47
+  avg_building_storeys: 1.8
+
+- id: Z-NC-2022
+  zone_id: Z-NC
+  year: 2022
+  population: 41400
+  households: 9628
+  children_under_5: 4388
+  elderly_over_65: 2629
+  persons_with_disability: 911
+  informal_settlement_population: 2300
+  low_income_households: 1583
+  impermeable_surface_pct: 42
+  built_up_pct: 47
+  green_cover_pct: 45
+  avg_building_storeys: 2.0
+
+- id: Z-NC-2023
+  zone_id: Z-NC
+  year: 2023
+  population: 57500
+  households: 13372
+  children_under_5: 6066
+  elderly_over_65: 3615
+  persons_with_disability: 1265
+  informal_settlement_population: 2680
+  low_income_households: 2103
+  impermeable_surface_pct: 58
+  built_up_pct: 63
+  green_cover_pct: 29
+  avg_building_storeys: 2.1
+
+- id: Z-NC-2024
+  zone_id: Z-NC
+  year: 2024
+  population: 57650
+  households: 13407
+  children_under_5: 6053
+  elderly_over_65: 3589
+  persons_with_disability: 1268
+  informal_settlement_population: 3050
+  low_income_households: 2176
+  impermeable_surface_pct: 59
+  built_up_pct: 64
+  green_cover_pct: 28
+  avg_building_storeys: 2.3
+
+- id: Z-NC-2025
+  zone_id: Z-NC
+  year: 2025
+  population: 57800
+  households: 13442
+  children_under_5: 6040
+  elderly_over_65: 3562
+  persons_with_disability: 1272
+  informal_settlement_population: 3420
+  low_income_households: 2249
+  impermeable_surface_pct: 60
+  built_up_pct: 65
+  green_cover_pct: 27
+  avg_building_storeys: 2.4
+
+- id: Z-NC-2026
+  zone_id: Z-NC
+  year: 2026
+  population: 58000
+  households: 13488
+  children_under_5: 6032
+  elderly_over_65: 3538
+  persons_with_disability: 1276
+  informal_settlement_population: 3800
+  low_income_households: 2326
+  impermeable_surface_pct: 62
+  built_up_pct: 67
+  green_cover_pct: 25
+  avg_building_storeys: 2.6
+
+- id: Z-MI-2018
+  zone_id: Z-MI
+  year: 2018
+  population: 19000
+  households: 4419
+  children_under_5: 1862
+  elderly_over_65: 1178
+  persons_with_disability: 456
+  informal_settlement_population: 3900
+  low_income_households: 2184
+  impermeable_surface_pct: 55
+  built_up_pct: 61
+  green_cover_pct: 30
+  avg_building_storeys: 1.6
+
+- id: Z-MI-2019
+  zone_id: Z-MI
+  year: 2019
+  population: 19350
+  households: 4500
+  children_under_5: 1887
+  elderly_over_65: 1205
+  persons_with_disability: 464
+  informal_settlement_population: 3990
+  low_income_households: 2227
+  impermeable_surface_pct: 56.1
+  built_up_pct: 62.1
+  green_cover_pct: 28.9
+  avg_building_storeys: 1.6
+
+- id: Z-MI-2020
+  zone_id: Z-MI
+  year: 2020
+  population: 19700
+  households: 4581
+  children_under_5: 1911
+  elderly_over_65: 1231
+  persons_with_disability: 473
+  informal_settlement_population: 4080
+  low_income_households: 2271
+  impermeable_surface_pct: 57.2
+  built_up_pct: 63.2
+  green_cover_pct: 27.8
+  avg_building_storeys: 1.7
+
+- id: Z-MI-2021
+  zone_id: Z-MI
+  year: 2021
+  population: 20050
+  households: 4663
+  children_under_5: 1935
+  elderly_over_65: 1258
+  persons_with_disability: 481
+  informal_settlement_population: 4160
+  low_income_households: 2313
+  impermeable_surface_pct: 58.4
+  built_up_pct: 64.4
+  green_cover_pct: 26.6
+  avg_building_storeys: 1.7
+
+- id: Z-MI-2022
+  zone_id: Z-MI
+  year: 2022
+  population: 20400
+  households: 4744
+  children_under_5: 1958
+  elderly_over_65: 1285
+  persons_with_disability: 490
+  informal_settlement_population: 4250
+  low_income_households: 2356
+  impermeable_surface_pct: 59.5
+  built_up_pct: 65.5
+  green_cover_pct: 25.5
+  avg_building_storeys: 1.7
+
+- id: Z-MI-2023
+  zone_id: Z-MI
+  year: 2023
+  population: 20750
+  households: 4826
+  children_under_5: 1982
+  elderly_over_65: 1312
+  persons_with_disability: 498
+  informal_settlement_population: 4340
+  low_income_households: 2400
+  impermeable_surface_pct: 60.6
+  built_up_pct: 66.6
+  green_cover_pct: 24.4
+  avg_building_storeys: 1.7
+
+- id: Z-MI-2024
+  zone_id: Z-MI
+  year: 2024
+  population: 21100
+  households: 4907
+  children_under_5: 2004
+  elderly_over_65: 1340
+  persons_with_disability: 506
+  informal_settlement_population: 4420
+  low_income_households: 2442
+  impermeable_surface_pct: 61.8
+  built_up_pct: 67.8
+  green_cover_pct: 23.2
+  avg_building_storeys: 1.8
+
+- id: Z-MI-2025
+  zone_id: Z-MI
+  year: 2025
+  population: 21500
+  households: 5000
+  children_under_5: 2032
+  elderly_over_65: 1371
+  persons_with_disability: 516
+  informal_settlement_population: 4510
+  low_income_households: 2489
+  impermeable_surface_pct: 62.9
+  built_up_pct: 68.9
+  green_cover_pct: 22.1
+  avg_building_storeys: 1.8
+
+- id: Z-MI-2026
+  zone_id: Z-MI
+  year: 2026
+  population: 22000
+  households: 5116
+  children_under_5: 2068
+  elderly_over_65: 1408
+  persons_with_disability: 528
+  informal_settlement_population: 4600
+  low_income_households: 2544
+  impermeable_surface_pct: 64
+  built_up_pct: 70
+  green_cover_pct: 21
+  avg_building_storeys: 1.8
+
+residential_areas:
+- id: RA-01
+  name: Hillview Terrace Phase 1
+  zone_id: Z-HV
+  kind: apartment_blocks
+  households: 3581
+  population: 15400
+  year_established: 2022
+  storeys: 5
+  building_quality: good
+  slope_id: SL-HV-2
+  flood_plain_id: null
+  nearest_channel_id: D-7
+  distance_to_channel_m: 140
+  x_m: 9350
+  y_m: 5150
+  description: Apartment blocks of Hillview Terrace Phase 1 (about 3,200 residents, occupied 2022 after project
+    PR-HT1) and the older terraced lanes of the lower Hillview ridge around them, on slope SL-HV-2 behind its 2022
+    retaining wall. Reached only by Hill Road (RD-01); drains to D-7 about 140 m downslope.
+
+- id: RA-02
+  name: Kalinadi Drain settlement
+  zone_id: Z-HV
+  kind: informal_settlement
+  households: 605
+  population: 2600
+  year_established: 1995
+  storeys: 1
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-7
+  distance_to_channel_m: 5
+  x_m: 9600
+  y_m: 4700
+  description: Informal settlement on the banks of the upper reach of D-7 just upstream of the BR-4 culvert on Hill
+    Road (RD-01); grew from about 1,900 to 2,600 people in 2026 and was flooded 0.6 m in 2025.
+
+- id: RA-03
+  name: Riverside Old Village
+  zone_id: Z-RS
+  kind: row_houses
+  households: 5116
+  population: 22000
+  year_established: 1880
+  storeys: 2
+  building_quality: fair
+  slope_id: null
+  flood_plain_id: FP-1
+  nearest_channel_id: D-7
+  distance_to_channel_m: 200
+  x_m: 9400
+  y_m: 3800
+  description: Old village core of Riverside on flood plain FP-1 between the Riverside Bypass (RD-02) and the lower
+    D-7; ponded 0.5 m in 2019 when a landslide blocked D-7. Supplied from WF-2 and powered from PS-2.
+
+- id: RA-04
+  name: Riverside Bypass Colony
+  zone_id: Z-RS
+  kind: planned_colony
+  households: 4186
+  population: 18000
+  year_established: 2017
+  storeys: 3
+  building_quality: good
+  slope_id: null
+  flood_plain_id: FP-1
+  nearest_channel_id: D-8
+  distance_to_channel_m: 300
+  x_m: 8400
+  y_m: 3900
+  description: Planned colony laid out along the Riverside Bypass (RD-02) in 2017 on flood plain FP-1, about 300
+    m from drain D-8 and close to hospital H-2 and substation PS-2.
+
+- id: RA-05
+  name: D-8 settlement
+  zone_id: Z-RS
+  kind: informal_settlement
+  households: 791
+  population: 3400
+  year_established: 2004
+  storeys: 1
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: FP-1
+  nearest_channel_id: D-8
+  distance_to_channel_m: 0
+  x_m: 8800
+  y_m: 3650
+  description: Informal houses built on and against the banks of drain D-8 on flood plain FP-1; encroachment narrowed
+    the channel by about 15 % in 2025. Behind the D-8 flap gate, south of the Riverside Bypass (RD-02).
+
+- id: RA-06
+  name: Old Town core
+  zone_id: Z-OT
+  kind: row_houses
+  households: 9302
+  population: 40000
+  year_established: 1740
+  storeys: 3
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: FP-3
+  nearest_channel_id: D-3
+  distance_to_channel_m: 150
+  x_m: 6000
+  y_m: 4100
+  description: Dense historic core of three-storey row houses, partly on the Old Town riverfront plain FP-3 behind
+    the earth embankment; drained by the brick culvert D-3 and served by the WF-4 overhead tanks and PS-4.
+
+- id: RA-07
+  name: Bazaar quarters
+  zone_id: Z-OT
+  kind: mixed
+  households: 4651
+  population: 20000
+  year_established: 1820
+  storeys: 3
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-3
+  distance_to_channel_m: 60
+  x_m: 6600
+  y_m: 3900
+  description: Mixed shop-houses along Bazaar Lane (RD-05), a 4 m lane that large fire appliances cannot enter;
+    the D-3 drain passes under the BR-5 arch bridge at its western end.
+
+- id: RA-08
+  name: Market Ward flats
+  zone_id: Z-MW
+  kind: apartment_blocks
+  households: 8372
+  population: 36000
+  year_established: 1985
+  storeys: 6
+  building_quality: fair
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-4
+  distance_to_channel_m: 200
+  x_m: 6000
+  y_m: 5500
+  description: Apartment blocks and upper-floor tenements over the Market Ward shops either side of Market Ward
+    Main (RD-06), drained by D-4; the Market Ward Mall site PR-MWM lies to the south-east.
+
+- id: RA-09
+  name: Railway Colony
+  zone_id: Z-SR
+  kind: worker_housing
+  households: 7907
+  population: 34000
+  year_established: 1925
+  storeys: 3
+  building_quality: fair
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-5
+  distance_to_channel_m: 700
+  x_m: 2600
+  y_m: 5400
+  description: Railway staff quarters and the surrounding Station Road wards north of Station Road (RD-04), around
+    hospital H-3 and substation PS-4; drained by D-5 towards the TU-1 underpass.
+
+- id: RA-10
+  name: Station Road settlement
+  zone_id: Z-SR
+  kind: informal_settlement
+  households: 1209
+  population: 5200
+  year_established: 1990
+  storeys: 1
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-5
+  distance_to_channel_m: 10
+  x_m: 3200
+  y_m: 4300
+  description: Informal houses along drain D-5 beside the Rail Underpass Road (RD-13) just south of tunnel TU-1;
+    low ground that floods when D-5 surcharges.
+
+- id: RA-11
+  name: Civil Lines bungalows
+  zone_id: Z-CL
+  kind: villas
+  households: 1628
+  population: 7000
+  year_established: 1905
+  storeys: 2
+  building_quality: good
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-2
+  distance_to_channel_m: 600
+  x_m: 6800
+  y_m: 7000
+  description: Old administrative bungalows on the Civil Lines rise north of Civil Lines Road (RD-10), above slope
+    SL-CL-1 and drained by D-2; powered from PS-1.
+
+- id: RA-12
+  name: Civil Lines flats
+  zone_id: Z-CL
+  kind: apartment_blocks
+  households: 3023
+  population: 13000
+  year_established: 1998
+  storeys: 7
+  building_quality: good
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-2
+  distance_to_channel_m: 800
+  x_m: 5600
+  y_m: 6600
+  description: Government apartment blocks between the Kalinadi WTP (WF-1) and Civil Lines Road (RD-10), close to
+    shelter S-1 and hospital H-1.
+
+- id: RA-13
+  name: Lakeside Old Village
+  zone_id: Z-LK
+  kind: village
+  households: 3256
+  population: 14000
+  year_established: 1760
+  storeys: 1
+  building_quality: fair
+  slope_id: null
+  flood_plain_id: FP-4
+  nearest_channel_id: D-11
+  distance_to_channel_m: 900
+  x_m: 1400
+  y_m: 1000
+  description: Old lake-edge village inside the Lakeside Ring Road (RD-07) on the Nandi Lake basin FP-4; depends
+    on the pumped drain D-11 and regulator DM-2 to stay dry.
+
+- id: RA-14
+  name: Ring Road settlement
+  zone_id: Z-LK
+  kind: informal_settlement
+  households: 1698
+  population: 7300
+  year_established: 1992
+  storeys: 1
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: FP-4
+  nearest_channel_id: D-11
+  distance_to_channel_m: 20
+  x_m: 2800
+  y_m: 2200
+  description: Informal settlement on the lowest ground of the basin FP-4, 20 m from the D-11 pumped drain near
+    the Lake Causeway (RD-14) and the D-11 pump station.
+
+- id: RA-15
+  name: Lakeview Apartments
+  zone_id: Z-LK
+  kind: apartment_blocks
+  households: 2674
+  population: 11500
+  year_established: 2012
+  storeys: 8
+  building_quality: good
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-11
+  distance_to_channel_m: 1200
+  x_m: 1200
+  y_m: 2300
+  description: Eight-storey apartment blocks built in 2012 next to hospital H-4 on the northern side of the Lakeside
+    Ring Road (RD-07); powered from PS-5.
+
+- id: RA-16
+  name: New Colony Sector 1
+  zone_id: Z-NC
+  kind: planned_colony
+  households: 3256
+  population: 14000
+  year_established: 2019
+  storeys: 2
+  building_quality: good
+  slope_id: null
+  flood_plain_id: FP-2
+  nearest_channel_id: D-9
+  distance_to_channel_m: 80
+  x_m: 5000
+  y_m: 1800
+  description: First sector of the New Colony Housing Scheme (PR-NCH), occupied 2019 on former paddy on flood plain
+    FP-2, 80 m from drain D-9; flooded in 2020 and 2021. Near fire station FS-3 and New Colony Avenue (RD-09).
+
+- id: RA-17
+  name: New Colony Sector 2
+  zone_id: Z-NC
+  kind: planned_colony
+  households: 4186
+  population: 18000
+  year_established: 2021
+  storeys: 3
+  building_quality: good
+  slope_id: null
+  flood_plain_id: FP-2
+  nearest_channel_id: D-9
+  distance_to_channel_m: 150
+  x_m: 6400
+  y_m: 1800
+  description: Second PR-NCH sector, occupied 2021 on flood plain FP-2 and drained by D-9; flooded 0.6 m in the
+    2021 flood. Served by booster station WF-5 and substation PS-5.
+
+- id: RA-18
+  name: New Colony Sector 3
+  zone_id: Z-NC
+  kind: planned_colony
+  households: 3721
+  population: 16000
+  year_established: 2023
+  storeys: 4
+  building_quality: good
+  slope_id: null
+  flood_plain_id: FP-2
+  nearest_channel_id: D-9
+  distance_to_channel_m: 400
+  x_m: 7600
+  y_m: 1400
+  description: Third PR-NCH sector, occupied 2023 on flood plain FP-2 at the eastern end of New Colony Avenue (RD-09);
+    its runoff joins drain D-9.
+
+- id: RA-19
+  name: New Colony old village
+  zone_id: Z-NC
+  kind: village
+  households: 1395
+  population: 6000
+  year_established: 1850
+  storeys: 1
+  building_quality: fair
+  slope_id: null
+  flood_plain_id: null
+  nearest_channel_id: D-9
+  distance_to_channel_m: 1400
+  x_m: 4200
+  y_m: 600
+  description: Original farming village south-west of the New Colony sectors, off New Colony Avenue (RD-09) near
+    the Lake Causeway (RD-14) landing.
+
+- id: RA-20
+  name: Mill Road labour lines
+  zone_id: Z-MI
+  kind: worker_housing
+  households: 3953
+  population: 17000
+  year_established: 1962
+  storeys: 2
+  building_quality: fair
+  slope_id: null
+  flood_plain_id: FP-2
+  nearest_channel_id: D-12
+  distance_to_channel_m: 1000
+  x_m: 9200
+  y_m: 2200
+  description: Mill workers' housing north of Mill Road (RD-08) on flood plain FP-2, between fire station FS-2 and
+    hospital H-5.
+
+- id: RA-21
+  name: Mill Road settlement
+  zone_id: Z-MI
+  kind: informal_settlement
+  households: 1070
+  population: 4600
+  year_established: 2000
+  storeys: 1
+  building_quality: poor
+  slope_id: null
+  flood_plain_id: FP-2
+  nearest_channel_id: D-12
+  distance_to_channel_m: 0
+  x_m: 10400
+  y_m: 2100
+  description: Informal settlement on the banks of the Mill Road industrial drain D-12, which is 25 % blocked, near
+    substation PS-3 and the Eastern Highway Link (RD-12).
+
+- id: RA-22
+  name: Tekri village
+  zone_id: Z-TH
+  kind: village
+  households: 930
+  population: 4000
+  year_established: 1870
+  storeys: 1
+  building_quality: fair
+  slope_id: SL-TH-1
+  flood_plain_id: null
+  nearest_channel_id: D-7
+  distance_to_channel_m: 900
+  x_m: 10000
+  y_m: 7200
+  description: Hill village below the Tekri Quarry face SL-TH-1 and the Quarry Road hairpins SL-TH-3, on Tekri Quarry
+    Road (RD-11); houses were destroyed in 2014 and evacuated in 2024. Reached from the city via Hill Road (RD-01).
+
+schools:
+- id: SC-01
+  name: Nandipur College
+  zone_id: Z-CL
+  level: college
+  students: 3200
+  staff: 210
+  floors: 4
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: null
+  x_m: 5400
+  y_m: 7200
+  description: The city's degree college on the Civil Lines rise north of Civil Lines Road (RD-10) and the Kalinadi
+    WTP (WF-1).
+
+- id: SC-02
+  name: Civil Lines Convent School
+  zone_id: Z-CL
+  level: secondary
+  students: 1100
+  staff: 62
+  floors: 3
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: null
+  x_m: 7200
+  y_m: 6800
+  description: Secondary school near the Civil Lines scarp SL-CL-1 and drain D-2, off Civil Lines Road (RD-10).
+
+- id: SC-03
+  name: Hillview Primary School
+  zone_id: Z-HV
+  level: primary
+  students: 420
+  staff: 18
+  floors: 2
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: SL-HV-1
+  x_m: 9650
+  y_m: 5300
+  description: Primary school about 180 m downslope of slope SL-HV-1 and the Hillview Terrace Phase 2 excavation
+    (PR-HT2), between Hill Road (RD-01) and drain D-7.
+
+- id: SC-04
+  name: Tekri Heights Primary School
+  zone_id: Z-TH
+  level: primary
+  students: 260
+  staff: 12
+  floors: 1
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: SL-TH-3
+  x_m: 10300
+  y_m: 7100
+  description: Small hill school beside the Quarry Road hairpins (SL-TH-3) on Tekri Quarry Road (RD-11), near shelter
+    S-6.
+
+- id: SC-05
+  name: Govt Higher Secondary School Market Ward
+  zone_id: Z-MW
+  level: higher_secondary
+  students: 1400
+  staff: 70
+  floors: 3
+  shelter_id: S-2
+  flood_plain_id: null
+  slope_id: null
+  x_m: 5600
+  y_m: 5400
+  description: Government higher secondary school off Market Ward Main (RD-06) whose buildings serve as shelter
+    S-2; drain D-4 runs to the east.
+
+- id: SC-06
+  name: Old Town Municipal Primary School
+  zone_id: Z-OT
+  level: primary
+  students: 850
+  staff: 34
+  floors: 2
+  shelter_id: null
+  flood_plain_id: FP-3
+  slope_id: null
+  x_m: 5700
+  y_m: 3500
+  description: Municipal primary school on the Old Town riverfront plain FP-3 behind the earth embankment, near
+    the D-3 outfall and the Kalinadi Bridge Road (RD-03).
+
+- id: SC-07
+  name: Bazaar Girls' Secondary School
+  zone_id: Z-OT
+  level: secondary
+  students: 1050
+  staff: 48
+  floors: 3
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: null
+  x_m: 6800
+  y_m: 4200
+  description: Girls' secondary school in the Bazaar quarters north of Bazaar Lane (RD-05), reached by narrow lanes
+    off RD-05.
+
+- id: SC-08
+  name: Riverside Primary School
+  zone_id: Z-RS
+  level: primary
+  students: 380
+  staff: 16
+  floors: 2
+  shelter_id: S-5
+  flood_plain_id: FP-1
+  slope_id: null
+  x_m: 9200
+  y_m: 3900
+  description: Primary school on the Riverside Bypass (RD-02) on flood plain FP-1 whose building is shelter S-5;
+    flooded 0.9 m in 2021.
+
+- id: SC-09
+  name: Riverside Bypass Secondary School
+  zone_id: Z-RS
+  level: secondary
+  students: 900
+  staff: 40
+  floors: 3
+  shelter_id: null
+  flood_plain_id: FP-1
+  slope_id: null
+  x_m: 8500
+  y_m: 4000
+  description: Secondary school in the Riverside Bypass Colony on flood plain FP-1, about 300 m from drain D-8 and
+    near hospital H-2.
+
+- id: SC-10
+  name: Railway Colony Higher Secondary School
+  zone_id: Z-SR
+  level: higher_secondary
+  students: 1300
+  staff: 64
+  floors: 3
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: null
+  x_m: 2500
+  y_m: 5500
+  description: Higher secondary school in the Railway Colony north of Station Road (RD-04), close to hospital H-3.
+
+- id: SC-11
+  name: Station Road Municipal Primary School
+  zone_id: Z-SR
+  level: primary
+  students: 700
+  staff: 26
+  floors: 2
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: null
+  x_m: 3600
+  y_m: 4400
+  description: Primary school beside the Rail Underpass Road (RD-13) near tunnel TU-1 and drain D-5.
+
+- id: SC-12
+  name: New Colony Public School
+  zone_id: Z-NC
+  level: secondary
+  students: 1600
+  staff: 75
+  floors: 3
+  shelter_id: null
+  flood_plain_id: FP-2
+  slope_id: null
+  x_m: 6800
+  y_m: 1600
+  description: Largest school in New Colony, built with Sector 2 on flood plain FP-2 beside New Colony Avenue (RD-09)
+    and drain D-9.
+
+- id: SC-13
+  name: New Colony Sector 3 Primary School
+  zone_id: Z-NC
+  level: primary
+  students: 650
+  staff: 24
+  floors: 2
+  shelter_id: null
+  flood_plain_id: FP-2
+  slope_id: null
+  x_m: 7700
+  y_m: 1600
+  description: Primary school opened with New Colony Sector 3 (RA-18) on flood plain FP-2 near the eastern end of
+    RD-09.
+
+- id: SC-14
+  name: Lakeside Govt School
+  zone_id: Z-LK
+  level: secondary
+  students: 900
+  staff: 42
+  floors: 2
+  shelter_id: null
+  flood_plain_id: FP-4
+  slope_id: null
+  x_m: 2200
+  y_m: 1200
+  description: Government school inside the Lakeside Ring Road (RD-07) on the Nandi Lake basin FP-4, drained by
+    D-11.
+
+- id: SC-15
+  name: Mill Road Industrial Training Institute
+  zone_id: Z-MI
+  level: college
+  students: 800
+  staff: 55
+  floors: 2
+  shelter_id: null
+  flood_plain_id: FP-2
+  slope_id: null
+  x_m: 10800
+  y_m: 2300
+  description: Industrial training institute near Mill Road (RD-08) and the Eastern Highway Link (RD-12) on flood
+    plain FP-2, north of substation PS-3.
+
+- id: SC-16
+  name: Lakeview Public School
+  zone_id: Z-LK
+  level: secondary
+  students: 1200
+  staff: 58
+  floors: 3
+  shelter_id: null
+  flood_plain_id: null
+  slope_id: null
+  x_m: 1100
+  y_m: 2500
+  description: Private secondary school next to Lakeview Apartments (RA-15) and hospital H-4 on the Lakeside Ring
+    Road (RD-07).

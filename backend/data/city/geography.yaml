@@ -1,0 +1,521 @@
+geological_zones:
+  - id: GZ-1
+    name: Tekri Quartzite Ridge
+    lithology: hard massive quartzite with thin residual soils
+    description: >-
+      The crest and upper flanks of Tekri Hill (HL-1) in Tekri Heights (Z-TH). Hard quartzite with less than 1.5 m
+      of residual soil; rock is exposed on the Tekri Quarry face (SL-TH-1).
+    permeability_class: very_low
+    bearing_capacity_class: very_high
+    hazard_notes: Rockfall and wedge failures on cuts and quarry benches; very high runoff that feeds the D-7 head and R-2.
+  - id: GZ-2
+    name: Hillview Phyllite Slopes
+    lithology: weathered phyllite under 2-6 m of colluvial silty clay
+    description: >-
+      The Hillview spur (HL-2) in Z-HV. Weathered phyllite with foliation dipping to the south-west, parallel to the
+      slope, covered by 2-6 m of colluvium that drains towards D-7.
+    permeability_class: low
+    bearing_capacity_class: moderate
+    hazard_notes: Dip slope to the SW; colluvium becomes slide-prone when saturated; perched water table after heavy rain.
+  - id: GZ-3
+    name: Kalinadi Recent Alluvium
+    lithology: loose to medium-dense silt, sand and gravel deposited by the Kalinadi
+    description: >-
+      Recent alluvium on both banks of the Kalinadi (R-1), under Riverside (Z-RS), Old Town (Z-OT), New Colony (Z-NC)
+      and Mill Road Industrial (Z-MI); it forms the flood plains FP-1, FP-2 and FP-3.
+    permeability_class: moderate
+    bearing_capacity_class: low
+    hazard_notes: High water table; moderate liquefaction susceptibility in saturated sands; active flood plain.
+  - id: GZ-4
+    name: Older Alluvial Terrace
+    lithology: compact older alluvium, clay loam and lateritic gravel over shale
+    description: >-
+      The raised terrace north of the river under Market Ward (Z-MW), Station Road (Z-SR) and Civil Lines (Z-CL),
+      including the Civil Lines Rise (HL-3).
+    permeability_class: moderate
+    bearing_capacity_class: high
+    hazard_notes: Compact and generally stable with good bearing; local shale scarp at SL-CL-1.
+  - id: GZ-5
+    name: Nandi Lacustrine Basin
+    lithology: soft lacustrine clay with peat lenses
+    description: >-
+      The closed basin of Nandi Lake (R-3) under Lakeside (Z-LK); about 30 m of soft clay and peat lie over the
+      alluvium.
+    permeability_class: very_low
+    bearing_capacity_class: low
+    hazard_notes: Soft clay and peat with poor bearing; long-term subsidence; chronic waterlogging; drains only by pumping at high river stage.
+
+soil_profiles:
+  - id: SP-HV
+    zone_id: Z-HV
+    soil_type: colluvial silty clay over weathered phyllite
+    depth_to_bedrock_m: 4.5
+    permeability_class: low
+    infiltration_rate_mm_h: 8
+    field_capacity: 0.34
+    plasticity_index: 22
+    shrink_swell: moderate
+    liquefaction_susceptibility: none
+    bearing_capacity_kpa: 120
+    water_table_depth_m: 3.0
+    notes: Water table 3 m but perched close to the surface after heavy rain; colluvium thickens towards the D-7 valley.
+  - id: SP-TH
+    zone_id: Z-TH
+    soil_type: thin residual soil over quartzite
+    depth_to_bedrock_m: 1.2
+    permeability_class: low
+    infiltration_rate_mm_h: 12
+    field_capacity: 0.22
+    plasticity_index: 9
+    shrink_swell: low
+    liquefaction_susceptibility: none
+    bearing_capacity_kpa: 400
+    water_table_depth_m: 15.0
+    notes: Thin soils over hard quartzite; most rainfall runs off quickly to the D-7 head and Tekri Nala (R-2).
+  - id: SP-RS
+    zone_id: Z-RS
+    soil_type: alluvial silt and sand
+    depth_to_bedrock_m: 22.0
+    permeability_class: moderate
+    infiltration_rate_mm_h: 15
+    field_capacity: 0.28
+    plasticity_index: 8
+    shrink_swell: low
+    liquefaction_susceptibility: moderate
+    bearing_capacity_kpa: 90
+    water_table_depth_m: 2.0
+    notes: Water table rises with Kalinadi stage; loose sands near the D-8 outfall.
+  - id: SP-OT
+    zone_id: Z-OT
+    soil_type: alluvial clay loam
+    depth_to_bedrock_m: 18.0
+    permeability_class: low
+    infiltration_rate_mm_h: 6
+    field_capacity: 0.36
+    plasticity_index: 18
+    shrink_swell: moderate
+    liquefaction_susceptibility: low
+    bearing_capacity_kpa: 110
+    water_table_depth_m: 3.5
+    notes: Largely sealed by old buildings and streets; infiltration applies only to courtyards and open ground.
+  - id: SP-MW
+    zone_id: Z-MW
+    soil_type: clay loam
+    depth_to_bedrock_m: 14.0
+    permeability_class: moderate
+    infiltration_rate_mm_h: 10
+    field_capacity: 0.33
+    plasticity_index: 15
+    shrink_swell: moderate
+    liquefaction_susceptibility: low
+    bearing_capacity_kpa: 180
+    water_table_depth_m: 5.0
+    notes: Deep basements need dewatering below about 5 m, as at the Market Ward Mall site (PR-MWM).
+  - id: SP-SR
+    zone_id: Z-SR
+    soil_type: silty loam over railway fill
+    depth_to_bedrock_m: 12.0
+    permeability_class: moderate
+    infiltration_rate_mm_h: 11
+    field_capacity: 0.30
+    plasticity_index: 11
+    shrink_swell: low
+    liquefaction_susceptibility: low
+    bearing_capacity_kpa: 160
+    water_table_depth_m: 4.0
+    notes: Up to 3 m of compacted railway fill near the tracks; the TU-1 underpass floor lies close to the water table.
+  - id: SP-CL
+    zone_id: Z-CL
+    soil_type: lateritic gravel over shale
+    depth_to_bedrock_m: 6.0
+    permeability_class: moderate
+    infiltration_rate_mm_h: 18
+    field_capacity: 0.25
+    plasticity_index: 12
+    shrink_swell: low
+    liquefaction_susceptibility: none
+    bearing_capacity_kpa: 250
+    water_table_depth_m: 8.0
+    notes: Well-drained lateritic cover over shale; shale is exposed on the Civil Lines scarp (SL-CL-1).
+  - id: SP-LK
+    zone_id: Z-LK
+    soil_type: lacustrine clay and peat
+    depth_to_bedrock_m: 30.0
+    permeability_class: very_low
+    infiltration_rate_mm_h: 2
+    field_capacity: 0.48
+    plasticity_index: 35
+    shrink_swell: high
+    liquefaction_susceptibility: low
+    bearing_capacity_kpa: 45
+    water_table_depth_m: 0.8
+    notes: Ground surface lies only a few metres above lake level; soils stay waterlogged for weeks after heavy rain.
+  - id: SP-NC
+    zone_id: Z-NC
+    soil_type: alluvial silt (former paddy)
+    depth_to_bedrock_m: 20.0
+    permeability_class: low
+    infiltration_rate_mm_h: 10
+    field_capacity: 0.38
+    plasticity_index: 14
+    shrink_swell: moderate
+    liquefaction_susceptibility: moderate
+    bearing_capacity_kpa: 85
+    water_table_depth_m: 1.5
+    notes: Former paddy fields with a compacted plough pan; shallow water table across the South Bank plain (FP-2).
+  - id: SP-MI
+    zone_id: Z-MI
+    soil_type: alluvial sand and gravel
+    depth_to_bedrock_m: 16.0
+    permeability_class: high
+    infiltration_rate_mm_h: 25
+    field_capacity: 0.18
+    plasticity_index: 5
+    shrink_swell: low
+    liquefaction_susceptibility: moderate
+    bearing_capacity_kpa: 150
+    water_table_depth_m: 2.5
+    notes: Permeable sands allow rapid groundwater rise during river floods; industrial fill covers much of the zone.
+
+catchments:
+  - id: CT-1
+    name: Tekri Upper
+    zone_ids: [Z-TH]
+    area_km2: 9.9
+    outlet_river_id: R-2
+    outlet_description: Drains west into the head of D-7 and east into Tekri Nala (R-2) through the DM-3 check dams.
+    impervious_pct_2018: 8
+    impervious_pct_2026: 14
+  - id: CT-2
+    name: Hillview-Riverside
+    zone_ids: [Z-HV, Z-RS]
+    area_km2: 10.6
+    outlet_river_id: R-1
+    outlet_description: Hillview runoff collects in D-7, passes the BR-4 culvert under Hill Road, receives D-8 in Riverside and outfalls to the Kalinadi (R-1).
+    impervious_pct_2018: 31
+    impervious_pct_2026: 44
+  - id: CT-3
+    name: North Bank Urban
+    zone_ids: [Z-OT, Z-MW, Z-SR, Z-CL]
+    area_km2: 20.4
+    outlet_river_id: R-1
+    outlet_description: D-2 flows into D-4, D-4 into D-3 and D-3 to the Kalinadi (R-1); Station Road drains separately through D-5 to R-1.
+    impervious_pct_2018: 58
+    impervious_pct_2026: 66
+  - id: CT-4
+    name: Nandi Lake Basin
+    zone_ids: [Z-LK]
+    area_km2: 9.7
+    outlet_river_id: R-1
+    outlet_description: Drains through D-11 and the Nandi Lake Regulator (DM-2) to the Kalinadi (R-1); pumped by PU-L1..PU-L3 when the river is high.
+    impervious_pct_2018: 42
+    impervious_pct_2026: 49
+  - id: CT-5
+    name: South Bank
+    zone_ids: [Z-NC, Z-MI]
+    area_km2: 22.7
+    outlet_river_id: R-1
+    outlet_description: New Colony drains through D-9 and Mill Road Industrial through D-12, both to the Kalinadi (R-1).
+    impervious_pct_2018: 24
+    impervious_pct_2026: 52
+
+rivers:
+  - id: R-1
+    name: Kalinadi
+    kind: river
+    description: >-
+      The Kalinadi flows east through the city between the north-bank zones (Z-OT, Z-RS) and the south-bank zones
+      (Z-LK, Z-NC, Z-MI). It is regulated upstream by the Kalinadi Barrage (DM-1), gauged at Kalinadi Bridge (RV-01),
+      crossed by BR-1 and BR-2, and receives D-3, D-5, D-7, D-9, D-11, D-12 and the Tekri Nala (R-2).
+    length_km: 12.4
+    ordinary_flow_m3s: 85
+    bankfull_flow_m3s: 1100
+    gauge_sensor_id: RV-01
+    gauge_zero_m: 207.0
+    flood_stage_m: 4.2
+    danger_stage_m: 5.5
+    record_stage_m: 5.8
+    record_date: "2021-09-14"
+    surface_level_m: 208.6
+    path: [[0, 2773], [500, 2759], [1000, 2751], [1500, 2751], [2000, 2757], [2500, 2770], [3000, 2790], [3500, 2815], [4000, 2845], [4500, 2880], [5000, 2918], [5500, 2959], [6000, 3000], [6500, 3041], [7000, 3082], [7500, 3120], [8000, 3155], [8500, 3185], [9000, 3210], [9500, 3230], [10000, 3243], [10500, 3249], [11000, 3249], [11500, 3241], [12000, 3227]]
+  - id: R-2
+    name: Tekri Nala
+    kind: stream
+    description: >-
+      A seasonal stream draining the eastern flank of Tekri Hill (HL-1) in Tekri Heights (Z-TH). It passes the Tekri
+      check dams (DM-3) and the gully slopes SL-TH-2, runs south along the eastern edge of Hillview and Riverside and
+      joins the Kalinadi (R-1) near the Eastern Bridge (BR-2). It is dry for most of the year.
+    length_km: 4.1
+    ordinary_flow_m3s: 0.3
+    bankfull_flow_m3s: 45
+    gauge_sensor_id: null
+    gauge_zero_m: null
+    flood_stage_m: null
+    danger_stage_m: null
+    record_stage_m: null
+    record_date: null
+    surface_level_m: null
+    path: [[11500, 8400], [11500, 7600], [11600, 6400], [11600, 5000], [11400, 3250]]
+  - id: R-3
+    name: Nandi Lake
+    kind: lake
+    description: >-
+      A shallow lake of about 1.6 km2 in the Lakeside basin (Z-LK), held at about 208.5 m by the Nandi Lake Regulator
+      (DM-2), which also controls the D-11 outfall to the Kalinadi (R-1). Its level is measured by LL-01 and it is
+      ringed by the Lakeside Ring Road (RD-07).
+    length_km: null
+    ordinary_flow_m3s: null
+    bankfull_flow_m3s: null
+    gauge_sensor_id: LL-01
+    gauge_zero_m: null
+    flood_stage_m: null
+    danger_stage_m: null
+    record_stage_m: null
+    record_date: null
+    surface_level_m: 208.5
+    path: [[1040, 1310], [1190, 1030], [1520, 880], [1900, 860], [2280, 930], [2610, 1120], [2750, 1450], [2700, 1780], [2890, 2120], [2700, 2160], [2370, 1930], [2040, 1930], [1710, 2020], [1380, 1830], [1120, 1590], [1040, 1310]]
+
+hills:
+  - id: HL-1
+    name: Tekri Hill
+    summit_x_m: 11000
+    summit_y_m: 8600
+    zone_ids: [Z-TH]
+    geological_zone_id: GZ-1
+    description: >-
+      The highest ground in Nandipur, a quartzite hill in Tekri Heights (Z-TH) carrying the Tekri Quarry (SL-TH-1),
+      the Tekri Hill Reservoir (WF-3) and the headwaters of D-7 and Tekri Nala (R-2).
+  - id: HL-2
+    name: Hillview Ridge
+    summit_x_m: 10400
+    summit_y_m: 6400
+    zone_ids: [Z-HV]
+    geological_zone_id: GZ-2
+    description: >-
+      A south-west trending phyllite spur of Tekri Hill (HL-1) that forms the Hillview zone (Z-HV). Its slopes
+      SL-HV-1, SL-HV-2 and SL-HV-3 fall towards D-7 and Hill Road (RD-01).
+  - id: HL-3
+    name: Civil Lines Rise
+    summit_x_m: 5500
+    summit_y_m: 6500
+    zone_ids: [Z-CL]
+    geological_zone_id: GZ-4
+    description: >-
+      A low lateritic rise about 30 m above the river plain under Civil Lines (Z-CL), with the District Hospital
+      (H-1) and the water treatment plant (WF-1) on its flanks; its eastern scarp is SL-CL-1.
+
+slopes:
+  - id: SL-HV-1
+    name: Hillview Terrace slope
+    zone_id: Z-HV
+    hill_id: HL-2
+    x_m: 9700
+    y_m: 5500
+    mean_angle_deg: 32
+    max_angle_deg: 38
+    aspect: SW
+    length_m: 260
+    height_m: 140
+    soil_depth_m: 4.5
+    vegetation_cover_pct: 20
+    stability_class: marginal
+    retaining_structures: null
+    toe_channel_id: D-7
+    toe_distance_to_channel_m: 60
+    has_active_construction: true
+    description: >-
+      A 32-degree colluvial slope on Hillview Ridge (HL-2) being excavated for Hillview Terrace Phase 2 (PR-HT2).
+      No retaining wall has been built yet. The toe is 60 m from D-7, the Tekri Hill Reservoir (WF-3) lies about
+      400 m upslope, and soil moisture probes SM-01 and SM-02 monitor it.
+  - id: SL-HV-2
+    name: Hillview Terrace Phase 1 cut
+    zone_id: Z-HV
+    hill_id: HL-2
+    x_m: 9350
+    y_m: 5200
+    mean_angle_deg: 28
+    max_angle_deg: 34
+    aspect: SW
+    length_m: 180
+    height_m: 85
+    soil_depth_m: 4.0
+    vegetation_cover_pct: 35
+    stability_class: stabilised
+    retaining_structures: 6 m reinforced-concrete retaining wall with weep holes (2022)
+    toe_channel_id: D-7
+    toe_distance_to_channel_m: 140
+    has_active_construction: false
+    description: >-
+      The cut slope behind Hillview Terrace Phase 1 (PR-HT1). It failed in July 2022 (HI-2022-LS-01) and was
+      stabilised with a 6 m retaining wall; probe SM-03 remains in place.
+  - id: SL-HV-3
+    name: Hill Road cut km 2.1
+    zone_id: Z-HV
+    hill_id: HL-2
+    x_m: 10100
+    y_m: 5000
+    mean_angle_deg: 41
+    max_angle_deg: 55
+    aspect: W
+    length_m: 120
+    height_m: 70
+    soil_depth_m: 3.0
+    vegetation_cover_pct: 15
+    stability_class: marginal
+    retaining_structures: rockfall mesh and rock bolts (2020)
+    toe_channel_id: D-7
+    toe_distance_to_channel_m: 20
+    has_active_construction: false
+    description: >-
+      A steep road cut above Hill Road (RD-01), only 20 m from D-7. The 2019 slide here (HI-2019-LS-01) blocked
+      D-7 and the road; a rockfall mesh was installed in 2020.
+  - id: SL-TH-1
+    name: Tekri Quarry face
+    zone_id: Z-TH
+    hill_id: HL-1
+    x_m: 10600
+    y_m: 7200
+    mean_angle_deg: 55
+    max_angle_deg: 70
+    aspect: SW
+    length_m: 220
+    height_m: 110
+    soil_depth_m: 1.0
+    vegetation_cover_pct: 30
+    stability_class: unstable
+    retaining_structures: null
+    toe_channel_id: D-7
+    toe_distance_to_channel_m: 350
+    has_active_construction: true
+    description: >-
+      The benched face of the Tekri Quarry (PR-TQ) on Tekri Hill (HL-1), 350 m above the head reach of D-7. A bench
+      slide in 2024 (HI-2024-LS-01) blocked Tekri Quarry Road (RD-11); probe SM-04 sits on the crest.
+  - id: SL-TH-2
+    name: Tekri Nala gully slopes
+    zone_id: Z-TH
+    hill_id: HL-1
+    x_m: 11500
+    y_m: 7600
+    mean_angle_deg: 30
+    max_angle_deg: 40
+    aspect: E
+    length_m: 300
+    height_m: 150
+    soil_depth_m: 1.5
+    vegetation_cover_pct: 70
+    stability_class: stable
+    retaining_structures: gabion check dams DM-3 (2008)
+    toe_channel_id: null
+    toe_distance_to_channel_m: null
+    has_active_construction: false
+    description: >-
+      Well-vegetated gully sides along the Tekri Nala (R-2), protected by the DM-3 check dams, which are now largely
+      silted.
+  - id: SL-TH-3
+    name: Quarry Road hairpins
+    zone_id: Z-TH
+    hill_id: HL-1
+    x_m: 10200
+    y_m: 6900
+    mean_angle_deg: 36
+    max_angle_deg: 48
+    aspect: S
+    length_m: 200
+    height_m: 95
+    soil_depth_m: 2.0
+    vegetation_cover_pct: 40
+    stability_class: marginal
+    retaining_structures: roadside ditches and small gabion walls (2024)
+    toe_channel_id: null
+    toe_distance_to_channel_m: null
+    has_active_construction: false
+    description: >-
+      The hairpin bends where Tekri Quarry Road (RD-11) leaves Hill Road (RD-01) near Tekri village. The 2014 landslide
+      (HI-2014-LS-01) started here; ditches were added when RD-11 was regraded in 2024.
+  - id: SL-CL-1
+    name: Civil Lines scarp
+    zone_id: Z-CL
+    hill_id: HL-3
+    x_m: 7900
+    y_m: 6600
+    mean_angle_deg: 15
+    max_angle_deg: 20
+    aspect: E
+    length_m: 150
+    height_m: 30
+    soil_depth_m: 1.5
+    vegetation_cover_pct: 60
+    stability_class: stable
+    retaining_structures: null
+    toe_channel_id: D-2
+    toe_distance_to_channel_m: 300
+    has_active_construction: false
+    description: >-
+      A gentle shale scarp on the eastern edge of the Civil Lines Rise (HL-3), 300 m from D-2. No movement has been
+      recorded.
+
+flood_plains:
+  - id: FP-1
+    name: Riverside plain
+    river_id: R-1
+    zone_ids: [Z-RS]
+    area_km2: 3.1
+    return_period_years: 10
+    typical_depth_m: 0.8
+    protection_type: Bypass embankment (partial)
+    protection_crest_m: 214.5
+    protection_year_built: 2016
+    protection_year_raised: null
+    residents_2018: 11000
+    residents_2026: 14000
+    description: >-
+      The Kalinadi flood plain under Riverside (Z-RS), partly protected by the Riverside Bypass (RD-02) embankment. It
+      also receives D-7 and D-8 overflow; raising the embankment is planned as PR-RSE.
+  - id: FP-2
+    name: South Bank plain
+    river_id: R-1
+    zone_ids: [Z-NC, Z-MI]
+    area_km2: 15.0
+    return_period_years: 25
+    typical_depth_m: 0.6
+    protection_type: none
+    protection_crest_m: null
+    protection_year_built: null
+    protection_year_raised: null
+    residents_2018: 6000
+    residents_2026: 41000
+    description: >-
+      The unprotected south-bank flood plain under New Colony (Z-NC) and Mill Road Industrial (Z-MI), drained by D-9
+      and D-12. Most of it was paddy land before the New Colony Housing Scheme (PR-NCH).
+  - id: FP-3
+    name: Old Town riverfront
+    river_id: R-1
+    zone_ids: [Z-OT]
+    area_km2: 1.4
+    return_period_years: 50
+    typical_depth_m: 0.4
+    protection_type: earth embankment
+    protection_crest_m: 214.6
+    protection_year_built: 1978
+    protection_year_raised: 2022
+    residents_2018: 9000
+    residents_2026: 8500
+    description: >-
+      The Old Town (Z-OT) riverfront behind an earth embankment near Kalinadi Bridge (BR-1) and the D-3 outfall. The
+      crest was raised from 214.0 m to 214.6 m in 2022.
+  - id: FP-4
+    name: Nandi Lake basin
+    river_id: R-3
+    zone_ids: [Z-LK]
+    area_km2: 5.2
+    return_period_years: 10
+    typical_depth_m: 1.2
+    protection_type: regulator DM-2 + pumped drain D-11
+    protection_crest_m: 209.5
+    protection_year_built: 1996
+    protection_year_raised: null
+    residents_2018: 17000
+    residents_2026: 21000
+    description: >-
+      The low ground around Nandi Lake (R-3) in Lakeside (Z-LK), which floods when the lake cannot drain to the
+      Kalinadi. It depends on the Nandi Lake Regulator (DM-2) and the D-11 pumps (PU-L1..PU-L3).

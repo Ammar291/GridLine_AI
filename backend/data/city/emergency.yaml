@@ -1,0 +1,773 @@
+# Nandipur emergency resources (synthetic). Spec section 5.7. elevation_m is computed at seed time.
+# Live columns (status, available beds, occupancy) hold their initial seed values.
+
+hospitals:
+- id: H-1
+  name: Nandipur District Hospital
+  kind: tertiary
+  zone_id: Z-CL
+  x_m: 6400
+  y_m: 6600
+  year_built: 1968
+  floors: 6
+  has_burn_unit: false
+  has_helipad: true
+  backup_power_hours: 72
+  access_road_id: RD-10
+  substation_id: PS-1
+  water_facility_id: WF-1
+  status: normal
+  description: The city's tertiary referral hospital on Civil Lines Road (RD-10), fed from the grid substation PS-1
+    and supplied by WF-1. It received 36 patients evacuated from H-2 in 2021 and takes burn overflow from H-5.
+
+- id: H-2
+  name: Riverside Community Hospital
+  kind: community
+  zone_id: Z-RS
+  x_m: 8800
+  y_m: 3800
+  year_built: 1996
+  floors: 3
+  has_burn_unit: false
+  has_helipad: false
+  backup_power_hours: 12
+  access_road_id: RD-02
+  substation_id: PS-2
+  water_facility_id: WF-2
+  status: normal
+  description: Community hospital beside the Riverside Bypass (RD-02) on flood plain FP-1, a short distance from
+    drain D-8. Powered by substation PS-2 with 12 hours of generator fuel and supplied from intake WF-2.
+
+- id: H-3
+  name: Railway Hospital
+  kind: district
+  zone_id: Z-SR
+  x_m: 2800
+  y_m: 5200
+  year_built: 1948
+  floors: 3
+  has_burn_unit: false
+  has_helipad: false
+  backup_power_hours: 24
+  access_road_id: RD-04
+  substation_id: PS-4
+  water_facility_id: WF-1
+  status: normal
+  description: District hospital of the Station Road railway colony on Station Road (RD-04), powered from PS-4 and
+    supplied by WF-1; the rail underpass TU-1 and drain D-5 lie south-east of it.
+
+- id: H-4
+  name: Lakeview Hospital
+  kind: private
+  zone_id: Z-LK
+  x_m: 1400
+  y_m: 2200
+  year_built: 2009
+  floors: 5
+  has_burn_unit: false
+  has_helipad: false
+  backup_power_hours: 36
+  access_road_id: RD-07
+  substation_id: PS-5
+  water_facility_id: WF-5
+  status: normal
+  description: Private hospital on the Lakeside Ring Road (RD-07) inside the Nandi Lake basin FP-4. Powered from
+    PS-5, the same substation that feeds the D-11 pumps; its ground floor took water in 2016 and 2024.
+
+- id: H-5
+  name: Mill Road Workers' Hospital
+  kind: specialist
+  zone_id: Z-MI
+  x_m: 10000
+  y_m: 1900
+  year_built: 1984
+  floors: 4
+  has_burn_unit: true
+  has_helipad: false
+  backup_power_hours: 48
+  access_road_id: RD-08
+  substation_id: PS-3
+  water_facility_id: WF-1
+  status: normal
+  description: Specialist industrial-injury hospital on Mill Road (RD-08) with the city's only burn unit (16 beds),
+    powered from PS-3 and supplied by WF-1; drain D-12 runs to its north.
+
+hospital_beds:
+- id: H-1-general
+  hospital_id: H-1
+  bed_type: general
+  total: 300
+  available: 66
+
+- id: H-1-icu
+  hospital_id: H-1
+  bed_type: icu
+  total: 40
+  available: 8
+
+- id: H-1-emergency
+  hospital_id: H-1
+  bed_type: emergency
+  total: 30
+  available: 8
+
+- id: H-1-pediatric
+  hospital_id: H-1
+  bed_type: pediatric
+  total: 30
+  available: 8
+
+- id: H-1-maternity
+  hospital_id: H-1
+  bed_type: maternity
+  total: 20
+  available: 5
+
+- id: H-2-general
+  hospital_id: H-2
+  bed_type: general
+  total: 56
+  available: 12
+
+- id: H-2-icu
+  hospital_id: H-2
+  bed_type: icu
+  total: 6
+  available: 1
+
+- id: H-2-emergency
+  hospital_id: H-2
+  bed_type: emergency
+  total: 10
+  available: 2
+
+- id: H-2-pediatric
+  hospital_id: H-2
+  bed_type: pediatric
+  total: 8
+  available: 2
+
+- id: H-3-general
+  hospital_id: H-3
+  bed_type: general
+  total: 44
+  available: 10
+
+- id: H-3-icu
+  hospital_id: H-3
+  bed_type: icu
+  total: 4
+  available: 1
+
+- id: H-3-emergency
+  hospital_id: H-3
+  bed_type: emergency
+  total: 8
+  available: 2
+
+- id: H-3-pediatric
+  hospital_id: H-3
+  bed_type: pediatric
+  total: 4
+  available: 1
+
+- id: H-4-general
+  hospital_id: H-4
+  bed_type: general
+  total: 80
+  available: 18
+
+- id: H-4-icu
+  hospital_id: H-4
+  bed_type: icu
+  total: 16
+  available: 3
+
+- id: H-4-emergency
+  hospital_id: H-4
+  bed_type: emergency
+  total: 12
+  available: 3
+
+- id: H-4-pediatric
+  hospital_id: H-4
+  bed_type: pediatric
+  total: 12
+  available: 3
+
+- id: H-5-general
+  hospital_id: H-5
+  bed_type: general
+  total: 60
+  available: 13
+
+- id: H-5-icu
+  hospital_id: H-5
+  bed_type: icu
+  total: 12
+  available: 2
+
+- id: H-5-emergency
+  hospital_id: H-5
+  bed_type: emergency
+  total: 12
+  available: 3
+
+- id: H-5-burn
+  hospital_id: H-5
+  bed_type: burn
+  total: 16
+  available: 3
+
+ambulances:
+- id: AMB-01
+  hospital_id: H-1
+  kind: ALS
+  status: available
+  location_zone_id: Z-CL
+
+- id: AMB-02
+  hospital_id: H-1
+  kind: ALS
+  status: available
+  location_zone_id: Z-CL
+
+- id: AMB-03
+  hospital_id: H-1
+  kind: BLS
+  status: available
+  location_zone_id: Z-CL
+
+- id: AMB-04
+  hospital_id: H-1
+  kind: BLS
+  status: available
+  location_zone_id: Z-CL
+
+- id: AMB-05
+  hospital_id: H-1
+  kind: BLS
+  status: maintenance
+  location_zone_id: Z-CL
+
+- id: AMB-06
+  hospital_id: H-2
+  kind: BLS
+  status: available
+  location_zone_id: Z-RS
+
+- id: AMB-07
+  hospital_id: H-2
+  kind: BLS
+  status: available
+  location_zone_id: Z-RS
+
+- id: AMB-08
+  hospital_id: H-3
+  kind: ALS
+  status: available
+  location_zone_id: Z-SR
+
+- id: AMB-09
+  hospital_id: H-3
+  kind: BLS
+  status: available
+  location_zone_id: Z-SR
+
+- id: AMB-10
+  hospital_id: H-4
+  kind: ALS
+  status: available
+  location_zone_id: Z-LK
+
+- id: AMB-11
+  hospital_id: H-4
+  kind: BLS
+  status: available
+  location_zone_id: Z-LK
+
+- id: AMB-12
+  hospital_id: H-4
+  kind: BLS
+  status: available
+  location_zone_id: Z-LK
+
+- id: AMB-13
+  hospital_id: H-5
+  kind: ALS
+  status: available
+  location_zone_id: Z-MI
+
+- id: AMB-14
+  hospital_id: H-5
+  kind: BLS
+  status: available
+  location_zone_id: Z-MI
+
+fire_stations:
+- id: FS-1
+  name: Central Fire Station
+  zone_id: Z-MW
+  x_m: 5200
+  y_m: 4700
+  year_built: 1958
+  staff_on_shift: 24
+  coverage_zone_ids: [Z-OT, Z-MW, Z-SR, Z-CL, Z-RS, Z-HV, Z-TH]
+  access_road_id: RD-06
+  has_foam_capability: false
+  description: Main fire station on the southern edge of Market Ward, reached from Market Ward Main (RD-06). Covers
+    the north bank and the hills; turnout to Hillview goes through Riverside and up Hill Road (RD-01) and takes
+    at least 25 minutes.
+
+- id: FS-2
+  name: Mill Road Fire Station
+  zone_id: Z-MI
+  x_m: 9600
+  y_m: 1400
+  year_built: 1986
+  staff_on_shift: 18
+  coverage_zone_ids: [Z-MI, Z-NC, Z-RS]
+  access_road_id: RD-08
+  has_foam_capability: true
+  description: Industrial fire station on Mill Road (RD-08) with the city's only foam tender (FT-07). Reaches Riverside
+    over the Eastern Bridge BR-2 via RD-12, or over BR-1 when that bridge is open.
+
+- id: FS-3
+  name: New Colony Fire Station
+  zone_id: Z-NC
+  x_m: 5000
+  y_m: 1600
+  year_built: 2022
+  staff_on_shift: 12
+  coverage_zone_ids: [Z-NC, Z-LK]
+  access_road_id: RD-09
+  has_foam_capability: false
+  description: Station opened in 2022 on New Colony Avenue (RD-09) to serve the new sectors on flood plain FP-2
+    and Lakeside via the Lake Causeway (RD-14).
+
+fire_trucks:
+- id: FT-01
+  station_id: FS-1
+  kind: pumper
+  water_capacity_l: 4500
+  foam_capacity_l: 0
+  min_road_width_m: 3.5
+  status: available
+  location_zone_id: Z-MW
+
+- id: FT-02
+  station_id: FS-1
+  kind: pumper
+  water_capacity_l: 4500
+  foam_capacity_l: 0
+  min_road_width_m: 3.5
+  status: available
+  location_zone_id: Z-MW
+
+- id: FT-03
+  station_id: FS-1
+  kind: ladder
+  water_capacity_l: 1500
+  foam_capacity_l: 0
+  min_road_width_m: 6.0
+  status: available
+  location_zone_id: Z-MW
+
+- id: FT-04
+  station_id: FS-1
+  kind: water_tender
+  water_capacity_l: 12000
+  foam_capacity_l: 0
+  min_road_width_m: 4.0
+  status: available
+  location_zone_id: Z-MW
+
+- id: FT-05
+  station_id: FS-1
+  kind: rescue_tender
+  water_capacity_l: 0
+  foam_capacity_l: 0
+  min_road_width_m: 3.5
+  status: available
+  location_zone_id: Z-MW
+
+- id: FT-06
+  station_id: FS-2
+  kind: pumper
+  water_capacity_l: 4500
+  foam_capacity_l: 0
+  min_road_width_m: 3.5
+  status: available
+  location_zone_id: Z-MI
+
+- id: FT-07
+  station_id: FS-2
+  kind: foam_tender
+  water_capacity_l: 3000
+  foam_capacity_l: 1500
+  min_road_width_m: 4.0
+  status: available
+  location_zone_id: Z-MI
+
+- id: FT-08
+  station_id: FS-2
+  kind: water_tender
+  water_capacity_l: 12000
+  foam_capacity_l: 0
+  min_road_width_m: 4.0
+  status: available
+  location_zone_id: Z-MI
+
+- id: FT-09
+  station_id: FS-3
+  kind: pumper
+  water_capacity_l: 4500
+  foam_capacity_l: 0
+  min_road_width_m: 3.5
+  status: available
+  location_zone_id: Z-NC
+
+- id: FT-10
+  station_id: FS-3
+  kind: mini_pumper
+  water_capacity_l: 1200
+  foam_capacity_l: 0
+  min_road_width_m: 3.0
+  status: available
+  location_zone_id: Z-NC
+
+police_stations:
+- id: PL-1
+  name: Kotwali Police Station
+  zone_id: Z-OT
+  x_m: 5800
+  y_m: 4000
+  personnel: 120
+  jurisdiction_zone_ids: [Z-OT, Z-MW]
+  has_control_room: true
+  description: Headquarters station in Old Town near Bazaar Lane (RD-05) and the D-3 main drain; houses the city
+    police control room that answers emergency number 112.
+
+- id: PL-2
+  name: Station Road Police Station
+  zone_id: Z-SR
+  x_m: 3200
+  y_m: 5000
+  personnel: 80
+  jurisdiction_zone_ids: [Z-SR, Z-CL]
+  has_control_room: false
+  description: Station on Station Road (RD-04) north of the rail underpass TU-1; manages closures of the Rail Underpass
+    Road (RD-13) when drain D-5 surcharges.
+
+- id: PL-3
+  name: Riverside Police Station
+  zone_id: Z-RS
+  x_m: 9000
+  y_m: 3900
+  personnel: 60
+  jurisdiction_zone_ids: [Z-RS, Z-HV, Z-TH]
+  has_control_room: false
+  description: Station on the Riverside Bypass (RD-02) on flood plain FP-1, responsible for Riverside and the hill
+    zones reached only by Hill Road (RD-01).
+
+- id: PL-4
+  name: Mill Road Police Station
+  zone_id: Z-MI
+  x_m: 10600
+  y_m: 1800
+  personnel: 55
+  jurisdiction_zone_ids: [Z-MI]
+  has_control_room: false
+  description: Industrial-area station on Mill Road (RD-08) near drain D-12 and the Eastern Highway Link (RD-12).
+
+- id: PL-5
+  name: Lakeside Police Station
+  zone_id: Z-LK
+  x_m: 1200
+  y_m: 1800
+  personnel: 45
+  jurisdiction_zone_ids: [Z-LK, Z-NC]
+  has_control_room: false
+  description: Station inside the Lakeside Ring Road (RD-07) on the Nandi Lake basin FP-4; also covers New Colony
+    across the Lake Causeway (RD-14).
+
+crews:
+- id: C-1
+  name: Rescue Alpha
+  kind: rescue
+  members: 24
+  base_zone_id: Z-CL
+  location_zone_id: Z-CL
+  x_m: 5800
+  y_m: 6200
+  status: available
+  capabilities: [search_and_rescue, rope_rescue, cutting, boat_rescue, first_aid]
+  equipment: ropes, hydraulic cutting tools, 2 inflatable boats, first-aid kits, 2 rescue vans
+  baseline_response_min: 20
+  description: General rescue crew based in Civil Lines on Civil Lines Road (RD-10), near shelter S-1 and hospital
+    H-1.
+
+- id: C-2
+  name: Drainage Crew Old Town
+  kind: drainage
+  members: 14
+  base_zone_id: Z-OT
+  location_zone_id: Z-OT
+  x_m: 5200
+  y_m: 4400
+  status: available
+  capabilities: [pump_operation, channel_clearing, desilting, sandbagging]
+  equipment: mobile pumps PU-M1 to PU-M4, debris grabs, sandbags, 2 flatbed trucks
+  baseline_response_min: 30
+  description: Drainage crew at the Old Town works yard that operates the mobile pumps PU-M1 to PU-M4 and clears
+    drains D-3 and D-4; deployed pumps to the D-7 outfall in 2025.
+
+- id: C-3
+  name: Road Maintenance Crew
+  kind: road
+  members: 16
+  base_zone_id: Z-SR
+  location_zone_id: Z-SR
+  x_m: 2600
+  y_m: 4600
+  status: busy
+  capabilities: [debris_clearance, road_closure, barricading, earthworks]
+  equipment: excavator, 2 dump trucks, barricades, traffic cones, chainsaws
+  baseline_response_min: 35
+  description: Road crew based at the Station Road depot off Station Road (RD-04); clears landslide debris from
+    Hill Road (RD-01) and Tekri Quarry Road (RD-11) and staffs closures at the TU-1 underpass.
+
+- id: C-4
+  name: Hill Rescue Team
+  kind: hill_rescue
+  members: 12
+  base_zone_id: Z-RS
+  location_zone_id: Z-RS
+  x_m: 9600
+  y_m: 4400
+  status: available
+  capabilities: [rope_rescue, slope_inspection, landslide_search, first_aid]
+  equipment: rope rescue kit, slope inclinometer, search cameras, 1 four-wheel-drive van
+  baseline_response_min: 25
+  description: Team formed in 2020 after the Hill Road landslide, stationed at the foot of Hill Road (RD-01) where
+    RD-10 meets it; inspects slopes SL-HV-1 to SL-HV-3 and reads probes SM-01 to SM-03.
+
+- id: C-5
+  name: Medical Response Team
+  kind: medical
+  members: 10
+  base_zone_id: Z-CL
+  location_zone_id: Z-CL
+  x_m: 6400
+  y_m: 6600
+  status: available
+  capabilities: [triage, field_medical_care, patient_transfer]
+  equipment: field triage tents, 2 ALS kits, portable oxygen
+  baseline_response_min: 15
+  description: Medical team attached to Nandipur District Hospital H-1 on Civil Lines Road (RD-10); sets up field
+    triage at shelters and incident sites.
+
+- id: C-6
+  name: Electrical Repair Crew
+  kind: electrical
+  members: 9
+  base_zone_id: Z-CL
+  location_zone_id: Z-CL
+  x_m: 6000
+  y_m: 6800
+  status: available
+  capabilities: [substation_repair, line_repair, generator_hookup]
+  equipment: bucket truck, 250 kVA mobile generator, cable jointing kit
+  baseline_response_min: 40
+  description: Electrical crew based at grid substation PS-1; restores feeders to PS-2, PS-3, PS-4 and PS-5 and
+    hooks up mobile generators at hospitals and pump stations.
+
+- id: C-7
+  name: Boat Rescue Unit
+  kind: boat
+  members: 8
+  base_zone_id: Z-LK
+  location_zone_id: Z-LK
+  x_m: 1600
+  y_m: 2400
+  status: available
+  capabilities: [boat_rescue, water_evacuation, first_aid]
+  equipment: 4 motor boats, life jackets, throw lines
+  baseline_response_min: 20
+  description: Boat unit on the Lakeside Ring Road (RD-07) at the edge of the Nandi Lake basin FP-4; also works
+    the Kalinadi flood plains FP-1 and FP-2.
+
+- id: C-8
+  name: New Colony Volunteer Team
+  kind: volunteer
+  members: 30
+  base_zone_id: Z-NC
+  location_zone_id: Z-NC
+  x_m: 5400
+  y_m: 1300
+  status: available
+  capabilities: [door_to_door_warning, sandbagging, shelter_support]
+  equipment: megaphones, sandbags, torches, first-aid kits
+  baseline_response_min: 15
+  description: Resident volunteer team trained in 2023 for door-to-door warnings in New Colony sectors on FP-2 along
+    drain D-9 and New Colony Avenue (RD-09); supports shelter S-4.
+
+shelters:
+- id: S-1
+  name: Civil Lines Community Hall
+  kind: community_hall
+  zone_id: Z-CL
+  x_m: 6200
+  y_m: 6400
+  capacity_persons: 800
+  current_occupancy: 0
+  status: closed
+  floors: 2
+  has_generator: true
+  water_supply_days: 5
+  has_kitchen: true
+  flood_plain_id: null
+  school_id: null
+  access_road_id: RD-10
+  managed_by: NMC Disaster Management Cell
+  description: Largest hall shelter, on Civil Lines Road (RD-10) on high ground near hospital H-1 and substation
+    PS-1. Received 210 people moved from S-5 in 2021.
+
+- id: S-2
+  name: Govt Higher Secondary School Market Ward
+  kind: school
+  zone_id: Z-MW
+  x_m: 5600
+  y_m: 5400
+  capacity_persons: 600
+  current_occupancy: 0
+  status: closed
+  floors: 3
+  has_generator: false
+  water_supply_days: 2
+  has_kitchen: false
+  flood_plain_id: null
+  school_id: SC-05
+  access_road_id: RD-06
+  managed_by: NMC Education Department
+  description: School shelter in the buildings of SC-05 off Market Ward Main (RD-06), about 400 m from drain D-4.
+
+- id: S-3
+  name: Station Road Sports Complex
+  kind: stadium
+  zone_id: Z-SR
+  x_m: 3800
+  y_m: 5600
+  capacity_persons: 1500
+  current_occupancy: 0
+  status: closed
+  floors: 2
+  has_generator: true
+  water_supply_days: 4
+  has_kitchen: true
+  flood_plain_id: null
+  school_id: null
+  access_road_id: RD-04
+  managed_by: NMC Sports Department
+  description: Stadium shelter north of Station Road (RD-04), fed from substation PS-4; the largest single shelter
+    by capacity.
+
+- id: S-4
+  name: New Colony Community Centre
+  kind: community_hall
+  zone_id: Z-NC
+  x_m: 5800
+  y_m: 1100
+  capacity_persons: 400
+  current_occupancy: 0
+  status: closed
+  floors: 1
+  has_generator: false
+  water_supply_days: 2
+  has_kitchen: true
+  flood_plain_id: FP-2
+  school_id: null
+  access_road_id: RD-09
+  managed_by: NMC Disaster Management Cell
+  description: Single-storey hall on New Colony Avenue (RD-09) on flood plain FP-2 between drain D-9 and booster
+    station WF-5.
+
+- id: S-5
+  name: Riverside Primary School
+  kind: school
+  zone_id: Z-RS
+  x_m: 9200
+  y_m: 3900
+  capacity_persons: 300
+  current_occupancy: 0
+  status: closed
+  floors: 2
+  has_generator: false
+  water_supply_days: 1
+  has_kitchen: false
+  flood_plain_id: FP-1
+  school_id: SC-08
+  access_road_id: RD-02
+  managed_by: NMC Education Department
+  description: School shelter in SC-08 on the Riverside Bypass (RD-02) on flood plain FP-1, between drains D-8 and
+    D-7.
+
+- id: S-6
+  name: Tekri Devi Temple Hall
+  kind: temple_hall
+  zone_id: Z-TH
+  x_m: 10400
+  y_m: 6800
+  capacity_persons: 200
+  current_occupancy: 0
+  status: closed
+  floors: 1
+  has_generator: false
+  water_supply_days: 3
+  has_kitchen: true
+  flood_plain_id: null
+  school_id: null
+  access_road_id: RD-01
+  managed_by: Tekri Devi Temple Trust
+  description: Temple hall at the top of Hill Road (RD-01) near the Tekri Quarry Road junction (RD-11) and reservoir
+    WF-3; reachable from the city only by RD-01.
+
+- id: S-7
+  name: Lakeside Marriage Hall
+  kind: marriage_hall
+  zone_id: Z-LK
+  x_m: 1000
+  y_m: 1200
+  capacity_persons: 500
+  current_occupancy: 0
+  status: closed
+  floors: 1
+  has_generator: false
+  water_supply_days: 2
+  has_kitchen: true
+  flood_plain_id: FP-4
+  school_id: null
+  access_road_id: RD-07
+  managed_by: Lakeside Hall Owners' Cooperative
+  description: Privately run hall inside the Lakeside Ring Road (RD-07) on the Nandi Lake basin FP-4, drained by
+    D-11.
+
+- id: S-8
+  name: Mill Road Workers' Club
+  kind: club
+  zone_id: Z-MI
+  x_m: 9800
+  y_m: 1000
+  capacity_persons: 350
+  current_occupancy: 0
+  status: closed
+  floors: 2
+  has_generator: true
+  water_supply_days: 3
+  has_kitchen: true
+  flood_plain_id: FP-2
+  school_id: null
+  access_road_id: RD-08
+  managed_by: Mill Road Industries Association
+  description: Club building south of Mill Road (RD-08) on flood plain FP-2, near hospital H-5 and fire station
+    FS-2.

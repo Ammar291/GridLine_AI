@@ -1,0 +1,423 @@
+roads:
+  - id: RD-01
+    name: Hill Road
+    kind: arterial
+    zone_id: Z-HV
+    from_zone_id: Z-RS
+    to_zone_id: Z-TH
+    length_m: 4200
+    lanes: 2
+    width_m: 7.5
+    surface: asphalt
+    year_built: 1994
+    last_major_work_year: 2025
+    status: open
+    is_evacuation_route: true
+    is_only_access: true
+    floods_at_river_stage_m: null
+    path: [[9600, 4400], [9800, 4900], [10100, 5400], [10300, 6000], [10200, 6400], [10400, 7000]]
+    description: >-
+      The only paved road from the city to Hillview (Z-HV) and Tekri Heights (Z-TH), climbing from the end of Civil
+      Lines Road (RD-10) in Riverside past the BR-4 culvert over D-7 and the SL-HV-3 cut. Two lanes, widened to four
+      lanes on the lower 1.6 km in 2025 (PR-HRW).
+  - id: RD-02
+    name: Riverside Bypass
+    kind: arterial
+    zone_id: Z-RS
+    from_zone_id: Z-OT
+    to_zone_id: Z-RS
+    length_m: 5600
+    lanes: 4
+    width_m: 14.0
+    surface: asphalt
+    year_built: 2016
+    last_major_work_year: 2022
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: 5.6
+    path: [[7600, 3450], [9000, 3500], [11400, 3400], [11800, 3400]]
+    description: >-
+      Four-lane bypass along the Riverside (Z-RS) riverfront on the FP-1 embankment, from Old Town to the Eastern
+      Highway Link (RD-12) at BR-2. It serves Riverside Community Hospital (H-2) and floods at a Kalinadi stage of 5.6 m.
+  - id: RD-03
+    name: Kalinadi Bridge Road
+    kind: arterial
+    zone_id: Z-OT
+    from_zone_id: Z-OT
+    to_zone_id: Z-NC
+    length_m: 1900
+    lanes: 2
+    width_m: 8.0
+    surface: asphalt
+    year_built: 1962
+    last_major_work_year: 2021
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[6200, 3700], [6200, 3000], [6200, 2400]]
+    description: >-
+      Links Old Town (Z-OT) to New Colony (Z-NC) across the Kalinadi (R-1) on Kalinadi Bridge (BR-1). The road itself
+      does not flood, but BR-1 is closed when RV-01 reaches 5.0 m.
+  - id: RD-04
+    name: Station Road
+    kind: arterial
+    zone_id: Z-SR
+    from_zone_id: Z-SR
+    to_zone_id: Z-MW
+    length_m: 3100
+    lanes: 4
+    width_m: 14.0
+    surface: asphalt
+    year_built: 1948
+    last_major_work_year: 2019
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[2200, 5000], [4800, 5000], [6000, 5000]]
+    description: >-
+      Main east-west road from the railway station in Station Road (Z-SR) to Market Ward (Z-MW), serving the
+      Railway Hospital and the Station Road Sports Complex shelter.
+  - id: RD-05
+    name: Bazaar Lane
+    kind: local
+    zone_id: Z-OT
+    from_zone_id: Z-OT
+    to_zone_id: Z-OT
+    length_m: 1800
+    lanes: 1
+    width_m: 4.0
+    surface: stone setts
+    year_built: 1850
+    last_major_work_year: 2010
+    status: open
+    is_evacuation_route: false
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[5400, 3800], [6200, 3900], [7000, 4000]]
+    description: >-
+      A 4 m wide single-lane bazaar street through Old Town (Z-OT) that crosses D-3 on the Bazaar arch bridge (BR-5).
+      Large fire appliances cannot enter it.
+  - id: RD-06
+    name: Market Ward Main
+    kind: collector
+    zone_id: Z-MW
+    from_zone_id: Z-MW
+    to_zone_id: Z-MW
+    length_m: 2400
+    lanes: 2
+    width_m: 9.0
+    surface: asphalt
+    year_built: 1955
+    last_major_work_year: 2018
+    status: open
+    is_evacuation_route: false
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[4800, 5300], [7600, 5300]]
+    description: >-
+      Main street of Market Ward (Z-MW), giving access to the Central Fire Station (FS-1) and the Market Ward school
+      shelter; it runs above the covered drain D-4.
+  - id: RD-07
+    name: Lakeside Ring Road
+    kind: collector
+    zone_id: Z-LK
+    from_zone_id: Z-LK
+    to_zone_id: Z-LK
+    length_m: 6800
+    lanes: 2
+    width_m: 7.0
+    surface: asphalt
+    year_built: 1996
+    last_major_work_year: 2017
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: 4.5
+    path: [[600, 600], [3000, 600], [3000, 2400], [600, 2400], [600, 600]]
+    description: >-
+      Loop road around Nandi Lake (R-3) in Lakeside (Z-LK), serving Lakeview Hospital and the lakeside villages. It
+      floods when the Kalinadi stage reaches 4.5 m and D-11 cannot drain the basin.
+  - id: RD-08
+    name: Mill Road
+    kind: arterial
+    zone_id: Z-MI
+    from_zone_id: Z-MI
+    to_zone_id: Z-MI
+    length_m: 3600
+    lanes: 4
+    width_m: 14.0
+    surface: concrete
+    year_built: 1975
+    last_major_work_year: 2020
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[8400, 1600], [12000, 1600]]
+    description: >-
+      Four-lane industrial road through Mill Road Industrial (Z-MI), serving the Workers' Hospital, the Mill Road Fire
+      Station and the PS-3 substation; it meets the Eastern Highway Link (RD-12) at its east end.
+  - id: RD-09
+    name: New Colony Avenue
+    kind: collector
+    zone_id: Z-NC
+    from_zone_id: Z-NC
+    to_zone_id: Z-NC
+    length_m: 3900
+    lanes: 2
+    width_m: 9.0
+    surface: asphalt
+    year_built: 2020
+    last_major_work_year: 2020
+    status: open
+    is_evacuation_route: false
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[3600, 1200], [8400, 1200]]
+    description: >-
+      Spine road of New Colony (Z-NC), opened in 2020 with the New Colony Housing Scheme (PR-NCH). It runs parallel to
+      D-9 across the South Bank plain (FP-2).
+  - id: RD-10
+    name: Civil Lines Road
+    kind: arterial
+    zone_id: Z-CL
+    from_zone_id: Z-SR
+    to_zone_id: Z-RS
+    length_m: 5400
+    lanes: 2
+    width_m: 9.0
+    surface: asphalt
+    year_built: 1935
+    last_major_work_year: 2016
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[4800, 6200], [8200, 6400], [8600, 5600], [9600, 4400]]
+    description: >-
+      Runs from Station Road through Civil Lines (Z-CL), past the District Hospital (H-1), down to the foot of Hill
+      Road (RD-01) in Riverside. It does not enter Hillview.
+  - id: RD-11
+    name: Tekri Quarry Road
+    kind: local
+    zone_id: Z-TH
+    from_zone_id: Z-TH
+    to_zone_id: Z-TH
+    length_m: 5200
+    lanes: 1
+    width_m: 5.0
+    surface: unpaved
+    year_built: 1978
+    last_major_work_year: 2024
+    status: open
+    is_evacuation_route: false
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[10400, 7000], [10200, 7400], [10800, 7800], [12000, 8200]]
+    description: >-
+      Unpaved single-lane road from the top of Hill Road (RD-01) through the SL-TH-3 hairpins and past the Tekri
+      Quarry (PR-TQ) eastward out of the city. Landslides blocked it in 2014 and 2024; it was regraded in 2024.
+  - id: RD-12
+    name: Eastern Highway Link
+    kind: highway
+    zone_id: Z-MI
+    from_zone_id: Z-MI
+    to_zone_id: Z-RS
+    length_m: 2800
+    lanes: 4
+    width_m: 15.0
+    surface: concrete
+    year_built: 2023
+    last_major_work_year: 2023
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[11800, 1600], [11800, 2700], [11800, 3400]]
+    description: >-
+      Four-lane highway link opened in 2023 from Mill Road (RD-08) across the Kalinadi on the Eastern Bridge (BR-2)
+      to the Riverside Bypass (RD-02); the city's second river crossing.
+  - id: RD-13
+    name: Rail Underpass Road
+    kind: collector
+    zone_id: Z-SR
+    from_zone_id: Z-SR
+    to_zone_id: Z-SR
+    length_m: 900
+    lanes: 2
+    width_m: 7.0
+    surface: concrete
+    year_built: 1974
+    last_major_work_year: 2019
+    status: open
+    is_evacuation_route: false
+    is_only_access: false
+    floods_at_river_stage_m: null
+    path: [[3300, 4200], [3300, 5100]]
+    description: >-
+      Short north-south road through the Station Road rail underpass (TU-1). It floods when D-5 surcharges rather than
+      with river stage; an automatic barrier was added in 2019.
+  - id: RD-14
+    name: Lake Causeway
+    kind: collector
+    zone_id: Z-LK
+    from_zone_id: Z-LK
+    to_zone_id: Z-NC
+    length_m: 1400
+    lanes: 2
+    width_m: 7.5
+    surface: asphalt
+    year_built: 1996
+    last_major_work_year: 2014
+    status: open
+    is_evacuation_route: true
+    is_only_access: false
+    floods_at_river_stage_m: 5.2
+    path: [[2800, 2300], [3600, 2300], [4200, 2000]]
+    description: >-
+      Causeway linking Lakeside (Z-LK) to New Colony (Z-NC) over D-11 on the Lake Causeway Bridge (BR-3), next to the
+      Nandi Lake Regulator (DM-2). It floods at a Kalinadi stage of 5.2 m.
+
+bridges:
+  - id: BR-1
+    name: Kalinadi Bridge
+    road_id: RD-03
+    crosses_kind: river
+    crosses_id: R-1
+    zone_id: Z-OT
+    x_m: 6200
+    y_m: 3300
+    year_built: 1962
+    year_rebuilt: null
+    length_m: 310
+    load_rating_t: 40
+    condition: fair
+    scour_risk: high
+    clearance_m: 6.2
+    waterway_area_m2: 1850
+    closes_at_river_stage_m: 5.0
+    last_inspection: "2025-11-12"
+    description: >-
+      The 1962 river bridge carrying RD-03 from Old Town (Z-OT) to New Colony (Z-NC), and the site of river gauge
+      RV-01. Pier 3 was found undermined by scour after the 2021 flood. The bridge is closed at a stage of 5.0 m.
+  - id: BR-2
+    name: Eastern Bridge
+    road_id: RD-12
+    crosses_kind: river
+    crosses_id: R-1
+    zone_id: Z-RS
+    x_m: 11000
+    y_m: 3300
+    year_built: 2023
+    year_rebuilt: null
+    length_m: 380
+    load_rating_t: 70
+    condition: good
+    scour_risk: low
+    clearance_m: 8.0
+    waterway_area_m2: 2600
+    closes_at_river_stage_m: null
+    last_inspection: "2025-10-08"
+    description: >-
+      The second Kalinadi (R-1) crossing, built under PR-EB2 and opened in 2023, carrying the Eastern Highway Link
+      (RD-12) from Mill Road Industrial to the Riverside Bypass (RD-02).
+  - id: BR-3
+    name: Lake Causeway Bridge
+    road_id: RD-14
+    crosses_kind: channel
+    crosses_id: D-11
+    zone_id: Z-LK
+    x_m: 3200
+    y_m: 2300
+    year_built: 1996
+    year_rebuilt: null
+    length_m: 24
+    load_rating_t: 30
+    condition: fair
+    scour_risk: moderate
+    clearance_m: 1.5
+    waterway_area_m2: 9
+    closes_at_river_stage_m: null
+    last_inspection: "2024-12-05"
+    description: >-
+      Short bridge carrying the Lake Causeway (RD-14) over the D-11 pumped drain just downstream of the Nandi Lake
+      Regulator (DM-2) in Lakeside (Z-LK).
+  - id: BR-4
+    name: Hill Road D-7 culvert crossing
+    road_id: RD-01
+    crosses_kind: channel
+    crosses_id: D-7
+    zone_id: Z-HV
+    x_m: 9800
+    y_m: 4900
+    year_built: 1994
+    year_rebuilt: 2025
+    length_m: 14
+    load_rating_t: 60
+    condition: good
+    scour_risk: low
+    clearance_m: 1.8
+    waterway_area_m2: 4.32
+    closes_at_river_stage_m: null
+    last_inspection: "2025-05-20"
+    description: >-
+      Box culvert carrying Hill Road (RD-01) over D-7, rebuilt during the Hill Road Widening (PR-HRW) in 2025 at
+      2.4 x 1.8 m (4.32 m2) in place of the original 3.2 x 2.4 m (7.68 m2). Channel level sensor CL-D7 is mounted here.
+  - id: BR-5
+    name: Bazaar arch bridge
+    road_id: RD-05
+    crosses_kind: channel
+    crosses_id: D-3
+    zone_id: Z-OT
+    x_m: 6200
+    y_m: 3900
+    year_built: 1901
+    year_rebuilt: null
+    length_m: 9
+    load_rating_t: 10
+    condition: poor
+    scour_risk: moderate
+    clearance_m: 2.2
+    waterway_area_m2: 6.5
+    closes_at_river_stage_m: null
+    last_inspection: "2025-02-18"
+    description: >-
+      A 1901 heritage brick arch carrying Bazaar Lane (RD-05) over D-3 in Old Town (Z-OT). Its 6.5 m2 waterway is the
+      narrowest point of D-3; channel level sensor CL-D3 is mounted here.
+
+tunnels:
+  - id: TU-1
+    name: Station Road rail underpass
+    kind: road
+    road_id: RD-13
+    zone_id: Z-SR
+    x_m: 3300
+    y_m: 4600
+    length_m: 180
+    year_built: 1974
+    depth_below_grade_m: 4.5
+    condition: fair
+    sump_pump_ids: [PU-T1, PU-T2]
+    floods_when: D-5 surcharge
+    description: >-
+      Road underpass carrying RD-13 beneath the railway in Station Road (Z-SR). Its sump is pumped by PU-T1 and PU-T2
+      into D-5, and it floods when D-5 surcharges, as in 2018 and 2021.
+  - id: TU-2
+    name: Kalinadi intake tunnel
+    kind: water_conveyance
+    road_id: null
+    zone_id: Z-SR
+    x_m: 2000
+    y_m: 5600
+    length_m: 1900
+    year_built: 1985
+    depth_below_grade_m: 12
+    condition: fair
+    sump_pump_ids: []
+    floods_when: null
+    description: >-
+      Raw-water tunnel carrying water from the Kalinadi Barrage (DM-1) pond to the Kalinadi water treatment plant
+      (WF-1) in Civil Lines, passing under Station Road (Z-SR).

@@ -1,0 +1,23 @@
+city:
+  - id: nandipur
+    name: Nandipur
+    region: Kalinadi Valley
+    country: Vandara (fictional)
+    founded_year: 1740
+    area_km2: 73.3
+    population_2026: 344700
+    bbox: [0, 0, 12000, 9000]
+    crs: schematic_metres
+    river_datum_m: 212
+    gauge_zero_m: 207.0
+    as_of_date: "2026-09-26"
+    administration: Nandipur Municipal Corporation (NMC)
+    disaster_authority: NMC Disaster Management Cell (NMC-DMC)
+    emergency_number: "112"
+    description: >-
+      Nandipur is a fictional river city of about 344,700 people on both banks of the Kalinadi (R-1) in the
+      Kalinadi Valley. The north bank holds the historic Old Town (Z-OT), Market Ward (Z-MW), Station Road (Z-SR)
+      and Civil Lines (Z-CL), rising east to the Hillview (Z-HV) slopes and Tekri Heights (Z-TH) under Tekri Hill
+      (HL-1). The south bank holds the Nandi Lake basin (Z-LK), the fast-growing New Colony (Z-NC) and the Mill Road
+      Industrial area (Z-MI). The river is regulated upstream by the Kalinadi Barrage (DM-1) and gauged at Kalinadi
+      Bridge (RV-01, gauge zero 207.0 m).

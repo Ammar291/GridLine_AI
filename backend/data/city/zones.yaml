@@ -1,0 +1,134 @@
+zones:
+  - id: Z-HV
+    name: Hillview
+    kind: hillside
+    bbox: [8200, 4400, 11400, 6400]
+    slope_deg: 32
+    soil_type: colluvial silty clay over weathered phyllite
+    geological_zone_id: GZ-2
+    catchment_id: CT-2
+    drains_to_channel_id: D-7
+    description: >-
+      Hillview is the steep south-west-facing spur of Tekri Hill (HL-2 Hillview Ridge) above Riverside (Z-RS),
+      built on 2-6 m of colluvium over weathered phyllite (GZ-2). All runoff reaches the Kalinadi drain D-7, which
+      passes under Hill Road (RD-01) at the BR-4 culvert before entering Riverside. Hill Road is the only paved access
+      to the zone; the Hillview Terrace projects (PR-HT1, PR-HT2) sit on slopes SL-HV-2 and SL-HV-1.
+  - id: Z-TH
+    name: Tekri Heights
+    kind: hillside_upper
+    bbox: [8200, 6400, 12000, 9000]
+    slope_deg: 24
+    soil_type: thin residual soil over quartzite
+    geological_zone_id: GZ-1
+    catchment_id: CT-1
+    drains_to_channel_id: D-7
+    description: >-
+      Tekri Heights is the upper quartzite ridge of Tekri Hill (HL-1) with thin residual soils (GZ-1), the Tekri
+      Quarry (PR-TQ, slope SL-TH-1), the Tekri Hill Reservoir (WF-3) and Tekri village. Runoff feeds the head of
+      D-7 and the seasonal Tekri Nala (R-2) with its check dams (DM-3). It is reached from the city only through
+      Hillview on Hill Road (RD-01); Tekri Quarry Road (RD-11) leaves eastward.
+  - id: Z-RS
+    name: Riverside
+    kind: floodplain
+    bbox: [7600, 3300, 11400, 4400]
+    slope_deg: 3
+    soil_type: alluvial silt and sand
+    geological_zone_id: GZ-3
+    catchment_id: CT-2
+    drains_to_channel_id: D-8
+    description: >-
+      Riverside is the low north-bank flood plain (FP-1) below Hillview, crossed by the Riverside Bypass (RD-02) and
+      the lower end of D-7. Local drainage is collected by the Riverside outfall drain D-8, which discharges into
+      D-7 through a flap gate. It holds Riverside Community Hospital (H-2), the Riverside substation (PS-2) and the
+      raw-water intake WF-2.
+  - id: Z-OT
+    name: Old Town
+    kind: urban_core
+    bbox: [4800, 3300, 7600, 4600]
+    slope_deg: 4
+    soil_type: alluvial clay loam
+    geological_zone_id: GZ-3
+    catchment_id: CT-3
+    drains_to_channel_id: D-3
+    description: >-
+      Old Town is the dense historic core on the north bank behind an earth embankment (FP-3). It is drained by the
+      1890 brick culvert D-3, which also receives D-4 from Market Ward and passes under the heritage Bazaar arch
+      bridge (BR-5) before its outfall to the Kalinadi. Kalinadi Bridge (BR-1) on RD-03 links it to the south bank.
+  - id: Z-MW
+    name: Market Ward
+    kind: commercial
+    bbox: [4800, 4600, 7600, 5800]
+    slope_deg: 3
+    soil_type: clay loam
+    geological_zone_id: GZ-4
+    catchment_id: CT-3
+    drains_to_channel_id: D-4
+    description: >-
+      Market Ward is the commercial district north of Old Town on the older alluvial terrace (GZ-4), with the
+      Central Fire Station (FS-1) and the Market Ward Mall site (PR-MWM). Its covered drain D-4 receives D-2 from
+      Civil Lines and discharges into D-3 in Old Town.
+  - id: Z-SR
+    name: Station Road
+    kind: transport
+    bbox: [1800, 3800, 4800, 6000]
+    slope_deg: 2
+    soil_type: silty loam over railway fill
+    geological_zone_id: GZ-4
+    catchment_id: CT-3
+    drains_to_channel_id: D-5
+    description: >-
+      Station Road is the railway and transport district west of Market Ward, with the Station Road rail underpass
+      (TU-1) on RD-13, the Station Road substation (PS-4) and the Kalinadi intake tunnel (TU-2). The D-5 culvert
+      drains the zone and is limited where it passes the TU-1 sump.
+  - id: Z-CL
+    name: Civil Lines
+    kind: administrative
+    bbox: [4800, 5800, 8200, 7800]
+    slope_deg: 6
+    soil_type: lateritic gravel over shale
+    geological_zone_id: GZ-4
+    catchment_id: CT-3
+    drains_to_channel_id: D-2
+    description: >-
+      Civil Lines is the raised administrative quarter on the Civil Lines Rise (HL-3), home to the District Hospital
+      (H-1), the grid substation PS-1, the Kalinadi water treatment plant (WF-1) and the main community-hall shelter.
+      It drains south through D-2 into Market Ward's D-4.
+  - id: Z-LK
+    name: Lakeside
+    kind: lakeside
+    bbox: [0, 0, 3600, 2700]
+    slope_deg: 1
+    soil_type: lacustrine clay and peat
+    geological_zone_id: GZ-5
+    catchment_id: CT-4
+    drains_to_channel_id: D-11
+    description: >-
+      Lakeside surrounds Nandi Lake (R-3) in a shallow basin of soft lacustrine clay and peat (GZ-5) on the south
+      bank. Its drain D-11 reaches the Kalinadi through the Nandi Lake Regulator (DM-2) and the D-11 pumping station
+      (PU-L1..PU-L3), powered from PS-5. The Lakeside Ring Road (RD-07) and Lake Causeway (RD-14) are its main roads.
+  - id: Z-NC
+    name: New Colony
+    kind: suburban
+    bbox: [3600, 0, 8400, 2700]
+    slope_deg: 2
+    soil_type: alluvial silt (former paddy)
+    geological_zone_id: GZ-3
+    catchment_id: CT-5
+    drains_to_channel_id: D-9
+    description: >-
+      New Colony is the south-bank suburb built on former paddy land on the South Bank plain (FP-2) under the New
+      Colony Housing Scheme (PR-NCH). Its lined drain D-9 was completed in 2019. It is reached from Old Town over
+      Kalinadi Bridge (BR-1) and served by the New Colony substation (PS-5) and booster station (WF-5).
+  - id: Z-MI
+    name: Mill Road Industrial
+    kind: industrial
+    bbox: [8400, 0, 12000, 2700]
+    slope_deg: 2
+    soil_type: alluvial sand and gravel
+    geological_zone_id: GZ-3
+    catchment_id: CT-5
+    drains_to_channel_id: D-12
+    description: >-
+      Mill Road Industrial is the south-bank mill and warehouse district along Mill Road (RD-08), with the Mill Road
+      substation (PS-3), the sewage treatment plant (WF-6) and the Workers' Hospital (H-5). The open channel D-12
+      drains it to the Kalinadi; the Eastern Bridge (BR-2) on RD-12 links it to Riverside.

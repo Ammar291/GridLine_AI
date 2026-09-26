@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import "@fontsource-variable/archivo/wdth.css";
+
+@theme {
+  --font-sans: "Archivo Variable", system-ui, sans-serif;
+
+  --color-page: #0F1620;        /* app background */
+  --color-panel: #151E2A;       /* panel surface */
+  --color-raised: #1C2735;      /* hover, popovers, drawers */
+  --color-line: #2A3644;        /* hairline borders */
+  --color-line-strong: #3A4858; /* focused / selected borders */
+
+  --color-ink: #E6EBF0;         /* primary text */
+  --color-ink-2: #9AA7B5;       /* secondary text */
+  --color-ink-3: #6B7A8A;       /* muted text, ≥3:1 only for labels ≥14px or non-text */
+
+  --color-accent: #6FA3DC;      /* interactive: links, focus ring, primary button */
+  --color-accent-strong: #8FBBEA;
+
+  --color-band-normal: #4C8C89;      --color-band-normal-text: #6FB3AF;
+  --color-band-watch: #F2C744;       --color-band-watch-text: #F2C744;
+  --color-band-warning: #EE7A2A;     --color-band-warning-text: #EE7A2A;
+  --color-band-critical: #C92B2B;    --color-band-critical-text: #F07A7A;
+
+  --color-ok: #2EA36A;               --color-ok-text: #5FCB8F;   /* verified */
+
+  --color-viz-rain: #6DA7EC;         /* rain bars, top chart */
+  --color-viz-flood: #3987E5;        /* flood index line */
+  --color-viz-landslide: #199E70;    /* landslide index line */
+  --color-viz-saturation: #8A97A6;   /* saturation context line + 10% wash */
+  --color-viz-grid: #243040;
+  --color-viz-axis: #3A4858;
+}
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+body { margin: 0; background: var(--color-page); color: var(--color-ink); font-family: var(--font-sans); font-size: 13px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+.tnum { font-variant-numeric: tabular-nums; }
+.condensed { font-stretch: 80%; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

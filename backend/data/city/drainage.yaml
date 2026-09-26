@@ -1,0 +1,322 @@
+drainage_channels:
+  - id: D-2
+    name: Civil Lines drain
+    kind: storm_drain
+    catchment_id: CT-3
+    upstream_zone_id: Z-CL
+    downstream_zone_id: Z-MW
+    x_m: 6500
+    y_m: 5800
+    length_m: 2100
+    year_built: 1962
+    year_relined: 2008
+    design_capacity_m3s: 8
+    current_capacity_m3s: 8
+    blocked_fraction: 0.00
+    condition: good
+    last_desilted: "2025-04-18"
+    outfall_river_id: null
+    outfall_channel_id: D-4
+    limiting_structure_id: null
+    limiting_structure_kind: null
+    gate_closes_at_river_stage_m: null
+    description: >-
+      Storm drain collecting runoff from Civil Lines (Z-CL) and the Civil Lines scarp (SL-CL-1) and discharging into
+      the Market Ward drain D-4 at the Z-CL/Z-MW boundary.
+  - id: D-3
+    name: Old Town main drain
+    kind: brick_culvert
+    catchment_id: CT-3
+    upstream_zone_id: Z-OT
+    downstream_zone_id: Z-OT
+    x_m: 6200
+    y_m: 3700
+    length_m: 3400
+    year_built: 1890
+    year_relined: null
+    design_capacity_m3s: 18
+    current_capacity_m3s: 14
+    blocked_fraction: 0.10
+    condition: poor
+    last_desilted: "2025-03-31"
+    outfall_river_id: R-1
+    outfall_channel_id: null
+    limiting_structure_id: BR-5
+    limiting_structure_kind: bridge
+    gate_closes_at_river_stage_m: null
+    description: >-
+      The 1890 brick culvert under Old Town (Z-OT) that carries D-4 and D-2 flows to the Kalinadi (R-1) through the
+      FP-3 embankment. Its narrowest section is the heritage Bazaar arch bridge (BR-5). Phase 1 desilting under
+      PR-D3R was completed in 2025 and relining is in progress; level sensor CL-D3 is at BR-5.
+  - id: D-4
+    name: Market Ward drain
+    kind: covered_drain
+    catchment_id: CT-3
+    upstream_zone_id: Z-MW
+    downstream_zone_id: Z-OT
+    x_m: 6200
+    y_m: 4900
+    length_m: 2600
+    year_built: 1938
+    year_relined: 1999
+    design_capacity_m3s: 12
+    current_capacity_m3s: 10
+    blocked_fraction: 0.08
+    condition: fair
+    last_desilted: "2024-05-06"
+    outfall_river_id: null
+    outfall_channel_id: D-3
+    limiting_structure_id: null
+    limiting_structure_kind: null
+    gate_closes_at_river_stage_m: null
+    description: >-
+      Covered drain under Market Ward (Z-MW) that receives D-2 from Civil Lines and discharges into D-3 in Old Town.
+      The Market Ward Mall site (PR-MWM) lies 25 m away and pumps its dewatering flow into it.
+  - id: D-5
+    name: Station Road drain
+    kind: culvert
+    catchment_id: CT-3
+    upstream_zone_id: Z-SR
+    downstream_zone_id: Z-SR
+    x_m: 3300
+    y_m: 4400
+    length_m: 2800
+    year_built: 1974
+    year_relined: null
+    design_capacity_m3s: 9
+    current_capacity_m3s: 7.5
+    blocked_fraction: 0.12
+    condition: fair
+    last_desilted: "2018-11-20"
+    outfall_river_id: R-1
+    outfall_channel_id: null
+    limiting_structure_id: TU-1
+    limiting_structure_kind: tunnel
+    gate_closes_at_river_stage_m: null
+    description: >-
+      Culvert draining Station Road (Z-SR) south to the Kalinadi (R-1). It is constricted where it passes beside the
+      Station Road rail underpass (TU-1), whose sump pumps PU-T1 and PU-T2 discharge into it.
+  - id: D-7
+    name: Kalinadi drain
+    kind: lined_channel
+    catchment_id: CT-2
+    upstream_zone_id: Z-HV
+    downstream_zone_id: Z-RS
+    x_m: 9700
+    y_m: 4600
+    length_m: 4800
+    year_built: 1994
+    year_relined: 2016
+    design_capacity_m3s: 42
+    current_capacity_m3s: 27
+    blocked_fraction: 0.00
+    condition: fair
+    last_desilted: "2024-05-15"
+    outfall_river_id: R-1
+    outfall_channel_id: null
+    limiting_structure_id: BR-4
+    limiting_structure_kind: bridge
+    gate_closes_at_river_stage_m: null
+    description: >-
+      The lined channel that carries all Hillview (Z-HV) and Tekri Heights runoff down to Riverside (Z-RS) and the
+      Kalinadi (R-1), receiving D-8 on the way. Its capacity is set by the BR-4 box culvert under Hill Road (RD-01),
+      rebuilt in 2025 at 2.4 x 1.8 m (previously 3.2 x 2.4 m). Level sensor CL-D7 is at BR-4.
+  - id: D-8
+    name: Riverside outfall drain
+    kind: storm_drain
+    catchment_id: CT-2
+    upstream_zone_id: Z-RS
+    downstream_zone_id: Z-RS
+    x_m: 8800
+    y_m: 3600
+    length_m: 1900
+    year_built: 1998
+    year_relined: null
+    design_capacity_m3s: 15
+    current_capacity_m3s: 13
+    blocked_fraction: 0.12
+    condition: fair
+    last_desilted: "2023-05-22"
+    outfall_river_id: null
+    outfall_channel_id: D-7
+    limiting_structure_id: null
+    limiting_structure_kind: null
+    gate_closes_at_river_stage_m: 4.0
+    description: >-
+      Storm drain serving the Riverside (Z-RS) flood plain, discharging into the lower reach of D-7 through a flap
+      gate that closes when the Kalinadi (R-1) stage reaches 4.0 m. Encroachment by the D-8 settlement has narrowed
+      it.
+  - id: D-9
+    name: New Colony drain
+    kind: lined_channel
+    catchment_id: CT-5
+    upstream_zone_id: Z-NC
+    downstream_zone_id: Z-NC
+    x_m: 6000
+    y_m: 2000
+    length_m: 4200
+    year_built: 2019
+    year_relined: null
+    design_capacity_m3s: 20
+    current_capacity_m3s: 20
+    blocked_fraction: 0.00
+    condition: good
+    last_desilted: "2025-05-12"
+    outfall_river_id: R-1
+    outfall_channel_id: null
+    limiting_structure_id: null
+    limiting_structure_kind: null
+    gate_closes_at_river_stage_m: null
+    description: >-
+      Lined channel built in 2019 for the New Colony Housing Scheme (PR-NCH), designed for a 35 % impervious
+      catchment. It drains New Colony (Z-NC) north to the Kalinadi (R-1) across the South Bank plain (FP-2).
+  - id: D-11
+    name: Lakeside pumped drain
+    kind: pumped_drain
+    catchment_id: CT-4
+    upstream_zone_id: Z-LK
+    downstream_zone_id: Z-LK
+    x_m: 2600
+    y_m: 2200
+    length_m: 1600
+    year_built: 1996
+    year_relined: null
+    design_capacity_m3s: 12
+    current_capacity_m3s: 9.5
+    blocked_fraction: 0.05
+    condition: fair
+    last_desilted: "2024-04-25"
+    outfall_river_id: R-1
+    outfall_channel_id: null
+    limiting_structure_id: DM-2
+    limiting_structure_kind: dam
+    gate_closes_at_river_stage_m: 2.5
+    description: >-
+      Drains Nandi Lake (R-3) and Lakeside (Z-LK) to the Kalinadi (R-1) through the Nandi Lake Regulator (DM-2).
+      Design capacity is 3 fixed pumps of 2.5 m3/s (PU-L1..PU-L3) plus 4.5 m3/s by gravity, but gravity discharge
+      works only while the river stage is below 1.5 m. PU-L2 failed on 2024-10-28, leaving 9.5 m3/s.
+  - id: D-12
+    name: Mill Road industrial drain
+    kind: open_channel
+    catchment_id: CT-5
+    upstream_zone_id: Z-MI
+    downstream_zone_id: Z-MI
+    x_m: 10200
+    y_m: 2000
+    length_m: 3000
+    year_built: 1979
+    year_relined: null
+    design_capacity_m3s: 16
+    current_capacity_m3s: 12
+    blocked_fraction: 0.25
+    condition: poor
+    last_desilted: "2021-03-15"
+    outfall_river_id: R-1
+    outfall_channel_id: null
+    limiting_structure_id: null
+    limiting_structure_kind: null
+    gate_closes_at_river_stage_m: null
+    description: >-
+      Open channel draining Mill Road Industrial (Z-MI) to the Kalinadi (R-1). The 2025 survey found it a quarter
+      blocked with silt and industrial waste; the Mill Road settlement lines its banks.
+
+pump_units:
+  - id: PU-M1
+    name: Mobile pump M1
+    kind: mobile
+    capacity_m3s: 0.6
+    status: available
+    location_zone_id: Z-OT
+    channel_id: null
+    x_m: 5200
+    y_m: 4400
+    year_installed: 2012
+    notes: Trailer-mounted diesel pump kept at the Old Town works yard; operated by the Old Town drainage crew. Deployed at the D-7 outfall in July 2025.
+  - id: PU-M2
+    name: Mobile pump M2
+    kind: mobile
+    capacity_m3s: 0.6
+    status: available
+    location_zone_id: Z-OT
+    channel_id: null
+    x_m: 5200
+    y_m: 4400
+    year_installed: 2012
+    notes: Trailer-mounted diesel pump at the Old Town works yard. Deployed at the D-7 outfall in July 2025.
+  - id: PU-M3
+    name: Mobile pump M3
+    kind: mobile
+    capacity_m3s: 0.6
+    status: available
+    location_zone_id: Z-OT
+    channel_id: null
+    x_m: 5200
+    y_m: 4400
+    year_installed: 2017
+    notes: Trailer-mounted diesel pump at the Old Town works yard.
+  - id: PU-M4
+    name: Mobile pump M4
+    kind: mobile
+    capacity_m3s: 0.6
+    status: available
+    location_zone_id: Z-OT
+    channel_id: null
+    x_m: 5200
+    y_m: 4400
+    year_installed: 2017
+    notes: Trailer-mounted diesel pump at the Old Town works yard.
+  - id: PU-L1
+    name: D-11 station pump L1
+    kind: fixed
+    capacity_m3s: 2.5
+    status: available
+    location_zone_id: Z-LK
+    channel_id: D-11
+    x_m: 3000
+    y_m: 2350
+    year_installed: 1996
+    notes: Fixed pump at the D-11 pumping station beside DM-2, powered from PS-5 since 2021. Failed during the 2016 lake flood and was repaired.
+  - id: PU-L2
+    name: D-11 station pump L2
+    kind: fixed
+    capacity_m3s: 2.5
+    status: failed
+    location_zone_id: Z-LK
+    channel_id: D-11
+    x_m: 3000
+    y_m: 2350
+    year_installed: 1996
+    notes: Failed on 2024-10-28 during Cyclone Meher and has not been repaired, reducing D-11 capacity from 12 to 9.5 m3/s.
+  - id: PU-L3
+    name: D-11 station pump L3
+    kind: fixed
+    capacity_m3s: 2.5
+    status: available
+    location_zone_id: Z-LK
+    channel_id: D-11
+    x_m: 3000
+    y_m: 2350
+    year_installed: 2023
+    notes: Replacement unit installed in October 2023 after the original overheated during the 2021 flood.
+  - id: PU-T1
+    name: TU-1 sump pump T1
+    kind: fixed
+    capacity_m3s: 0.4
+    status: available
+    location_zone_id: Z-SR
+    channel_id: D-5
+    x_m: 3300
+    y_m: 4600
+    year_installed: 1998
+    notes: Sump pump for the Station Road rail underpass (TU-1), discharging into D-5. Could not keep up alone in 2018.
+  - id: PU-T2
+    name: TU-1 sump pump T2
+    kind: fixed
+    capacity_m3s: 0.4
+    status: available
+    location_zone_id: Z-SR
+    channel_id: D-5
+    x_m: 3300
+    y_m: 4600
+    year_installed: 2019
+    notes: Second TU-1 sump pump added in 2019 together with the automatic underpass barrier, discharging into D-5.
