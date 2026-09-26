@@ -32,7 +32,7 @@ export function LayerLegend({ active, onToggle }: { active: ReadonlySet<LayerId>
         Layers
       </button>
       {open && (
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-0.5 px-2 pb-2">
+        <ul className="flex flex-col gap-y-0.5 px-2 pb-2">
           {ALL_LAYERS.map((layer) => (
             <li key={layer}>
               <label className="flex items-center gap-1.5 h-5 cursor-pointer text-ink-2 hover:text-ink">

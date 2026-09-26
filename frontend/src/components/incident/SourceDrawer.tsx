@@ -23,7 +23,7 @@ export function SourceDrawer() {
   const facts = isChunk ? null : sourceFacts(citationId, { city, zoneState, assets, feed });
 
   return (
-    <Drawer open title="Source" onClose={closeSource}>
+    <Drawer open stacked title="Source" onClose={closeSource}>
       <div className="flex flex-col gap-3">
         <p className="tnum text-[11px] text-ink-3 break-all">{citationId}</p>
         {isChunk && chunk.isPending && <LoadingState label="Loading source" />}

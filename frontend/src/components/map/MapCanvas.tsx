@@ -50,7 +50,8 @@ export function MapCanvas({ city }: { city: City }) {
       <style href="gl-map-motion" precedence="default">{MAP_MOTION_CSS}</style>
       <svg
         ref={svgRef}
-        role="img"
+        role="group"
+        aria-roledescription="map"
         aria-label="Map of Nandipur"
         viewBox={viewBoxAttr}
         preserveAspectRatio="xMidYMid meet"

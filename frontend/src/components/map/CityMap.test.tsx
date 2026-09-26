@@ -12,7 +12,8 @@ import { seedLive } from '@/test/seedStores';
 import { CityMap } from './CityMap';
 
 const renderMap = (client = fakeClient()) => renderWithProviders(<CityMap />, client);
-const findMap = () => screen.findByRole('img', { name: 'Map of Nandipur' });
+// A group, not an img: an img role would hide the focusable zones and assets inside from screen readers.
+const findMap = () => screen.findByRole('group', { name: 'Map of Nandipur' });
 
 function zoneStateEvent(zoneId: string, band: 'warning' | 'critical'): Event {
   const e = eventsFixture['zone.state'];
@@ -25,6 +26,8 @@ describe('CityMap', () => {
   it('renders one element per zone, road and channel with data attributes', async () => {
     renderMap();
     const svg = await findMap();
+    expect(svg).toHaveAttribute('aria-roledescription', 'map');
+    expect(screen.getByRole('button', { name: /^Hillview,/ })).toBeInTheDocument();
     expect(svg.querySelectorAll('[data-layer="zones"] [data-zone-id]')).toHaveLength(6);
     expect(svg.querySelectorAll('[data-layer="roads"] [data-road-id]')).toHaveLength(cityFixture.roads.length);
     expect(svg.querySelectorAll('[data-layer="drainage"] [data-channel-id]')).toHaveLength(3);

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { OverviewStrip } from '@/components/overview/OverviewStrip';
 import { ModeBanner } from '@/components/scenario/ModeBanner';
 import { ScenarioBar } from '@/components/scenario/ScenarioBar';
+import { WhyDrawer } from '@/components/why/WhyDrawer';
 import { useLiveStore } from '@/live/liveStore';
 
 interface DashboardProps {
@@ -21,7 +22,7 @@ export function Dashboard({ map, timeline, feed, incident, approvals, actions }:
   return (
     <div
       data-testid="dashboard"
-      className="grid h-screen overflow-hidden bg-page text-ink gap-px grid-cols-[58fr_42fr] grid-rows-[64px_auto_55fr_22fr_23fr_44px]"
+      className="grid h-screen overflow-hidden bg-page text-ink gap-px grid-cols-[58fr_42fr] grid-rows-[64px_auto_50fr_30fr_20fr_44px]"
     >
       <div className={`${cell} col-span-2`}><OverviewStrip /></div>
       <div className={`${cell} col-span-2`}><ModeBanner mode={mode} connection={connection} /></div>
@@ -32,6 +33,7 @@ export function Dashboard({ map, timeline, feed, incident, approvals, actions }:
       <div className={cell}>{feed}</div>
       <div className={cell}>{actions}</div>
       <div className={`${cell} col-span-2`}><ScenarioBar /></div>
+      <WhyDrawer />
     </div>
   );
 }

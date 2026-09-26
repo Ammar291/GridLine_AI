@@ -12,9 +12,10 @@ function bannerText(mode: ApiMode, connection: ConnectionStatus): string | null 
 export function ModeBanner({ mode, connection }: { mode: ApiMode; connection: ConnectionStatus }) {
   const text = bannerText(mode, connection);
   if (text === null) return null;
-  const tone = mode === 'mock' ? 'border-band-watch text-band-watch-text' : 'border-band-warning text-band-warning-text';
+  // Band colours mean severity only: the mock notice is ink on slate; a lost connection is a warning.
+  const tone = mode === 'mock' ? 'border-l-line-strong text-ink-2' : 'border-l-band-warning text-band-warning-text';
   return (
-    <div role="status" className={`px-4 py-1 text-[12px] bg-panel border-b border-l-2 ${tone}`}>
+    <div role="status" className={`px-4 py-1 text-[12px] bg-panel border-b border-b-line border-l-2 ${tone}`}>
       {text}
     </div>
   );

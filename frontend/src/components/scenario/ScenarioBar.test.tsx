@@ -77,6 +77,13 @@ describe('ModeBanner', () => {
     expect(screen.getByText('Connecting…')).toBeInTheDocument();
   });
 
+  it('keeps band colours for severity: the mock notice is ink on slate, a lost connection is a warning', () => {
+    const { rerender } = render(<ModeBanner mode="mock" connection="open" />);
+    expect(screen.getByRole('status').className).not.toMatch(/band-/);
+    rerender(<ModeBanner mode="http" connection="reconnecting" />);
+    expect(screen.getByRole('status')).toHaveClass('border-l-band-warning', 'text-band-warning-text', 'border-b-line');
+  });
+
   it('reconnecting shows the banner while panels keep their last data', () => {
     seedLive();
     useLiveStore.getState().setMode('http');

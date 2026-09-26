@@ -11,7 +11,7 @@ import { StatusDot } from './StatusDot';
 describe('ui primitives', () => {
   it('Panel shows title and count', () => {
     render(<Panel title="Live events" count={12}><p>body</p></Panel>);
-    expect(screen.getByRole('heading', { name: /Live events/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Live events 12' })).toBeInTheDocument();
     expect(screen.getByText('12')).toBeInTheDocument();
   });
   it('SeverityChip renders sentence-case label and data-band', () => {
@@ -33,6 +33,25 @@ describe('ui primitives', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+  it('Drawer takes focus while open and gives it back when it closes', () => {
+    const { rerender } = render(<><button type="button">Why?</button><Drawer open={false} title="Why" onClose={vi.fn()}>x</Drawer></>);
+    const trigger = screen.getByRole('button', { name: 'Why?' });
+    trigger.focus();
+    rerender(<><button type="button">Why?</button><Drawer open title="Why" onClose={vi.fn()}>x</Drawer></>);
+    expect(screen.getByRole('dialog', { name: 'Why' })).toHaveFocus();
+    rerender(<><button type="button">Why?</button><Drawer open={false} title="Why" onClose={vi.fn()}>x</Drawer></>);
+    expect(trigger).toHaveFocus();
+  });
+  it('a stacked Drawer sits above the other and takes Escape alone', () => {
+    const closeBase = vi.fn();
+    const closeTop = vi.fn();
+    render(<><Drawer open title="Why" onClose={closeBase}>x</Drawer><Drawer open stacked title="Source" onClose={closeTop}>y</Drawer></>);
+    expect(screen.getByRole('dialog', { name: 'Source' })).toHaveClass('z-50');
+    expect(screen.getByRole('dialog', { name: 'Why' })).toHaveClass('z-40');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(closeTop).toHaveBeenCalledTimes(1);
+    expect(closeBase).not.toHaveBeenCalled();
   });
   it('EmptyState, ErrorState, StatusDot expose roles and labels', () => {
     const retry = vi.fn();

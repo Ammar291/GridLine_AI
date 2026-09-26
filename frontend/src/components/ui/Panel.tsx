@@ -19,7 +19,8 @@ export function Panel({ title, count, actions, children, className, testId }: Pa
       <header className="flex items-center justify-between h-8 shrink-0 px-3 border-b border-line gap-2">
         <h2 className="condensed text-[13px] font-medium flex items-center gap-2">
           {title}
-          {count !== undefined && <span className="tnum text-ink-2 font-normal">{count}</span>}
+          {/* The space keeps the accessible name "Live events 12"; flex gap does the visual spacing. */}
+          {count !== undefined && <>{' '}<span className="tnum text-ink-2 font-normal">{count}</span></>}
         </h2>
         {actions !== undefined && <div className="flex items-center gap-2">{actions}</div>}
       </header>

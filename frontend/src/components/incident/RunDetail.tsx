@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 import type { AgentRun, City, Incident, NodeName } from '@/api/types';
 import { IconChevron } from '@/components/ui/icons';
 import { stepOutput, whatChanged } from '@/live/derive';
-import { fmtIndex, statusLabel } from '@/live/format';
+import { statusLabel } from '@/live/format';
 import type { TelemetryPoint } from '@/live/types';
-import { useUiStore } from '@/ui/uiStore';
 import { CitationChip } from './CitationChip';
+import { EvidenceTable } from './EvidenceTable';
 import { ClaimList } from './ClaimList';
 import { runCitations } from './citations';
 import { NodeRail } from './NodeRail';
@@ -19,7 +19,6 @@ const notYet = (node: NodeName) => <p className="text-ink-3">{`${NODE_LABELS[nod
 
 /** One run's trace: node rail, then why, what changed, what evidence, and the step timings. */
 export function RunDetail({ incident, run, telemetry, city }: RunDetailProps) {
-  const openSource = useUiStore((s) => s.openSource);
   const assess = stepOutput(run, 'assess');
   const predict = stepOutput(run, 'predict');
   const cascade = stepOutput(run, 'cascade');
@@ -67,27 +66,7 @@ export function RunDetail({ incident, run, telemetry, city }: RunDetailProps) {
         )}
       </TraceSection>
       <TraceSection title="What evidence supports it?">
-        {retrieve ? (
-          <table className="w-full text-left text-[12px]">
-            <thead className="text-[11px] text-ink-2">
-              <tr><th className="font-normal py-0.5">Source</th><th className="font-normal">Section</th><th className="font-normal">Kind</th><th className="font-normal text-right">Score</th></tr>
-            </thead>
-            <tbody>
-              {retrieve.chunks.map((c) => (
-                <tr key={c.id} className="border-t border-line">
-                  <td className="py-1 pr-2">
-                    <button type="button" title={c.id} onClick={() => { openSource(c.id); }} className="text-accent hover:text-accent-strong text-left">
-                      {c.doc_title}
-                    </button>
-                  </td>
-                  <td className="pr-2 tnum text-ink-2">{c.section}</td>
-                  <td className="pr-2 text-ink-2">{c.kind}</td>
-                  <td className="tnum text-right">{fmtIndex(c.score)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : notYet('retrieve')}
+        {retrieve ? <EvidenceTable chunks={retrieve.chunks} /> : notYet('retrieve')}
         {citations.length > 0 && (
           <ul aria-label="Citations in this run" className="flex flex-wrap gap-1.5 mt-1">
             {citations.map((c) => <li key={c.id}><CitationChip citation={c} /></li>)}

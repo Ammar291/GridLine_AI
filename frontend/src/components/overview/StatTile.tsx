@@ -27,7 +27,7 @@ export function StatTile({ label, value, detail, band, onClick, testId }: StatTi
     <>
       <span className="block text-[11px] text-ink-2">{label}</span>{' '}
       <span className={`block condensed text-[26px] leading-7 font-medium truncate ${band ? BAND_TEXT[band] : 'text-ink'}`}>{value}</span>{' '}
-      {detail !== undefined && <span className="block text-[11px] text-ink-3 truncate">{detail}</span>}
+      {detail !== undefined && <span className="block text-[11px] text-ink-3 truncate" title={detail}>{detail}</span>}
     </>
   );
   return (
