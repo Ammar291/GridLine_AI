@@ -16,7 +16,7 @@ before/after state. Read tools return typed views of current state and do not wr
 - Backend skeleton required by the tools: `uv` project, settings, async SQLAlchemy engine, ORM models,
   schema creation and reset, synthetic city seed (YAML + loader), `docker-compose.yml` for Postgres.
 - Tool contract, executor (validation, idempotency, approval enforcement, snapshots, audit), registry.
-- The 22 tools listed in §9, in seven groups.
+- The 21 tools listed in §9, in seven groups (4 + 3 + 2 + 3 + 4 + 2 + 3).
 - Tests against a real Postgres that read state back through a *separate* session to prove mutation.
 - A targeted update of ARCHITECTURE.md §4, §10 and §11 so the design document matches the code.
 
@@ -39,6 +39,8 @@ These were decided without a live user; each is easy to reverse.
 | D8 | Postgres is exposed on host port **5433** (5432 is taken by another project on this machine). | Environment fact. |
 | D9 | `hospitals.reserved_beds` is a denormalised counter updated in the same transaction as the `bed_reservations` row. | Makes before/after on the hospital row legible in the audit trail. |
 | D10 | Escalating an evacuation order (voluntary → mandatory) updates the existing active order in place via `create_evacuation_order`. | Brief has no `update_evacuation_order`; one active order per zone is the simplest invariant. |
+| D11 | `execute_action` does **not** call `verify()`. Verification is a separate step the caller runs (tests now; the LangGraph `verify` node later, which polls per tick). `record_verification(session, action_id, result)` stores the outcome in `actions.verification_json` so the audit trail carries it. | ARCHITECTURE §11 verifies after ticks elapse; coupling it to execution would make the executor wait on a simulation that does not exist. |
+| D12 | `crews.kind` is `rescue` or `engineering` only (pumps are `pump_units` in ARCHITECTURE §4, not crews). The engineering crew `C-3` is seeded so read-tool filtering is testable; no tool acts on it in this milestone (a generic `dispatch_crew` is a later follow-up). | Keeps the seed honest without inventing tools the brief did not ask for. |
 
 ## 3. Package layout
 
@@ -66,7 +68,8 @@ backend/
                                          VerificationCheck, VerificationResult, ToolRejected,
                                          Plan, Applied, ActionTool, ReadTool
       snapshot.py                        ENTITY_MODELS, row_to_dict, snapshot(session, refs)
-      executor.py                        execute_action(tool, raw_input, ctx) -> ActionResult
+      executor.py                        execute_action(tool, raw_input, ctx) -> ActionResult,
+                                         record_verification(session, action_id, result) -> None
       registry.py                        ToolRegistry, ToolSpec, build_registry()
       common.py                          shared lookups: require_zone, require_open_incident,
                                          require_crew, zone_has_open_road, create_task, new_id
@@ -103,7 +106,7 @@ columns are `String` columns holding `StrEnum` values (no native Postgres enum t
 | `zones` | id, name, slope_deg float, soil_type |
 | `roads` | id, name, zone_id→zones, status (`open`/`closed`), is_evacuation_route bool, closure_reason nullable, closed_at nullable, incident_id nullable→incidents |
 | `projects` | id, name, zone_id→zones, status (`active`/`halted`), excavation_depth_m float, planned_depth_m float, depth_limit_m float nullable, permit_id |
-| `crews` | id, name, kind (`rescue`/`engineering`/`pump`), status (`available`/`dispatched`/`unavailable`), members int, location_zone_id→zones, target_zone_id nullable→zones, task nullable, incident_id nullable→incidents, dispatched_at nullable |
+| `crews` | id, name, kind (`rescue`/`engineering`), status (`available`/`dispatched`/`unavailable`), members int, location_zone_id→zones, target_zone_id nullable→zones, task nullable, incident_id nullable→incidents, dispatched_at nullable |
 | `ambulances` | id, callsign, status (`available`/`dispatched`), base_hospital_id→hospitals, location_zone_id→zones, target_zone_id nullable→zones, destination_hospital_id nullable→hospitals, incident_id nullable→incidents, dispatched_at nullable |
 | `shelters` | id, name, zone_id→zones, status (`closed`/`open`), capacity int, occupancy int default 0, opened_at nullable, incident_id nullable→incidents |
 | `hospitals` | id, name, zone_id→zones, total_beds int, occupied_beds int, reserved_beds int default 0 |
@@ -116,7 +119,10 @@ columns are `String` columns holding `StrEnum` values (no native Postgres enum t
 | `actions` | id, tool, status (`executed`/`unchanged`/`rejected`/`failed`), idempotency_key nullable **unique**, actor, approval_id nullable, run_id nullable, incident_id nullable (plain string, no FK), input_json JSONB, before_json JSONB, after_json JSONB, affected_entities_json JSONB, message, sim_time nullable, executed_at, verification_json JSONB nullable |
 
 Foreign keys on `incident_id` columns other than `actions` point at `incidents.id`. `actions.incident_id`
-is a plain string so a rejected `create_incident` attempt can still record what it was for.
+is a plain string so a rejected attempt that named a nonexistent incident id can still be recorded.
+The executor fills it from, in order of precedence: `Applied.incident_id` (set by tools that create or
+derive the incident, e.g. `create_incident`, `create_evacuation_task`), `Plan.incident_id`, then the
+validated input's `incident_id` field when the tool's `Input` has one; otherwise `NULL`.
 
 `truncate_all(session)` truncates every table (`TRUNCATE ... CASCADE`) so tests and the future
 `POST /api/simulation/reset` can re-seed.
@@ -177,8 +183,9 @@ class VerificationResult(BaseModel): status: Literal["verified", "failed"]; chec
 
 class ToolRejected(Exception): reason: str      # raised by check() or apply() for state/precondition failures
 
-class Plan:      refs: list[EntityRef]; data: dict[str, Any]   # what to snapshot, plus rows loaded by check()
-class Applied:   changed: bool; message: str; created: list[EntityRef] = []
+class Plan:      refs: list[EntityRef]; data: dict[str, Any]; incident_id: str | None = None
+                 # what to snapshot, rows loaded by check(), and the incident this action concerns if known
+class Applied:   changed: bool; message: str; created: list[EntityRef] = []; incident_id: str | None = None
 
 class ReadTool[I: BaseModel, O: BaseModel]:
     name: ClassVar[str]; description: ClassVar[str]; Input: ClassVar[type[BaseModel]]; Output: ...
@@ -219,6 +226,11 @@ and commit; `before`/`after` are `{}` and `affected_entities` is `[]`.
 
 The executor never raises for tool-level problems; it returns a status. It re-raises only if the audit
 insert itself fails (that is an infrastructure fault).
+
+`execute_action` never calls `verify()` (D11). `record_verification(session, action_id, result)` writes
+`result.model_dump()` into `actions.verification_json` for that row and commits; it raises `KeyError` if
+the action id is unknown. The caller (tests now, the graph's `verify` node later) runs
+`tool.verify(inp, ctx)` and then `record_verification`.
 
 ## 8. Idempotency
 
@@ -276,9 +288,9 @@ Approval column: **auto** = executes without approval; **required** = rejected w
 
 | Tool | Input | Validation | Effect | Unchanged when | Verify | Approval |
 |---|---|---|---|---|---|---|
-| `create_inspection_order` | `target_kind: zone/road/project/shelter/hospital, target_id, priority, reason, incident_id?` | target exists (per kind); incident open if given | insert `tasks` kind `inspection` (title `"Inspect <kind> <id>"`, description=reason, zone_id = the target's zone or the zone itself) | an `open` inspection task exists for the same target | task row open | auto |
-| `create_monitoring_task` | `target_kind: zone/project/road, target_id, metric: str(1..64), interval_minutes: int 5..1440, reason, incident_id?` | as above | insert `tasks` kind `monitoring` with `metric`, `interval_minutes` | an open monitoring task exists for same target + metric | task row open with the interval | auto |
-| `create_construction_restriction` | `project_id, kind: halt/depth_limit, max_depth_m?: float > 0, reason, incident_id?` | project exists; `max_depth_m` required iff `kind == depth_limit` (else reject); `max_depth_m <= planned_depth_m`; incident open if given | insert `construction_restrictions` (active); `halt` → `project.status = halted`; `depth_limit` → `project.depth_limit_m = min(existing or inf, max_depth_m)` | an active restriction with identical `(project_id, kind, max_depth_m)` exists | restriction active; project status/limit as expected | required |
+| `create_inspection_order` | `target_kind: zone/road/project/shelter/hospital, target_id, priority, reason, incident_id?` | target exists (per kind); incident open if given | insert `tasks` kind `inspection` with `target_kind`, `target_id`, title `"Inspect <kind> <id>"`, description=reason, zone_id = the target's zone (or the zone itself) | an `open` inspection task exists for the same `(target_kind, target_id)` | task row open | auto |
+| `create_monitoring_task` | `target_kind: zone/project/road, target_id, metric: str(1..64), interval_minutes: int 5..1440, reason, incident_id?` | as above | insert `tasks` kind `monitoring` with `target_kind`, `target_id`, `metric`, `interval_minutes`, title `"Monitor <metric> on <kind> <id>"` | an open monitoring task exists for same `(target_kind, target_id, metric)` | task row open with the interval | auto |
+| `create_construction_restriction` | `project_id, kind: halt/depth_limit, max_depth_m?: float > 0, reason, incident_id?` | project exists; `kind == depth_limit` without `max_depth_m` → reject `"max_depth_m is required for kind 'depth_limit'"`; `kind == halt` with `max_depth_m` → reject `"max_depth_m only applies to kind 'depth_limit'"`; `max_depth_m > planned_depth_m` → reject; incident open if given | insert `construction_restrictions` (active); `halt` → `project.status = halted`; `depth_limit` → `project.depth_limit_m = min(existing or inf, max_depth_m)` | an active restriction with identical `(project_id, kind, max_depth_m)` exists | restriction active; project status/limit as expected | required |
 | `issue_preventive_alert` | `zone_id, level: advisory/warning/evacuate, message: str(1..500), incident_id?` | zone exists; incident open if given | insert `alerts` | an alert with identical `(zone_id, level, message)` exists | alert row exists | **auto for `advisory`, required for `warning` and `evacuate`** (overrides `requires_approval`) |
 
 ### Evacuation (`tools/evacuation.py`)
@@ -302,7 +314,7 @@ insertion helper for the four task kinds.
 ## 10. Registry
 
 `ToolRegistry` holds tools by name; `register` rejects duplicate names. `build_registry()` returns a
-new registry with all 22 tools (no module-level mutable state; the app will hang it on `app.state`).
+new registry with all 21 tools (no module-level mutable state; the app will hang it on `app.state`).
 
 `registry.describe() -> list[ToolSpec]` with `ToolSpec(name, description, kind: "read"|"action",
 approval: "auto"|"required"|"conditional", input_schema: dict)` where `input_schema` is
@@ -320,10 +332,14 @@ approval: "auto"|"required"|"conditional", input_schema: dict)` where `input_sch
   `AUTOCOMMIT`), then drops and creates the schema once per session using `asyncio.run` in a
   **sync** session-scoped fixture, so no async engine is shared across event loops.
 - **Windows:** psycopg async refuses the default `ProactorEventLoop` (verified on this machine on
-  2026-09-26). `conftest.py` overrides pytest-asyncio's `event_loop_policy` fixture with
-  `asyncio.WindowsSelectorEventLoopPolicy()` on `sys.platform == "win32"`, and the same policy is set
-  before every `asyncio.run` in the sync fixtures.
-- `pytest-asyncio` in `auto` mode, function-scoped loops. Per-test fixtures: `engine` (fresh
+  2026-09-26). pytest-asyncio 1.4 deprecates overriding the `event_loop_policy` fixture, so
+  `conftest.py` implements the `pytest_asyncio_loop_factories(config, item)` hook and returns
+  `{"selector": asyncio.SelectorEventLoop}` on `sys.platform == "win32"` (`{"default":
+  asyncio.new_event_loop}` elsewhere). The sync session fixture runs its coroutine with
+  `asyncio.Runner(loop_factory=<same factory>)`, never `asyncio.run` or a policy. This exact setup
+  was spiked on 2026-09-26 and passes with `filterwarnings = error`.
+- `pytest-asyncio` in `auto` mode, `asyncio_default_fixture_loop_scope = "function"` (unset is a
+  deprecation warning, hence an error), function-scoped loops. Per-test fixtures: `engine` (fresh
   `AsyncEngine`, disposed after), `session_factory`, `seeded` (truncate all + seed from the YAML),
   `session` (an `AsyncSession` for the tool call) and `check_session` (a **second** session used only
   to read state back, so tests prove the commit reached the database rather than the identity map).
@@ -334,7 +350,9 @@ approval: "auto"|"required"|"conditional", input_schema: dict)` where `input_sch
 - Each tool module has tests for: executed path (state read back through `check_session`), unchanged
   path, every distinct rejection message, approval enforcement for required tools, `verify()` passing
   after execution and failing after the state is tampered with through `check_session`.
-- Registry test: all 22 names present, kinds and approval modes match §9, every `input_schema` has
+- Executor tests also cover `record_verification`: the stored `verification_json` matches the
+  `VerificationResult`, and an unknown action id raises `KeyError`.
+- Registry test: all 21 names present, kinds and approval modes match §9, every `input_schema` has
   `additionalProperties: false`.
 - Seed tests: YAML loads into `CitySeed`; row counts per table; foreign keys resolve.
 
