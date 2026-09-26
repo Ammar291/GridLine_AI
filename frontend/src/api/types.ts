@@ -1,31 +1,63 @@
-// Named re-exports of the generated contract. Never hand-write payload types; edit openapi.yaml and run `npm run gen:api`.
-import type { components, paths } from './schema';
+// Named re-exports of the generated contract (schema.d.ts). Never hand-write payload types: backend types come from its
+// OpenAPI schema and pending ones from openapi.pending.yaml; run `npm run gen:api` after a contract change.
+import type { components } from './schema';
 
 type S = components['schemas'];
 
-export type Health = S['Health'];
-export type LlmStatus = S['LlmStatus'];
-export type City = S['City'];
+// ---- city: GET /api/city and the sim.snapshot frame (static; live state is in WorldSnapshot) ----
+export type City = S['CityMap'];
 export type ViewBox = S['ViewBox'];
 export type XY = S['XY'];
-export type Zone = S['Zone'];
-export type ZoneState = S['ZoneState'];
-export type Band = S['Band'];
-export type Hazard = S['Hazard'];
-export type Road = S['Road'];
-export type Channel = S['Channel'];
-export type Project = S['Project'];
-export type Sensor = S['Sensor'];
-export type Crew = S['Crew'];
-export type Shelter = S['Shelter'];
+export type Zone = S['MapZone'];
+export type Road = S['MapRoad'];
+export type Bridge = S['MapBridge'];
+export type Channel = S['MapChannel'];
+export type Slope = S['MapSlope'];
+export type Project = S['MapProject'];
+export type Sensor = S['MapSensor'];
+export type Crew = S['MapCrew'];
+export type Shelter = S['MapShelter'];
+export type Hospital = S['MapHospital'];
 export type PumpDepot = S['PumpDepot'];
 export type PumpUnit = S['PumpUnit'];
-export type Hospital = S['Hospital'];
 export type MapFeature = S['MapFeature'];
+export type Scenario = S['ScenarioInfo'];
+export type InjectionPreset = S['InjectionPreset'];
+
+// ---- live world: sim.snapshot, then kept current by events ----
+export type WorldSnapshot = S['WorldSnapshot'];
+export type ZoneConditions = S['ZoneConditions'];
+export type RoadState = S['RoadState'];
+export type BridgeState = S['BridgeState'];
+export type ChannelState = S['ChannelState'];
+export type ProjectState = S['ProjectState'];
+export type CrewState = S['CrewState'];
+export type ShelterState = S['ShelterState'];
+export type HospitalState = S['HospitalState'];
+export type SlopeState = S['SlopeState'];
+
+// ---- simulation control and sources ----
+export type Health = S['Health'];
+export type SimulationStatus = S['SimulationStatus'];
+export type SimulationStart = S['SimulationStart'];
+export type InjectRequest = S['InjectRequest'];
+export type Chunk = S['StoredChunk'];
+export type Severity = S['Severity'];
+
+// ---- events: the backend's union plus the pending events of later milestones ----
+export type Event = S['Event'];
+/** The sim.status payload (runner state, scenario, speed, tick). */
+export type SimStatus = S['SimStatus'];
+export type EventType = Event['event_type'];
+export type EventOf<T extends EventType> = Extract<Event, { event_type: T }>;
+
+// ---- PENDING (openapi.pending.yaml): threat detector, incidents and agent, approvals and actions, alerts, LLM ----
+export type LlmStatus = S['LlmStatus'];
+export type Band = S['Band'];
+export type Hazard = S['Hazard'];
 export type Bands = S['Bands'];
 export type BandThresholds = S['BandThresholds'];
-export type Scenario = S['Scenario'];
-export type Injection = S['Injection'];
+export type ZoneState = S['ZoneState'];
 export type IncidentSummary = S['IncidentSummary'];
 export type Incident = S['Incident'];
 export type IncidentStatus = S['IncidentStatus'];
@@ -50,7 +82,6 @@ export type PerActionVerification = S['PerActionVerification'];
 export type ReplanResult = S['ReplanResult'];
 export type Claim = S['Claim'];
 export type Citation = S['Citation'];
-export type Chunk = S['Chunk'];
 export type Document = S['Document'];
 export type Approval = S['Approval'];
 export type ApprovalStatus = S['ApprovalStatus'];
@@ -60,10 +91,3 @@ export type ActionStatus = S['ActionStatus'];
 export type StateChange = S['StateChange'];
 export type ActionVerification = S['ActionVerification'];
 export type Alert = S['Alert'];
-export type SimStatus = S['SimStatus'];
-export type InjectEvent = S['InjectEvent'];
-export type StateSnapshot = S['StateSnapshot'];
-export type Event = S['Event'];
-export type EventType = S['EventType'];
-export type Paths = paths;
-export type EventOf<T extends Event['type']> = Extract<Event, { type: T }>;

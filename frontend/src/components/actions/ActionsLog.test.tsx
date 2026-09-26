@@ -12,7 +12,7 @@ import { VerificationBadge } from './VerificationBadge';
 import { verificationState, type VerificationState } from './verification';
 
 function executed(action: Action): Event {
-  return { ...eventsFixture['action.executed'], id: `evt_exec_${action.id}`, payload: action };
+  return { ...eventsFixture['action.executed'], event_id: `evt_exec_${action.id}`, payload: action };
 }
 const row = (name: string) => screen.getByRole('article', { name });
 const badge = (el: HTMLElement) => within(el).getByTestId('verification-badge');
@@ -88,7 +88,7 @@ describe('ActionsLog', () => {
   });
 
   it('shows the empty state when no action has run', () => {
-    seedLive([{ ...snapshotEventFixture, payload: { ...snapshotEventFixture.payload, actions: [] } }], { snapshot: false });
+    seedLive([snapshotEventFixture], { snapshot: false });
     render(<ActionsLog />);
     expect(screen.getByRole('note')).toHaveTextContent('No actions yet. Approved actions appear here as they execute.');
   });

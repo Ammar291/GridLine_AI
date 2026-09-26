@@ -1,0 +1,644 @@
+# PENDING OVERLAY: contract the dashboard already renders but the backend does not serve yet.
+#
+# `npm run gen:types` (scripts/gen-api.mjs) merges this file into the backend's contract (openapi.json, written by
+# backend/scripts/export_contract.py) and generates src/api/schema.d.ts from the result. Everything here belongs
+# to a later milestone. Delete an entry when its backend lands: the merge FAILS if the backend already defines a
+# path, a schema or an event type listed here, so a stale entry cannot shadow the real contract.
+#
+#   threat detector (ARCHITECTURE section 5)   zone.state, threat.detected, threat.escalated; Band, Hazard, ZoneState,
+#                                               Bands, GET /api/detector/bands
+#   incidents and agent (section 8)            incident.*, agent.*, replan.triggered; GET /api/incidents*
+#   approvals, tools, verification (10, 11)    approval.*, action.*; /api/approvals*, /api/actions*
+#   alerts                                     alert.issued; Alert
+#   LLM provider (section 9)                   GET /api/llm/status
+#   event history and documents (section 12)  GET /api/events, GET /api/documents/{doc_id}
+#
+# Until then HttpApiClient answers the pending endpoints with 501 without a request (src/api/http.ts) and the
+# panels show their empty states; mock mode replays scripted detector events so those panels can be exercised.
+# Pending events use the backend's envelope (event_id, timestamp, sim_time, event_type, source, location,
+# severity, payload, incident_id) and are appended to the backend's `Event` union (x-pending-events).
+openapi: 3.1.0
+info:
+  title: GridLine AI pending overlay
+  version: pending
+x-pending-events:
+  - ZoneStateEvent
+  - ThreatDetectedEvent
+  - ThreatEscalatedEvent
+  - IncidentOpenedEvent
+  - IncidentClosedEvent
+  - AgentRunStartedEvent
+  - AgentRunFinishedEvent
+  - AgentNodeStartedEvent
+  - AgentNodeFinishedEvent
+  - ApprovalRequestedEvent
+  - ApprovalDecidedEvent
+  - ActionExecutedEvent
+  - ActionVerifiedEvent
+  - ReplanTriggeredEvent
+  - AlertIssuedEvent
+paths:
+  /api/llm/status:
+    get:
+      operationId: getLlmStatus
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LlmStatus' } } } }
+  /api/detector/bands:
+    get:
+      operationId: getDetectorBands
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Bands' } } } }
+  /api/events:
+    get:
+      operationId: listEvents
+      parameters:
+        - { name: since, in: query, required: false, schema: { type: string } }
+        - { name: type, in: query, required: false, schema: { type: string } }
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+      responses:
+        '200':
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Event' } } } }
+  /api/incidents:
+    get:
+      operationId: listIncidents
+      responses:
+        '200':
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/IncidentSummary' } } } }
+  /api/incidents/{incident_id}:
+    get:
+      operationId: getIncident
+      parameters:
+        - { name: incident_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Incident' } } } }
+  /api/approvals:
+    get:
+      operationId: listApprovals
+      parameters:
+        - { name: status, in: query, required: false, schema: { $ref: '#/components/schemas/ApprovalStatus' } }
+      responses:
+        '200':
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Approval' } } } }
+  /api/approvals/{approval_id}/decide:
+    post:
+      operationId: decideApproval
+      parameters:
+        - { name: approval_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ApprovalDecision' } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Approval' } } } }
+  /api/actions:
+    get:
+      operationId: listActions
+      responses:
+        '200':
+          description: OK
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Action' } } } }
+  /api/actions/{action_id}:
+    get:
+      operationId: getAction
+      parameters:
+        - { name: action_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Action' } } } }
+  /api/documents/{doc_id}:
+    get:
+      operationId: getDocument
+      parameters:
+        - { name: doc_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Document' } } } }
+
+components:
+  schemas:
+    # ---- LLM provider ----
+    LlmStatus:
+      type: object
+      required: [provider, model]
+      properties:
+        provider: { type: string, enum: [anthropic, mock, none] }
+        model: { type: [string, 'null'] }
+
+    # ---- threat detector ----
+    Band: { type: string, enum: [normal, watch, warning, critical] }
+    Hazard: { type: string, enum: [landslide, flood] }
+    BandThresholds:
+      type: object
+      required: [watch, warning, critical]
+      properties: { watch: { type: number }, warning: { type: number }, critical: { type: number } }
+    Bands:
+      type: object
+      required: [landslide, flood]
+      properties:
+        landslide: { $ref: '#/components/schemas/BandThresholds' }
+        flood: { $ref: '#/components/schemas/BandThresholds' }
+    ZoneState:
+      type: object
+      required: [saturation, rain_24h_mm, rain_intensity_mm_h, landslide_index, flood_index, band, updated_sim_time]
+      properties:
+        saturation: { type: number }
+        rain_24h_mm: { type: number }
+        rain_intensity_mm_h: { type: number }
+        landslide_index: { type: number }
+        flood_index: { type: number }
+        band: { $ref: '#/components/schemas/Band' }
+        updated_sim_time: { type: string }
+    ZoneStatePayload:
+      allOf:
+        - { $ref: '#/components/schemas/ZoneState' }
+        - type: object
+          required: [zone_id]
+          properties:
+            zone_id: { type: string }
+            prev_band:
+              oneOf: [{ $ref: '#/components/schemas/Band' }, { type: 'null' }]
+    ThreatPayload:
+      type: object
+      required: [incident_id, zone_id, hazard, band, index]
+      properties:
+        incident_id: { type: string }
+        zone_id: { type: string }
+        hazard: { $ref: '#/components/schemas/Hazard' }
+        band: { $ref: '#/components/schemas/Band' }
+        prev_band:
+          oneOf: [{ $ref: '#/components/schemas/Band' }, { type: 'null' }]
+        index: { type: number }
+
+    # ---- reasoning ----
+    Citation:
+      type: object
+      required: [id, kind, label]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [chunk, sensor, state, event] }
+        label: { type: string }
+    Claim:
+      type: object
+      required: [text, citation_ids]
+      properties:
+        text: { type: string }
+        citation_ids: { type: array, items: { type: string } }
+    ContributingFactor:
+      type: object
+      required: [factor, value, citation_ids]
+      properties:
+        factor: { type: string }
+        value: { type: string }
+        citation_ids: { type: array, items: { type: string } }
+    CitySnapshotReadings:
+      type: object
+      required: [rain_intensity_mm_h, rain_24h_mm, saturation, landslide_index, flood_index, band]
+      properties:
+        rain_intensity_mm_h: { type: number }
+        rain_24h_mm: { type: number }
+        saturation: { type: number }
+        landslide_index: { type: number }
+        flood_index: { type: number }
+        band: { $ref: '#/components/schemas/Band' }
+    SnapshotProject:
+      type: object
+      required: [id, name, status, excavation_depth_m, planned_depth_m]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        status: { type: string }
+        excavation_depth_m: { type: number }
+        planned_depth_m: { type: number }
+    SnapshotChannel:
+      type: object
+      required: [id, name, current_capacity_m3s, design_capacity_m3s, blocked_fraction]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        current_capacity_m3s: { type: number }
+        design_capacity_m3s: { type: number }
+        blocked_fraction: { type: number }
+    SnapshotCrew:
+      type: object
+      required: [id, name, status, location_zone_id]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        status: { type: string }
+        location_zone_id: { type: string }
+    CitySnapshot:
+      type: object
+      required: [node, zone_id, sim_time, readings, crews, open_roads, closed_roads, downstream_zone_ids]
+      properties:
+        node: { type: string, enum: [observe] }
+        zone_id: { type: string }
+        sim_time: { type: string }
+        readings: { $ref: '#/components/schemas/CitySnapshotReadings' }
+        project:
+          oneOf: [{ $ref: '#/components/schemas/SnapshotProject' }, { type: 'null' }]
+        channel:
+          oneOf: [{ $ref: '#/components/schemas/SnapshotChannel' }, { type: 'null' }]
+        crews: { type: array, items: { $ref: '#/components/schemas/SnapshotCrew' } }
+        open_roads: { type: array, items: { type: string } }
+        closed_roads: { type: array, items: { type: string } }
+        downstream_zone_ids: { type: array, items: { type: string } }
+    RetrievedChunk:
+      # Field names follow the RAG layer's gridline.rag.models.RetrievedChunk (a subset of it).
+      type: object
+      required: [chunk_id, document_id, document_title, section_id, section, kind, similarity]
+      properties:
+        chunk_id: { type: string }
+        document_id: { type: string }
+        document_title: { type: string }
+        section_id: { type: string }
+        section: { type: string }
+        kind: { type: string }
+        similarity: { type: number }
+    RetrievedChunks:
+      type: object
+      required: [node, chunks]
+      properties:
+        node: { type: string, enum: [retrieve] }
+        chunks: { type: array, items: { $ref: '#/components/schemas/RetrievedChunk' } }
+    ThreatAssessment:
+      type: object
+      required: [node, hazard, summary, contributing_factors, confidence, claims]
+      properties:
+        node: { type: string, enum: [assess] }
+        hazard: { $ref: '#/components/schemas/Hazard' }
+        summary: { type: string }
+        contributing_factors: { type: array, items: { $ref: '#/components/schemas/ContributingFactor' } }
+        confidence: { type: number }
+        claims: { type: array, items: { $ref: '#/components/schemas/Claim' } }
+    RiskPrediction:
+      type: object
+      required: [node, probability_band, time_horizon, what_would_change_it, claims]
+      properties:
+        node: { type: string, enum: [predict] }
+        probability_band: { type: string, enum: [low, moderate, high, very_high] }
+        time_horizon: { type: string }
+        onset_sim_time: { type: [string, 'null'] }
+        what_would_change_it: { type: array, items: { type: string } }
+        claims: { type: array, items: { $ref: '#/components/schemas/Claim' } }
+    CascadeLink:
+      type: object
+      required: [cause, effect, affected_asset_ids, citation_ids]
+      properties:
+        cause: { type: string }
+        effect: { type: string }
+        affected_asset_ids: { type: array, items: { type: string } }
+        citation_ids: { type: array, items: { type: string } }
+    CascadeAnalysis:
+      type: object
+      required: [node, chain, affected_zone_ids, claims]
+      properties:
+        node: { type: string, enum: [cascade] }
+        chain: { type: array, items: { $ref: '#/components/schemas/CascadeLink' } }
+        affected_zone_ids: { type: array, items: { type: string } }
+        claims: { type: array, items: { $ref: '#/components/schemas/Claim' } }
+    ProposedAction:
+      type: object
+      required: [action_id, tool, input, rationale, expected_effect, citation_ids, requires_approval]
+      properties:
+        action_id: { type: string }
+        tool: { type: string }
+        input: { type: object, additionalProperties: true }
+        rationale: { type: string }
+        expected_effect: { type: string }
+        citation_ids: { type: array, items: { type: string } }
+        requires_approval: { type: boolean }
+    ActionPlan:
+      type: object
+      required: [node, actions]
+      properties:
+        node: { type: string, enum: [recommend] }
+        actions: { type: array, items: { $ref: '#/components/schemas/ProposedAction' } }
+    ApprovalGateResult:
+      type: object
+      required: [node, auto_approved_action_ids, pending_action_ids]
+      properties:
+        node: { type: string, enum: [approval_gate] }
+        approval_id: { type: [string, 'null'] }
+        auto_approved_action_ids: { type: array, items: { type: string } }
+        pending_action_ids: { type: array, items: { type: string } }
+    ExecuteResult:
+      type: object
+      required: [node, action_ids]
+      properties:
+        node: { type: string, enum: [execute] }
+        action_ids: { type: array, items: { type: string } }
+    PerActionVerification:
+      type: object
+      required: [action_id, status, expected, observed, failures]
+      properties:
+        action_id: { type: string }
+        status: { type: string, enum: [verified, partially_verified, failed, pending] }
+        expected: { type: string }
+        observed: { type: string }
+        failures: { type: array, items: { type: string } }
+    VerificationResult:
+      type: object
+      required: [node, status, per_action]
+      properties:
+        node: { type: string, enum: [verify] }
+        status: { type: string, enum: [verified, partially_verified, failed] }
+        per_action: { type: array, items: { $ref: '#/components/schemas/PerActionVerification' } }
+    ReplanResult:
+      type: object
+      required: [node, reason]
+      properties:
+        node: { type: string, enum: [replan] }
+        reason: { type: string }
+    StepOutput:
+      oneOf:
+        - { $ref: '#/components/schemas/CitySnapshot' }
+        - { $ref: '#/components/schemas/RetrievedChunks' }
+        - { $ref: '#/components/schemas/ThreatAssessment' }
+        - { $ref: '#/components/schemas/RiskPrediction' }
+        - { $ref: '#/components/schemas/CascadeAnalysis' }
+        - { $ref: '#/components/schemas/ActionPlan' }
+        - { $ref: '#/components/schemas/ApprovalGateResult' }
+        - { $ref: '#/components/schemas/ExecuteResult' }
+        - { $ref: '#/components/schemas/VerificationResult' }
+        - { $ref: '#/components/schemas/ReplanResult' }
+      discriminator:
+        propertyName: node
+        mapping:
+          observe: '#/components/schemas/CitySnapshot'
+          retrieve: '#/components/schemas/RetrievedChunks'
+          assess: '#/components/schemas/ThreatAssessment'
+          predict: '#/components/schemas/RiskPrediction'
+          cascade: '#/components/schemas/CascadeAnalysis'
+          recommend: '#/components/schemas/ActionPlan'
+          approval_gate: '#/components/schemas/ApprovalGateResult'
+          execute: '#/components/schemas/ExecuteResult'
+          verify: '#/components/schemas/VerificationResult'
+          replan: '#/components/schemas/ReplanResult'
+    NodeName: { type: string, enum: [observe, retrieve, assess, predict, cascade, recommend, approval_gate, execute, verify, replan] }
+    AgentStep:
+      type: object
+      required: [id, run_id, node, status, started_at, output, citations]
+      properties:
+        id: { type: string }
+        run_id: { type: string }
+        node: { $ref: '#/components/schemas/NodeName' }
+        status: { type: string, enum: [running, finished, ungrounded, failed] }
+        started_at: { type: string }
+        finished_at: { type: [string, 'null'] }
+        duration_ms: { type: [number, 'null'] }
+        output:
+          oneOf: [{ $ref: '#/components/schemas/StepOutput' }, { type: 'null' }]
+        citations: { type: array, items: { $ref: '#/components/schemas/Citation' } }
+    AgentRun:
+      type: object
+      required: [id, incident_id, thread_id, trigger, status, started_at, steps]
+      properties:
+        id: { type: string }
+        incident_id: { type: string }
+        thread_id: { type: string }
+        trigger: { type: string }
+        replan_reason: { type: [string, 'null'] }
+        status: { type: string, enum: [running, waiting_approval, finished, failed] }
+        started_at: { type: string }
+        finished_at: { type: [string, 'null'] }
+        steps: { type: array, items: { $ref: '#/components/schemas/AgentStep' } }
+    NodeStartedPayload:
+      type: object
+      required: [run_id, incident_id, node, step_id]
+      properties:
+        run_id: { type: string }
+        incident_id: { type: string }
+        node: { $ref: '#/components/schemas/NodeName' }
+        step_id: { type: string }
+    ReplanPayload:
+      type: object
+      required: [incident_id, run_id, reason]
+      properties:
+        incident_id: { type: string }
+        run_id: { type: string }
+        reason: { type: string }
+
+    # ---- approvals and actions ----
+    ApprovalStatus: { type: string, enum: [pending, approved, rejected, partial] }
+    Approval:
+      type: object
+      required: [id, run_id, incident_id, proposed_actions, status, requested_at, approved_action_ids, synthetic]
+      properties:
+        id: { type: string }
+        run_id: { type: string }
+        incident_id: { type: string }
+        proposed_actions: { type: array, items: { $ref: '#/components/schemas/ProposedAction' } }
+        status: { $ref: '#/components/schemas/ApprovalStatus' }
+        requested_at: { type: string }
+        decided_at: { type: [string, 'null'] }
+        decided_by: { type: [string, 'null'] }
+        note: { type: [string, 'null'] }
+        approved_action_ids: { type: array, items: { type: string } }
+        synthetic: { type: boolean }
+    ApprovalDecision:
+      type: object
+      required: [decision, approved_action_ids]
+      properties:
+        decision: { type: string, enum: [approve, reject, partial] }
+        approved_action_ids: { type: array, items: { type: string } }
+        note: { type: [string, 'null'] }
+    StateChange:
+      type: object
+      required: [entity_type, entity_id, entity_name, field, from, to]
+      properties:
+        entity_type: { type: string, enum: [crew, shelter, road, bridge, project, channel, pump_unit, alert] }
+        entity_id: { type: string }
+        entity_name: { type: string }
+        field: { type: string }
+        from: { type: string }
+        to: { type: string }
+    ActionVerification:
+      type: object
+      required: [status, expected, observed, failures]
+      properties:
+        status: { type: string, enum: [verified, partially_verified, failed, pending] }
+        expected: { type: string }
+        observed: { type: string }
+        failures: { type: array, items: { type: string } }
+        checked_sim_time: { type: [string, 'null'] }
+    ActionStatus: { type: string, enum: [pending, executing, executed, failed] }
+    Action:
+      type: object
+      required: [id, run_id, incident_id, tool, input, status, state_changes]
+      properties:
+        id: { type: string }
+        run_id: { type: string }
+        incident_id: { type: string }
+        tool: { type: string }
+        input: { type: object, additionalProperties: true }
+        status: { $ref: '#/components/schemas/ActionStatus' }
+        executed_at: { type: [string, 'null'] }
+        executed_sim_time: { type: [string, 'null'] }
+        state_changes: { type: array, items: { $ref: '#/components/schemas/StateChange' } }
+        verification:
+          oneOf: [{ $ref: '#/components/schemas/ActionVerification' }, { type: 'null' }]
+    ActionVerifiedPayload:
+      type: object
+      required: [action_id, verification]
+      properties:
+        action_id: { type: string }
+        verification: { $ref: '#/components/schemas/ActionVerification' }
+    Alert:
+      type: object
+      required: [id, zone_id, level, message, issued_at, issued_sim_time]
+      properties:
+        id: { type: string }
+        zone_id: { type: string }
+        level: { type: string, enum: [advisory, warning, evacuate] }
+        message: { type: string }
+        issued_at: { type: string }
+        issued_sim_time: { type: string }
+
+    # ---- incidents ----
+    IncidentStatus: { type: string, enum: [open, closed] }
+    IncidentSummary:
+      type: object
+      required: [id, zone_id, hazard, band, status, opened_at, opened_sim_time, run_count, pending_approval_count]
+      properties:
+        id: { type: string }
+        zone_id: { type: string }
+        hazard: { $ref: '#/components/schemas/Hazard' }
+        band: { $ref: '#/components/schemas/Band' }
+        status: { $ref: '#/components/schemas/IncidentStatus' }
+        opened_at: { type: string }
+        opened_sim_time: { type: string }
+        closed_at: { type: [string, 'null'] }
+        run_count: { type: integer }
+        pending_approval_count: { type: integer }
+    Incident:
+      type: object
+      required: [id, zone_id, hazard, band, status, opened_at, opened_sim_time, runs, approvals, actions]
+      properties:
+        id: { type: string }
+        zone_id: { type: string }
+        hazard: { $ref: '#/components/schemas/Hazard' }
+        band: { $ref: '#/components/schemas/Band' }
+        status: { $ref: '#/components/schemas/IncidentStatus' }
+        opened_at: { type: string }
+        opened_sim_time: { type: string }
+        closed_at: { type: [string, 'null'] }
+        runs: { type: array, items: { $ref: '#/components/schemas/AgentRun' } }
+        approvals: { type: array, items: { $ref: '#/components/schemas/Approval' } }
+        actions: { type: array, items: { $ref: '#/components/schemas/Action' } }
+
+    # ---- documents ----
+    DocumentSection:
+      type: object
+      required: [id, heading, text]
+      properties: { id: { type: string }, heading: { type: string }, text: { type: string } }
+    Document:
+      type: object
+      required: [id, title, kind, sections]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        kind: { type: string }
+        sections: { type: array, items: { $ref: '#/components/schemas/DocumentSection' } }
+
+    # ---- pending events (backend envelope) ----
+    PendingEventEnvelope:
+      type: object
+      required: [event_id, timestamp, sim_time, source, location, severity, incident_id]
+      properties:
+        event_id: { type: string }
+        timestamp: { type: string, format: date-time }
+        sim_time: { type: string, format: date-time }
+        source: { type: string }
+        location: { type: [string, 'null'] }
+        severity: { $ref: '#/components/schemas/Severity' }
+        incident_id: { type: [string, 'null'] }
+    ZoneStateEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: zone.state }, payload: { $ref: '#/components/schemas/ZoneStatePayload' } }
+    ThreatDetectedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: threat.detected }, payload: { $ref: '#/components/schemas/ThreatPayload' } }
+    ThreatEscalatedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: threat.escalated }, payload: { $ref: '#/components/schemas/ThreatPayload' } }
+    IncidentOpenedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: incident.opened }, payload: { $ref: '#/components/schemas/Incident' } }
+    IncidentClosedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: incident.closed }, payload: { $ref: '#/components/schemas/Incident' } }
+    AgentRunStartedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: agent.run.started }, payload: { $ref: '#/components/schemas/AgentRun' } }
+    AgentRunFinishedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: agent.run.finished }, payload: { $ref: '#/components/schemas/AgentRun' } }
+    AgentNodeStartedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: agent.node.started }, payload: { $ref: '#/components/schemas/NodeStartedPayload' } }
+    AgentNodeFinishedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: agent.node.finished }, payload: { $ref: '#/components/schemas/AgentStep' } }
+    ApprovalRequestedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: approval.requested }, payload: { $ref: '#/components/schemas/Approval' } }
+    ApprovalDecidedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: approval.decided }, payload: { $ref: '#/components/schemas/Approval' } }
+    ActionExecutedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: action.executed }, payload: { $ref: '#/components/schemas/Action' } }
+    ActionVerifiedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: action.verified }, payload: { $ref: '#/components/schemas/ActionVerifiedPayload' } }
+    ReplanTriggeredEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: replan.triggered }, payload: { $ref: '#/components/schemas/ReplanPayload' } }
+    AlertIssuedEvent:
+      allOf:
+        - { $ref: '#/components/schemas/PendingEventEnvelope' }
+        - type: object
+          required: [event_type, payload]
+          properties: { event_type: { type: string, const: alert.issued }, payload: { $ref: '#/components/schemas/Alert' } }

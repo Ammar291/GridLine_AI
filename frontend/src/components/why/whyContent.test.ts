@@ -16,7 +16,7 @@ describe('buildWhyContent', () => {
     expect(c?.toolCall).toEqual({ tool: 'halt_construction', input: { project_id: 'ht_phase2' } });
     expect(c?.summary).toBe('fixture: rationale one');
     expect(c?.expectedEffect).toBe('fixture: effect one');
-    expect(c?.evidence?.map((e) => e.doc_title)).toEqual(['Disaster Management Policy', 'Hillview Terrace permit']);
+    expect(c?.evidence?.map((e) => e.document_title)).toEqual(['Disaster Management Policy', 'Hillview Terrace permit']);
     expect(c?.citations).toEqual([{ id: 'dmp-2024#s4.2', kind: 'chunk', label: 'Disaster Management Policy §4.2' }]);
     expect(c?.cityState?.zone_id).toBe('hillview');
     expect(c?.missing).toEqual({});

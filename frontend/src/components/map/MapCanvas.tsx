@@ -65,10 +65,13 @@ export function MapCanvas({ city }: { city: City }) {
         {layers.has('drainage') && (
           <DrainageLayer channels={data.channels} selectedId={selectedId('channel')} onSelect={(id) => { onSelect({ kind: 'channel', id }); }} />
         )}
-        {layers.has('roads') && <RoadsLayer roads={data.roads} u={u} selectedId={selectedId('road')} onSelect={(id) => { onSelect({ kind: 'road', id }); }} />}
+        {layers.has('roads') && (
+          <RoadsLayer roads={data.roads} bridges={data.bridges} u={u} selectedId={selectedId('road')} selectedBridgeId={selectedId('bridge')}
+            onSelect={(id) => { onSelect({ kind: 'road', id }); }} onSelectBridge={(id) => { onSelect({ kind: 'bridge', id }); }} />
+        )}
         <AssetsLayer data={data} layers={layers} u={u} selected={selected} onSelect={onSelect} />
         {layers.has('threats') && <ThreatLayer data={data} u={u} />}
-        <LabelsLayer zones={data.zones} features={data.features} u={u} />
+        <LabelsLayer zones={data.zones} u={u} />
       </svg>
       <LayerLegend active={layers} onToggle={toggleLayer} />
       <MapControls onZoomIn={() => { zoomAt(BUTTON_ZOOM, cx, cy); }} onZoomOut={() => { zoomAt(1 / BUTTON_ZOOM, cx, cy); }} onFit={fit} />

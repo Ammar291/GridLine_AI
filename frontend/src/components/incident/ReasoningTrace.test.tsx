@@ -53,7 +53,7 @@ describe('ReasoningTrace', () => {
 
   it('what changed lists the trigger, band transition, reading deltas and cascade chain', () => {
     const t = (landslide: number, band: TelemetryPoint['band'], simTime: string): TelemetryPoint =>
-      ({ simTime, tick: 1, rain: 40, saturation: 0.6, landslide, flood: 0.05, band });
+      ({ simTime, rain: 40, saturation: 0.6, landslide, flood: 0.05, water: null, band });
     renderTrace(incidentFixture, [t(0.4, 'watch', '2026-07-14T10:00:00'), t(0.61, 'warning', '2026-07-14T10:10:00')]);
     const changed = region('What changed?');
     expect(changed).toHaveTextContent('Triggered by band change');

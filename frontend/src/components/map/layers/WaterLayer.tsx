@@ -18,7 +18,7 @@ export function WaterLayer({ features, u }: { features: MapFeature[]; u: number 
       ))}
       {rivers.map((f) => f.label ? (
         <text key={`label-${f.id}`} fontSize={11 * u} fill={INK_2} dy={-6 * u} {...halo}>
-          <textPath href={`#${prefix}-${f.id}`} startOffset="50%" textAnchor="middle">{f.label}</textPath>
+          <textPath href={`#${prefix}-${f.id}`} startOffset="66%" textAnchor="middle">{f.label}</textPath>
         </text>
       ) : null)}
       {lakes.map((f) => {

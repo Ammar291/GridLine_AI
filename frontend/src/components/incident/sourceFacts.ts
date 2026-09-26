@@ -1,5 +1,6 @@
 // What the live store currently knows about a non-document citation (sensor reading, entity state, event).
 import { bandLabel } from '@/components/ui/bandLabel';
+import type { LiveAssets } from '@/live/assets';
 import { describeEvent } from '@/live/describeEvent';
 import { zoneName } from '@/live/derive';
 import { fmtIndex, fmtPct, fmtSimTime, statusLabel } from '@/live/format';
@@ -13,7 +14,7 @@ export interface SourceFacts {
   note: string | null;
 }
 
-export type LiveView = Pick<LiveState, 'city' | 'zoneState' | 'assets' | 'feed'>;
+export type LiveView = Pick<LiveState, 'city' | 'world' | 'zoneState' | 'feed'> & { assets: LiveAssets };
 
 const num = (v: number) => String(Number(v.toFixed(2)));
 
@@ -23,11 +24,33 @@ function sensorFacts(body: string, live: LiveView): SourceFacts {
   const items = [{ label: 'Sensor', value: sensorId }];
   if (citedAt) items.push({ label: 'Cited reading at', value: fmtSimTime(citedAt) });
   if (!sensor) return { heading: 'Live reading', items, note: 'This sensor is not in the city model.' };
-  items.push({ label: 'Zone', value: zoneName(live.city, sensor.zone_id) });
-  if (sensor.last_value == null) return { heading: 'Live reading', items, note: 'No reading has arrived from this sensor yet.' };
-  items.push({ label: 'Latest value', value: `${num(sensor.last_value)} ${sensor.unit}` });
-  items.push({ label: 'Latest reading at', value: fmtSimTime(sensor.last_sim_time ?? null) });
+  if (sensor.zone_id) items.push({ label: 'Zone', value: zoneName(live.city, sensor.zone_id) });
+  if (!sensor.reading) return { heading: 'Live reading', items, note: 'No reading has arrived from this sensor yet.' };
+  items.push({ label: 'Latest value', value: sensor.reading.text });
+  items.push({ label: 'Latest reading at', value: fmtSimTime(sensor.reading.simTime) });
   return { heading: 'Live reading', items, note: null };
+}
+
+function zoneFacts(id: string, live: LiveView): SourceFacts | null {
+  const zs = live.zoneState[id];
+  const conditions = live.world?.zones[id];
+  if (!zs && !conditions) return null;
+  const items = [{ label: 'Zone', value: zoneName(live.city, id) }];
+  if (zs) {
+    items.push(
+      { label: 'Band', value: bandLabel(zs.band) },
+      { label: 'Landslide index', value: fmtIndex(zs.landslide_index) },
+      { label: 'Flood index', value: fmtIndex(zs.flood_index) },
+    );
+  }
+  if (conditions) {
+    items.push(
+      { label: 'Saturation', value: fmtPct(conditions.saturation) },
+      { label: 'Rain intensity', value: `${num(conditions.rainfall_intensity_mm_h)} mm/h` },
+      { label: 'Standing water', value: `${num(conditions.water_depth_cm)} cm` },
+    );
+  }
+  return { heading: 'Live state', items, note: null };
 }
 
 function stateFacts(body: string, live: LiveView): SourceFacts {
@@ -35,32 +58,23 @@ function stateFacts(body: string, live: LiveView): SourceFacts {
   const entity = dot < 0 ? body : body.slice(0, dot);
   const id = dot < 0 ? '' : body.slice(dot + 1);
   const heading = 'Live state';
-  const zs = entity === 'zone' ? live.zoneState[id] : undefined;
-  if (zs) {
-    return {
-      heading, note: null,
-      items: [
-        { label: 'Zone', value: zoneName(live.city, id) },
-        { label: 'Band', value: bandLabel(zs.band) },
-        { label: 'Landslide index', value: fmtIndex(zs.landslide_index) },
-        { label: 'Flood index', value: fmtIndex(zs.flood_index) },
-        { label: 'Saturation', value: fmtPct(zs.saturation) },
-        { label: 'Rain intensity', value: `${String(Math.round(zs.rain_intensity_mm_h))} mm/h` },
-      ],
-    };
-  }
+  const zone = entity === 'zone' ? zoneFacts(id, live) : null;
+  if (zone) return zone;
   const channel = entity === 'channel' ? live.assets.channels[id] : undefined;
   if (channel) {
     return {
       heading, note: null,
       items: [
         { label: 'Channel', value: channel.name },
-        { label: 'Capacity', value: `${num(channel.current_capacity_m3s)} of ${num(channel.design_capacity_m3s)} m³/s` },
+        { label: 'Capacity', value: `${num(channel.capacity_m3s)} of ${num(channel.design_capacity_m3s)} m³/s` },
+        { label: 'Flow', value: `${num(channel.flow_m3s)} m³/s` },
         { label: 'Blocked', value: fmtPct(channel.blocked_fraction) },
       ],
     };
   }
-  const tables = { crew: live.assets.crews, road: live.assets.roads, shelter: live.assets.shelters, project: live.assets.projects };
+  const tables = {
+    crew: live.assets.crews, road: live.assets.roads, bridge: live.assets.bridges, shelter: live.assets.shelters, project: live.assets.projects,
+  };
   const other = entity in tables ? tables[entity as keyof typeof tables][id] : undefined;
   if (other) {
     return { heading, note: null, items: [{ label: statusLabel(entity), value: other.name }, { label: 'Status', value: statusLabel(other.status) }] };
@@ -69,7 +83,7 @@ function stateFacts(body: string, live: LiveView): SourceFacts {
 }
 
 function eventFacts(eventId: string, live: LiveView): SourceFacts {
-  const event = live.feed.find((e) => e.id === eventId);
+  const event = live.feed.find((e) => e.event_id === eventId);
   if (!event) return { heading: 'Event', items: [{ label: 'Event id', value: eventId }], note: 'This event is no longer in the live feed.' };
   return {
     heading: 'Event', note: null,

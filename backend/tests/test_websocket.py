@@ -5,9 +5,12 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette.testclient import WebSocketTestSession
 
+from gridline.api.city_map import CityMap, build_city_map
+from gridline.city.dataset import load_city_data
 from gridline.city.model import City
 from gridline.config import Settings
 from gridline.main import create_app
+from tests.conftest import DATA_DIR
 
 ENVELOPE = {
     "event_id",
@@ -22,9 +25,14 @@ ENVELOPE = {
 }
 
 
+@pytest.fixture(scope="module")
+def city_map(city: City) -> CityMap:
+    return build_city_map(load_city_data(DATA_DIR), city)
+
+
 @pytest.fixture
-def client(settings: Settings, city: City) -> Any:
-    with TestClient(create_app(settings, city=city)) as client:
+def client(settings: Settings, city: City, city_map: CityMap) -> Any:
+    with TestClient(create_app(settings, city=city, city_map=city_map)) as client:
         yield client
 
 

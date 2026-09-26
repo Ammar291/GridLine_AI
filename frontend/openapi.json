@@ -1,0 +1,4517 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GridLine AI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/city": {
+      "get": {
+        "tags": [
+          "city"
+        ],
+        "summary": "Get City",
+        "description": "Static geometry and attributes of every simulated asset, the scenarios and the inject presets.",
+        "operationId": "get_city_api_city_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityMap"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chunks/{chunk_id}": {
+      "get": {
+        "tags": [
+          "sources"
+        ],
+        "summary": "Get Chunk",
+        "operationId": "get_chunk_api_chunks__chunk_id__get",
+        "parameters": [
+          {
+            "name": "chunk_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chunk Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoredChunk"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown chunk"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/status": {
+      "get": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Get Status",
+        "operationId": "get_status_api_simulation_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/scenarios": {
+      "get": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "List Scenarios",
+        "operationId": "list_scenarios_api_simulation_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioInfo"
+                  },
+                  "type": "array",
+                  "title": "Response List Scenarios Api Simulation Scenarios Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/snapshot": {
+      "get": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Get Snapshot",
+        "operationId": "get_snapshot_api_simulation_snapshot_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorldSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/scenario": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Select Scenario",
+        "operationId": "select_scenario_api_simulation_scenario_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectScenarioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/start": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Start",
+        "operationId": "start_api_simulation_start_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SimulationStart"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/pause": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Pause",
+        "operationId": "pause_api_simulation_pause_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/resume": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Resume",
+        "operationId": "resume_api_simulation_resume_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/reset": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Reset",
+        "operationId": "reset_api_simulation_reset_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/advance": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Advance",
+        "operationId": "advance_api_simulation_advance_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AdvanceRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvanceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/speed": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Set Speed",
+        "operationId": "set_speed_api_simulation_speed_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationSpeed"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulation/inject": {
+      "post": {
+        "tags": [
+          "simulation"
+        ],
+        "summary": "Inject",
+        "description": "Apply an operator event now; returns it plus any derived events (all published on the bus).",
+        "operationId": "inject_api_simulation_inject_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InjectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Event"
+                  },
+                  "type": "array",
+                  "title": "Response Inject Api Simulation Inject Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdvanceRequest": {
+        "properties": {
+          "ticks": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Ticks",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "AdvanceRequest"
+      },
+      "AdvanceResponse": {
+        "properties": {
+          "events_emitted": {
+            "type": "integer",
+            "title": "Events Emitted"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimulationStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "events_emitted",
+          "status"
+        ],
+        "title": "AdvanceResponse"
+      },
+      "AmbulanceState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "dispatched",
+              "maintenance"
+            ],
+            "title": "Status"
+          },
+          "location_zone_id": {
+            "type": "string",
+            "title": "Location Zone Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "location_zone_id"
+        ],
+        "title": "AmbulanceState"
+      },
+      "AmbulanceStatus": {
+        "properties": {
+          "ambulance_id": {
+            "type": "string",
+            "title": "Ambulance Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "dispatched",
+              "maintenance"
+            ],
+            "title": "Status"
+          },
+          "location_zone_id": {
+            "type": "string",
+            "title": "Location Zone Id"
+          },
+          "hospital_id": {
+            "type": "string",
+            "title": "Hospital Id",
+            "default": ""
+          },
+          "available_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Available Count",
+            "default": 0
+          },
+          "total_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Count",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ambulance_id",
+          "status",
+          "location_zone_id",
+          "hospital_id",
+          "available_count",
+          "total_count"
+        ],
+        "title": "AmbulanceStatus"
+      },
+      "AmbulanceStatusEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "emergency.ambulance",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/AmbulanceStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "AmbulanceStatusEvent"
+      },
+      "BridgeState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "restricted",
+              "closed"
+            ],
+            "title": "Status",
+            "default": "open"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "BridgeState"
+      },
+      "BridgeStatus": {
+        "properties": {
+          "bridge_id": {
+            "type": "string",
+            "title": "Bridge Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "restricted",
+              "closed"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bridge_id",
+          "status",
+          "reason"
+        ],
+        "title": "BridgeStatus"
+      },
+      "BridgeStatusEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "infrastructure.bridge",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/BridgeStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "BridgeStatusEvent"
+      },
+      "ChannelState": {
+        "properties": {
+          "blocked_fraction": {
+            "type": "number",
+            "title": "Blocked Fraction"
+          },
+          "capacity_m3s": {
+            "type": "number",
+            "title": "Capacity M3S"
+          },
+          "extra_capacity_m3s": {
+            "type": "number",
+            "title": "Extra Capacity M3S",
+            "default": 0.0
+          },
+          "gate_closed": {
+            "type": "boolean",
+            "title": "Gate Closed",
+            "default": false
+          },
+          "flow_m3s": {
+            "type": "number",
+            "title": "Flow M3S",
+            "default": 0.0
+          },
+          "overflow_m3s": {
+            "type": "number",
+            "title": "Overflow M3S",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "blocked_fraction",
+          "capacity_m3s"
+        ],
+        "title": "ChannelState"
+      },
+      "CityMap": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "view_box": {
+            "$ref": "#/components/schemas/ViewBox"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/MapZone"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "roads": {
+            "items": {
+              "$ref": "#/components/schemas/MapRoad"
+            },
+            "type": "array",
+            "title": "Roads"
+          },
+          "bridges": {
+            "items": {
+              "$ref": "#/components/schemas/MapBridge"
+            },
+            "type": "array",
+            "title": "Bridges"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/MapChannel"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "slopes": {
+            "items": {
+              "$ref": "#/components/schemas/MapSlope"
+            },
+            "type": "array",
+            "title": "Slopes"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/MapProject"
+            },
+            "type": "array",
+            "title": "Projects"
+          },
+          "sensors": {
+            "items": {
+              "$ref": "#/components/schemas/MapSensor"
+            },
+            "type": "array",
+            "title": "Sensors"
+          },
+          "crews": {
+            "items": {
+              "$ref": "#/components/schemas/MapCrew"
+            },
+            "type": "array",
+            "title": "Crews"
+          },
+          "shelters": {
+            "items": {
+              "$ref": "#/components/schemas/MapShelter"
+            },
+            "type": "array",
+            "title": "Shelters"
+          },
+          "hospitals": {
+            "items": {
+              "$ref": "#/components/schemas/MapHospital"
+            },
+            "type": "array",
+            "title": "Hospitals"
+          },
+          "pump_depot": {
+            "$ref": "#/components/schemas/PumpDepot"
+          },
+          "map_features": {
+            "items": {
+              "$ref": "#/components/schemas/MapFeature"
+            },
+            "type": "array",
+            "title": "Map Features"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioInfo"
+            },
+            "type": "array",
+            "title": "Scenarios"
+          },
+          "injections": {
+            "items": {
+              "$ref": "#/components/schemas/InjectionPreset"
+            },
+            "type": "array",
+            "title": "Injections"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "view_box",
+          "zones",
+          "roads",
+          "bridges",
+          "channels",
+          "slopes",
+          "projects",
+          "sensors",
+          "crews",
+          "shelters",
+          "hospitals",
+          "pump_depot",
+          "map_features",
+          "scenarios",
+          "injections"
+        ],
+        "title": "CityMap"
+      },
+      "ConstructionActivity": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "halted"
+            ],
+            "title": "Status"
+          },
+          "activity": {
+            "type": "string",
+            "enum": [
+              "excavating",
+              "idle",
+              "halted"
+            ],
+            "title": "Activity"
+          },
+          "excavation_depth_m": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Excavation Depth M"
+          },
+          "planned_depth_m": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Planned Depth M",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "project_id",
+          "status",
+          "activity",
+          "excavation_depth_m",
+          "planned_depth_m"
+        ],
+        "title": "ConstructionActivity"
+      },
+      "ConstructionActivityEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "infrastructure.construction",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ConstructionActivity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "ConstructionActivityEvent"
+      },
+      "CrewState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "dispatched",
+              "en_route",
+              "on_site",
+              "blocked",
+              "busy",
+              "off_duty"
+            ],
+            "title": "Status"
+          },
+          "location_zone_id": {
+            "type": "string",
+            "title": "Location Zone Id"
+          },
+          "task": {
+            "type": "string",
+            "title": "Task",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "location_zone_id"
+        ],
+        "title": "CrewState"
+      },
+      "DrainageObservation": {
+        "properties": {
+          "gauge_id": {
+            "type": "string",
+            "title": "Gauge Id"
+          },
+          "channel_id": {
+            "type": "string",
+            "title": "Channel Id"
+          },
+          "flow_m3s": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Flow M3S"
+          },
+          "capacity_m3s": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Capacity M3S"
+          },
+          "load_ratio": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Load Ratio"
+          },
+          "blocked_fraction": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Blocked Fraction"
+          },
+          "overflow_m3s": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Overflow M3S"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gauge_id",
+          "channel_id",
+          "flow_m3s",
+          "capacity_m3s",
+          "load_ratio",
+          "blocked_fraction",
+          "overflow_m3s"
+        ],
+        "title": "DrainageObservation"
+      },
+      "DrainageObservationEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "environment.drainage",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/DrainageObservation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "DrainageObservationEvent"
+      },
+      "DrainageObstruction": {
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "title": "Channel Id"
+          },
+          "blocked_fraction": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Blocked Fraction"
+          },
+          "cause": {
+            "type": "string",
+            "title": "Cause",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "channel_id",
+          "blocked_fraction",
+          "cause"
+        ],
+        "title": "DrainageObstruction"
+      },
+      "DrainageObstructionEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "infrastructure.drainage_obstruction",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/DrainageObstruction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "DrainageObstructionEvent"
+      },
+      "Event": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SimTickEvent"
+          },
+          {
+            "$ref": "#/components/schemas/SimStatusEvent"
+          },
+          {
+            "$ref": "#/components/schemas/SimSnapshotEvent"
+          },
+          {
+            "$ref": "#/components/schemas/HeartbeatEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ScenarioStageEvent"
+          },
+          {
+            "$ref": "#/components/schemas/WeatherObservationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/WeatherForecastEvent"
+          },
+          {
+            "$ref": "#/components/schemas/SoilObservationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/RiverObservationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/DrainageObservationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/SlopeObservationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/WaterAccumulationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/RoadStatusEvent"
+          },
+          {
+            "$ref": "#/components/schemas/BridgeStatusEvent"
+          },
+          {
+            "$ref": "#/components/schemas/DrainageObstructionEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ConstructionActivityEvent"
+          },
+          {
+            "$ref": "#/components/schemas/InfrastructureFailureEvent"
+          },
+          {
+            "$ref": "#/components/schemas/RescueTeamStatusEvent"
+          },
+          {
+            "$ref": "#/components/schemas/AmbulanceStatusEvent"
+          },
+          {
+            "$ref": "#/components/schemas/HospitalCapacityEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ShelterCapacityEvent"
+          }
+        ],
+        "title": "Event",
+        "description": "Any event on the bus or the WebSocket, discriminated by ``event_type``.",
+        "discriminator": {
+          "propertyName": "event_type",
+          "mapping": {
+            "emergency.ambulance": "#/components/schemas/AmbulanceStatusEvent",
+            "emergency.hospital": "#/components/schemas/HospitalCapacityEvent",
+            "emergency.rescue_team": "#/components/schemas/RescueTeamStatusEvent",
+            "emergency.shelter": "#/components/schemas/ShelterCapacityEvent",
+            "environment.drainage": "#/components/schemas/DrainageObservationEvent",
+            "environment.river": "#/components/schemas/RiverObservationEvent",
+            "environment.slope": "#/components/schemas/SlopeObservationEvent",
+            "environment.soil": "#/components/schemas/SoilObservationEvent",
+            "environment.water_accumulation": "#/components/schemas/WaterAccumulationEvent",
+            "infrastructure.bridge": "#/components/schemas/BridgeStatusEvent",
+            "infrastructure.construction": "#/components/schemas/ConstructionActivityEvent",
+            "infrastructure.drainage_obstruction": "#/components/schemas/DrainageObstructionEvent",
+            "infrastructure.failure": "#/components/schemas/InfrastructureFailureEvent",
+            "infrastructure.road": "#/components/schemas/RoadStatusEvent",
+            "scenario.stage": "#/components/schemas/ScenarioStageEvent",
+            "sim.heartbeat": "#/components/schemas/HeartbeatEvent",
+            "sim.snapshot": "#/components/schemas/SimSnapshotEvent",
+            "sim.status": "#/components/schemas/SimStatusEvent",
+            "sim.tick": "#/components/schemas/SimTickEvent",
+            "weather.forecast": "#/components/schemas/WeatherForecastEvent",
+            "weather.observation": "#/components/schemas/WeatherObservationEvent"
+          }
+        }
+      },
+      "EventType": {
+        "type": "string",
+        "enum": [
+          "sim.tick",
+          "sim.status",
+          "sim.snapshot",
+          "sim.heartbeat",
+          "scenario.stage",
+          "weather.observation",
+          "weather.forecast",
+          "environment.soil",
+          "environment.river",
+          "environment.drainage",
+          "environment.slope",
+          "environment.water_accumulation",
+          "infrastructure.road",
+          "infrastructure.bridge",
+          "infrastructure.drainage_obstruction",
+          "infrastructure.construction",
+          "infrastructure.failure",
+          "emergency.rescue_team",
+          "emergency.ambulance",
+          "emergency.hospital",
+          "emergency.shelter"
+        ],
+        "title": "EventType"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "Health"
+      },
+      "Heartbeat": {
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tick"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tick",
+          "sim_time"
+        ],
+        "title": "Heartbeat"
+      },
+      "HeartbeatEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "sim.heartbeat",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/Heartbeat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "HeartbeatEvent"
+      },
+      "HospitalCapacity": {
+        "properties": {
+          "hospital_id": {
+            "type": "string",
+            "title": "Hospital Id"
+          },
+          "beds_total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Beds Total",
+            "default": 0
+          },
+          "beds_occupied": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Beds Occupied"
+          },
+          "beds_available": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Beds Available",
+            "default": 0
+          },
+          "er_status": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "busy",
+              "overwhelmed"
+            ],
+            "title": "Er Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hospital_id",
+          "beds_total",
+          "beds_occupied",
+          "beds_available",
+          "er_status"
+        ],
+        "title": "HospitalCapacity"
+      },
+      "HospitalCapacityEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "emergency.hospital",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/HospitalCapacity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "HospitalCapacityEvent"
+      },
+      "HospitalState": {
+        "properties": {
+          "beds_occupied": {
+            "type": "integer",
+            "title": "Beds Occupied"
+          },
+          "er_status": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "busy",
+              "overwhelmed"
+            ],
+            "title": "Er Status",
+            "default": "normal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "beds_occupied"
+        ],
+        "title": "HospitalState"
+      },
+      "InfrastructureFailure": {
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "title": "Asset Id"
+          },
+          "asset_kind": {
+            "type": "string",
+            "enum": [
+              "slope",
+              "channel",
+              "bridge",
+              "road",
+              "power"
+            ],
+            "title": "Asset Kind"
+          },
+          "failure_kind": {
+            "type": "string",
+            "enum": [
+              "landslide",
+              "culvert_collapse",
+              "embankment_breach",
+              "power_outage"
+            ],
+            "title": "Failure Kind"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "asset_id",
+          "asset_kind",
+          "failure_kind",
+          "description"
+        ],
+        "title": "InfrastructureFailure"
+      },
+      "InfrastructureFailureEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "infrastructure.failure",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/InfrastructureFailure"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "InfrastructureFailureEvent"
+      },
+      "InjectRequest": {
+        "properties": {
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "operator:api"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Severity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_type",
+          "payload"
+        ],
+        "title": "InjectRequest"
+      },
+      "InjectionPreset": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "request": {
+            "$ref": "#/components/schemas/InjectRequest"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "description",
+          "request"
+        ],
+        "title": "InjectionPreset"
+      },
+      "MapBridge": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "crosses_id": {
+            "type": "string",
+            "title": "Crosses Id"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "road_id",
+          "zone_id",
+          "crosses_id",
+          "xy"
+        ],
+        "title": "MapBridge"
+      },
+      "MapChannel": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "downstream_zone_id": {
+            "type": "string",
+            "title": "Downstream Zone Id"
+          },
+          "design_capacity_m3s": {
+            "type": "number",
+            "title": "Design Capacity M3S"
+          },
+          "current_capacity_m3s": {
+            "type": "number",
+            "title": "Current Capacity M3S"
+          },
+          "svg_path": {
+            "type": "string",
+            "title": "Svg Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "downstream_zone_id",
+          "design_capacity_m3s",
+          "current_capacity_m3s",
+          "svg_path"
+        ],
+        "title": "MapChannel"
+      },
+      "MapCrew": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "base_zone_id": {
+            "type": "string",
+            "title": "Base Zone Id"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "base_zone_id",
+          "xy"
+        ],
+        "title": "MapCrew"
+      },
+      "MapFeature": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "river",
+              "lake",
+              "hill_contour"
+            ],
+            "title": "Kind"
+          },
+          "svg_path": {
+            "type": "string",
+            "title": "Svg Path"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "svg_path",
+          "label"
+        ],
+        "title": "MapFeature"
+      },
+      "MapHospital": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "beds_total": {
+            "type": "integer",
+            "title": "Beds Total"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "beds_total",
+          "xy"
+        ],
+        "title": "MapHospital"
+      },
+      "MapProject": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "slope_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slope Id"
+          },
+          "planned_depth_m": {
+            "type": "number",
+            "title": "Planned Depth M"
+          },
+          "permit_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permit Number"
+          },
+          "permit_doc_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permit Doc Id"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "slope_id",
+          "planned_depth_m",
+          "permit_number",
+          "permit_doc_id",
+          "xy"
+        ],
+        "title": "MapProject"
+      },
+      "MapRoad": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "zone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Zone Ids"
+          },
+          "is_evacuation_route": {
+            "type": "boolean",
+            "title": "Is Evacuation Route"
+          },
+          "is_only_access": {
+            "type": "boolean",
+            "title": "Is Only Access"
+          },
+          "svg_path": {
+            "type": "string",
+            "title": "Svg Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "zone_ids",
+          "is_evacuation_route",
+          "is_only_access",
+          "svg_path"
+        ],
+        "title": "MapRoad"
+      },
+      "MapSensor": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "rain_gauge",
+              "soil_moisture",
+              "channel_level",
+              "river_level",
+              "wind"
+            ],
+            "title": "Kind"
+          },
+          "zone_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone Id"
+          },
+          "target_id": {
+            "type": "string",
+            "title": "Target Id"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "zone_id",
+          "target_id",
+          "xy"
+        ],
+        "title": "MapSensor"
+      },
+      "MapShelter": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "capacity",
+          "xy"
+        ],
+        "title": "MapShelter"
+      },
+      "MapSlope": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "xy"
+        ],
+        "title": "MapSlope"
+      },
+      "MapZone": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "slope_deg": {
+            "type": "number",
+            "title": "Slope Deg"
+          },
+          "soil_type": {
+            "type": "string",
+            "title": "Soil Type"
+          },
+          "population": {
+            "type": "integer",
+            "title": "Population"
+          },
+          "drains_to_channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drains To Channel Id"
+          },
+          "svg_path": {
+            "type": "string",
+            "title": "Svg Path"
+          },
+          "label_xy": {
+            "$ref": "#/components/schemas/XY"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "slope_deg",
+          "soil_type",
+          "population",
+          "drains_to_channel_id",
+          "svg_path",
+          "label_xy"
+        ],
+        "title": "MapZone"
+      },
+      "ProjectState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "halted"
+            ],
+            "title": "Status",
+            "default": "active"
+          },
+          "activity": {
+            "type": "string",
+            "enum": [
+              "excavating",
+              "idle",
+              "halted"
+            ],
+            "title": "Activity",
+            "default": "idle"
+          },
+          "excavation_depth_m": {
+            "type": "number",
+            "title": "Excavation Depth M"
+          }
+        },
+        "type": "object",
+        "required": [
+          "excavation_depth_m"
+        ],
+        "title": "ProjectState"
+      },
+      "PumpDepot": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "xy": {
+            "$ref": "#/components/schemas/XY"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/components/schemas/PumpUnit"
+            },
+            "type": "array",
+            "title": "Units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "xy",
+          "units"
+        ],
+        "title": "PumpDepot"
+      },
+      "PumpUnit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "capacity_m3s": {
+            "type": "number",
+            "title": "Capacity M3S"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "capacity_m3s"
+        ],
+        "title": "PumpUnit"
+      },
+      "RescueTeamStatus": {
+        "properties": {
+          "crew_id": {
+            "type": "string",
+            "title": "Crew Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "dispatched",
+              "en_route",
+              "on_site",
+              "blocked",
+              "busy",
+              "off_duty"
+            ],
+            "title": "Status"
+          },
+          "location_zone_id": {
+            "type": "string",
+            "title": "Location Zone Id"
+          },
+          "task": {
+            "type": "string",
+            "title": "Task",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "crew_id",
+          "status",
+          "location_zone_id",
+          "task"
+        ],
+        "title": "RescueTeamStatus"
+      },
+      "RescueTeamStatusEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "emergency.rescue_team",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/RescueTeamStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "RescueTeamStatusEvent"
+      },
+      "RiverObservation": {
+        "properties": {
+          "gauge_id": {
+            "type": "string",
+            "title": "Gauge Id"
+          },
+          "river_id": {
+            "type": "string",
+            "title": "River Id"
+          },
+          "level_m": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Level M"
+          },
+          "flood_stage_m": {
+            "type": "number",
+            "title": "Flood Stage M"
+          },
+          "warning_level_m": {
+            "type": "number",
+            "title": "Warning Level M"
+          },
+          "danger_level_m": {
+            "type": "number",
+            "title": "Danger Level M"
+          },
+          "trend": {
+            "type": "string",
+            "enum": [
+              "rising",
+              "steady",
+              "falling"
+            ],
+            "title": "Trend"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gauge_id",
+          "river_id",
+          "level_m",
+          "flood_stage_m",
+          "warning_level_m",
+          "danger_level_m",
+          "trend"
+        ],
+        "title": "RiverObservation"
+      },
+      "RiverObservationEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "environment.river",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/RiverObservation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "RiverObservationEvent"
+      },
+      "RiverState": {
+        "properties": {
+          "level_m": {
+            "type": "number",
+            "title": "Level M"
+          },
+          "inflow_m3s": {
+            "type": "number",
+            "title": "Inflow M3S"
+          },
+          "trend": {
+            "type": "string",
+            "enum": [
+              "rising",
+              "steady",
+              "falling"
+            ],
+            "title": "Trend",
+            "default": "steady"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level_m",
+          "inflow_m3s"
+        ],
+        "title": "RiverState"
+      },
+      "RoadState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "blocked",
+              "closed"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "RoadState"
+      },
+      "RoadStatus": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "blocked",
+              "closed"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          },
+          "is_evacuation_route": {
+            "type": "boolean",
+            "title": "Is Evacuation Route",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "road_id",
+          "status",
+          "reason",
+          "is_evacuation_route"
+        ],
+        "title": "RoadStatus"
+      },
+      "RoadStatusEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "infrastructure.road",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/RoadStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "RoadStatusEvent"
+      },
+      "ScenarioInfo": {
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/ScenarioName"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "duration_ticks": {
+            "type": "integer",
+            "title": "Duration Ticks"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageInfo"
+            },
+            "type": "array",
+            "title": "Stages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "title",
+          "description",
+          "duration_ticks",
+          "stages"
+        ],
+        "title": "ScenarioInfo"
+      },
+      "ScenarioName": {
+        "type": "string",
+        "enum": [
+          "normal_city",
+          "hillside_landslide",
+          "flash_flood",
+          "cascading_landslide_flood"
+        ],
+        "title": "ScenarioName"
+      },
+      "ScenarioStage": {
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "title": "Scenario"
+          },
+          "stage_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Stage Index"
+          },
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "tick": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tick"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario",
+          "stage_index",
+          "stage",
+          "description",
+          "tick"
+        ],
+        "title": "ScenarioStage"
+      },
+      "ScenarioStageEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "scenario.stage",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ScenarioStage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "ScenarioStageEvent"
+      },
+      "SelectScenarioRequest": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/ScenarioName"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario"
+        ],
+        "title": "SelectScenarioRequest"
+      },
+      "Severity": {
+        "type": "string",
+        "enum": [
+          "info",
+          "low",
+          "moderate",
+          "high",
+          "critical"
+        ],
+        "title": "Severity"
+      },
+      "ShelterCapacity": {
+        "properties": {
+          "shelter_id": {
+            "type": "string",
+            "title": "Shelter Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "open",
+              "full"
+            ],
+            "title": "Status"
+          },
+          "capacity": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Capacity",
+            "default": 0
+          },
+          "occupancy": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Occupancy"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "shelter_id",
+          "status",
+          "capacity",
+          "occupancy"
+        ],
+        "title": "ShelterCapacity"
+      },
+      "ShelterCapacityEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "emergency.shelter",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ShelterCapacity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "ShelterCapacityEvent"
+      },
+      "ShelterState": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "open",
+              "full"
+            ],
+            "title": "Status"
+          },
+          "occupancy": {
+            "type": "integer",
+            "title": "Occupancy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "occupancy"
+        ],
+        "title": "ShelterState"
+      },
+      "SimSnapshotEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "sim.snapshot",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SimSnapshotPayload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "SimSnapshotEvent"
+      },
+      "SimSnapshotPayload": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/SimStatus"
+          },
+          "world": {
+            "$ref": "#/components/schemas/WorldSnapshot"
+          },
+          "city": {
+            "$ref": "#/components/schemas/CityMap"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "world",
+          "city"
+        ],
+        "title": "SimSnapshotPayload",
+        "description": "Typed view of the ``sim.snapshot`` payload (``payloads.SimSnapshot`` keeps world and city as dicts)."
+      },
+      "SimStatus": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "running",
+              "paused"
+            ],
+            "title": "State"
+          },
+          "running": {
+            "type": "boolean",
+            "title": "Running",
+            "default": false
+          },
+          "scenario": {
+            "type": "string",
+            "title": "Scenario"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed"
+          },
+          "speed": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Speed"
+          },
+          "tick": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tick"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "state",
+          "running",
+          "scenario",
+          "seed",
+          "speed",
+          "tick",
+          "sim_time",
+          "stage"
+        ],
+        "title": "SimStatus"
+      },
+      "SimStatusEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "sim.status",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SimStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "SimStatusEvent"
+      },
+      "SimTick": {
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Tick"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "scenario": {
+            "type": "string",
+            "title": "Scenario"
+          },
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          },
+          "speed": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Speed"
+          },
+          "running": {
+            "type": "boolean",
+            "title": "Running",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tick",
+          "sim_time",
+          "scenario",
+          "stage",
+          "speed",
+          "running"
+        ],
+        "title": "SimTick"
+      },
+      "SimTickEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "sim.tick",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SimTick"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "SimTickEvent"
+      },
+      "SimulationSpeed": {
+        "properties": {
+          "speed": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.25,
+            "title": "Speed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "speed"
+        ],
+        "title": "SimulationSpeed"
+      },
+      "SimulationStart": {
+        "properties": {
+          "scenario": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScenarioName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed"
+          },
+          "speed": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10.0,
+                "minimum": 0.25
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speed"
+          }
+        },
+        "type": "object",
+        "title": "SimulationStart"
+      },
+      "SimulationStatus": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "running",
+              "paused"
+            ],
+            "title": "State"
+          },
+          "running": {
+            "type": "boolean",
+            "title": "Running"
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/ScenarioName"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed"
+          },
+          "speed": {
+            "type": "number",
+            "title": "Speed"
+          },
+          "tick": {
+            "type": "integer",
+            "title": "Tick"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minutes_per_tick": {
+            "type": "integer",
+            "title": "Minutes Per Tick"
+          },
+          "tick_seconds": {
+            "type": "number",
+            "title": "Tick Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "running",
+          "scenario",
+          "seed",
+          "speed",
+          "tick",
+          "sim_time",
+          "stage",
+          "minutes_per_tick",
+          "tick_seconds"
+        ],
+        "title": "SimulationStatus"
+      },
+      "SlopeObservation": {
+        "properties": {
+          "slope_id": {
+            "type": "string",
+            "title": "Slope Id"
+          },
+          "movement_rate_mm_h": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Movement Rate Mm H"
+          },
+          "cumulative_movement_mm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Cumulative Movement Mm"
+          },
+          "saturation": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Saturation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "slope_id",
+          "movement_rate_mm_h",
+          "cumulative_movement_mm",
+          "saturation"
+        ],
+        "title": "SlopeObservation"
+      },
+      "SlopeObservationEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "environment.slope",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SlopeObservation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "SlopeObservationEvent"
+      },
+      "SlopeState": {
+        "properties": {
+          "saturation": {
+            "type": "number",
+            "title": "Saturation"
+          },
+          "movement_rate_mm_h": {
+            "type": "number",
+            "title": "Movement Rate Mm H",
+            "default": 0.0
+          },
+          "cumulative_movement_mm": {
+            "type": "number",
+            "title": "Cumulative Movement Mm",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "saturation"
+        ],
+        "title": "SlopeState"
+      },
+      "SoilObservation": {
+        "properties": {
+          "probe_id": {
+            "type": "string",
+            "title": "Probe Id"
+          },
+          "slope_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slope Id"
+          },
+          "soil_moisture_pct": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Soil Moisture Pct"
+          },
+          "saturation": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Saturation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "probe_id",
+          "slope_id",
+          "soil_moisture_pct",
+          "saturation"
+        ],
+        "title": "SoilObservation"
+      },
+      "SoilObservationEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "environment.soil",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SoilObservation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "SoilObservationEvent"
+      },
+      "StageInfo": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "start_tick": {
+            "type": "integer",
+            "title": "Start Tick"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "name",
+          "description",
+          "start_tick"
+        ],
+        "title": "StageInfo"
+      },
+      "StoredChunk": {
+        "properties": {
+          "chunk_id": {
+            "type": "string",
+            "title": "Chunk Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "document_title": {
+            "type": "string",
+            "title": "Document Title"
+          },
+          "section_id": {
+            "type": "string",
+            "title": "Section Id"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "policy",
+              "sop",
+              "report",
+              "permit",
+              "change_log",
+              "profile"
+            ],
+            "title": "Kind"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "policy",
+              "sop",
+              "procedure",
+              "incident_report",
+              "infrastructure_report",
+              "engineering_report",
+              "construction_safety",
+              "evacuation",
+              "resource_rules",
+              "change_log"
+            ],
+            "title": "Category"
+          },
+          "zone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Zone Ids"
+          },
+          "hazards": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "flood",
+                "flash_flood",
+                "landslide",
+                "cyclone",
+                "urban_fire"
+              ]
+            },
+            "type": "array",
+            "title": "Hazards"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chunk_id",
+          "document_id",
+          "document_title",
+          "section_id",
+          "section",
+          "source",
+          "kind",
+          "category",
+          "zone_ids",
+          "hazards",
+          "text",
+          "metadata"
+        ],
+        "title": "StoredChunk"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "ViewBox": {
+        "properties": {
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          },
+          "width": {
+            "type": "number",
+            "title": "Width"
+          },
+          "height": {
+            "type": "number",
+            "title": "Height"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "title": "ViewBox"
+      },
+      "WaterAccumulation": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "depth_cm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Depth Cm"
+          },
+          "trend": {
+            "type": "string",
+            "enum": [
+              "rising",
+              "steady",
+              "falling"
+            ],
+            "title": "Trend"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "zone_id",
+          "depth_cm",
+          "trend"
+        ],
+        "title": "WaterAccumulation"
+      },
+      "WaterAccumulationEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "environment.water_accumulation",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/WaterAccumulation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "WaterAccumulationEvent"
+      },
+      "WeatherForecast": {
+        "properties": {
+          "issued_sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued Sim Time"
+          },
+          "horizon_h": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Horizon H"
+          },
+          "expected_total_mm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Expected Total Mm"
+          },
+          "peak_intensity_mm_h": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Peak Intensity Mm H"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "issued_sim_time",
+          "horizon_h",
+          "expected_total_mm",
+          "peak_intensity_mm_h",
+          "confidence",
+          "summary"
+        ],
+        "title": "WeatherForecast"
+      },
+      "WeatherForecastEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "weather.forecast",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/WeatherForecast"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "WeatherForecastEvent"
+      },
+      "WeatherObservation": {
+        "properties": {
+          "station_id": {
+            "type": "string",
+            "title": "Station Id"
+          },
+          "rainfall_intensity_mm_h": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rainfall Intensity Mm H"
+          },
+          "cumulative_rainfall_24h_mm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cumulative Rainfall 24H Mm"
+          },
+          "temperature_c": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature C"
+          },
+          "wind_speed_kmh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Speed Kmh"
+          },
+          "wind_direction_deg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMaximum": 360.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Direction Deg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "station_id",
+          "rainfall_intensity_mm_h",
+          "cumulative_rainfall_24h_mm",
+          "temperature_c",
+          "wind_speed_kmh",
+          "wind_direction_deg"
+        ],
+        "title": "WeatherObservation",
+        "description": "A rain gauge reports rainfall, the wind station wind and temperature; unmeasured fields are None."
+      },
+      "WeatherObservationEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "incident_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Incident Id"
+          },
+          "event_type": {
+            "type": "string",
+            "const": "weather.observation",
+            "title": "Event Type"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/WeatherObservation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "sim_time",
+          "source",
+          "location",
+          "severity",
+          "incident_id",
+          "event_type",
+          "payload"
+        ],
+        "title": "WeatherObservationEvent"
+      },
+      "WeatherState": {
+        "properties": {
+          "temperature_c": {
+            "type": "number",
+            "title": "Temperature C"
+          },
+          "wind_speed_kmh": {
+            "type": "number",
+            "title": "Wind Speed Kmh"
+          },
+          "wind_direction_deg": {
+            "type": "number",
+            "title": "Wind Direction Deg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "temperature_c",
+          "wind_speed_kmh",
+          "wind_direction_deg"
+        ],
+        "title": "WeatherState"
+      },
+      "WorldSnapshot": {
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "title": "Tick"
+          },
+          "sim_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sim Time"
+          },
+          "stage_index": {
+            "type": "integer",
+            "title": "Stage Index"
+          },
+          "weather": {
+            "$ref": "#/components/schemas/WeatherState"
+          },
+          "forecast": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WeatherForecast"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zones": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ZoneConditions"
+            },
+            "type": "object",
+            "title": "Zones"
+          },
+          "slopes": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SlopeState"
+            },
+            "type": "object",
+            "title": "Slopes"
+          },
+          "channels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ChannelState"
+            },
+            "type": "object",
+            "title": "Channels"
+          },
+          "rivers": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RiverState"
+            },
+            "type": "object",
+            "title": "Rivers"
+          },
+          "roads": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RoadState"
+            },
+            "type": "object",
+            "title": "Roads"
+          },
+          "bridges": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/BridgeState"
+            },
+            "type": "object",
+            "title": "Bridges"
+          },
+          "projects": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProjectState"
+            },
+            "type": "object",
+            "title": "Projects"
+          },
+          "crews": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CrewState"
+            },
+            "type": "object",
+            "title": "Crews"
+          },
+          "ambulances": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AmbulanceState"
+            },
+            "type": "object",
+            "title": "Ambulances"
+          },
+          "hospitals": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HospitalState"
+            },
+            "type": "object",
+            "title": "Hospitals"
+          },
+          "shelters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ShelterState"
+            },
+            "type": "object",
+            "title": "Shelters"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tick",
+          "sim_time",
+          "stage_index",
+          "weather",
+          "forecast",
+          "zones",
+          "slopes",
+          "channels",
+          "rivers",
+          "roads",
+          "bridges",
+          "projects",
+          "crews",
+          "ambulances",
+          "hospitals",
+          "shelters"
+        ],
+        "title": "WorldSnapshot",
+        "description": "Frozen, JSON-safe export of the whole world (``sim.snapshot`` and ``GET /api/simulation/snapshot``)."
+      },
+      "XY": {
+        "properties": {
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x",
+          "y"
+        ],
+        "title": "XY"
+      },
+      "ZoneConditions": {
+        "properties": {
+          "saturation": {
+            "type": "number",
+            "title": "Saturation"
+          },
+          "rainfall_intensity_mm_h": {
+            "type": "number",
+            "title": "Rainfall Intensity Mm H",
+            "default": 0.0
+          },
+          "rain_24h_mm": {
+            "type": "number",
+            "title": "Rain 24H Mm",
+            "default": 0.0
+          },
+          "water_depth_cm": {
+            "type": "number",
+            "title": "Water Depth Cm",
+            "default": 0.0
+          },
+          "water_trend": {
+            "type": "string",
+            "enum": [
+              "rising",
+              "steady",
+              "falling"
+            ],
+            "title": "Water Trend",
+            "default": "steady"
+          }
+        },
+        "type": "object",
+        "required": [
+          "saturation"
+        ],
+        "title": "ZoneConditions"
+      }
+    }
+  }
+}

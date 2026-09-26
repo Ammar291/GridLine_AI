@@ -1,6 +1,6 @@
 import type { City } from '@/api/types';
 import { zoneName } from '@/live/derive';
-import type { LiveAssets } from '@/live/types';
+import type { LiveAssets } from '@/live/assets';
 
 const str = (v: unknown): string | null => (typeof v === 'string' && v !== '' ? v : null);
 

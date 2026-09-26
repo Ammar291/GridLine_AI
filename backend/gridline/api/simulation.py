@@ -1,58 +1,25 @@
 """``/api/simulation/*`` (spec §8.2): operator control of the runner. Every body and response is a model."""
 
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Body
-from pydantic import BaseModel, Field
 
 from gridline.api.deps import RunnerDep
-from gridline.events.envelope import Event
-from gridline.events.types import EventType, Severity
-from gridline.simulation.runner import MAX_SPEED, MIN_SPEED, SimulationStatus, StageInfo
-from gridline.simulation.scenarios import SCENARIOS, ScenarioName
+from gridline.api.event_models import Event, typed_event
+from gridline.api.simulation_models import (
+    AdvanceRequest,
+    AdvanceResponse,
+    InjectRequest,
+    ScenarioInfo,
+    SelectScenarioRequest,
+    SimulationSpeed,
+    SimulationStart,
+    scenario_infos,
+)
+from gridline.simulation.runner import SimulationStatus
 from gridline.simulation.world import WorldSnapshot
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
-
-
-class ScenarioInfo(BaseModel):
-    name: ScenarioName
-    title: str
-    description: str
-    duration_ticks: int
-    stages: list[StageInfo]
-
-
-class SelectScenarioRequest(BaseModel):
-    scenario: ScenarioName
-    seed: int | None = None
-
-
-class SimulationStart(BaseModel):
-    scenario: ScenarioName | None = None
-    seed: int | None = None
-    speed: float | None = Field(default=None, ge=MIN_SPEED, le=MAX_SPEED)
-
-
-class AdvanceRequest(BaseModel):
-    ticks: int = Field(default=1, ge=1, le=1000)
-
-
-class AdvanceResponse(BaseModel):
-    events_emitted: int
-    status: SimulationStatus
-
-
-class SimulationSpeed(BaseModel):
-    speed: float = Field(ge=MIN_SPEED, le=MAX_SPEED)
-
-
-class InjectRequest(BaseModel):
-    event_type: EventType
-    location: str | None = None
-    payload: dict[str, Any]
-    source: str = "operator:api"
-    severity: Severity | None = None
 
 
 @router.get("/status")
@@ -62,19 +29,7 @@ async def get_status(runner: RunnerDep) -> SimulationStatus:
 
 @router.get("/scenarios")
 async def list_scenarios() -> list[ScenarioInfo]:
-    return [
-        ScenarioInfo(
-            name=s.name,
-            title=s.title,
-            description=s.description,
-            duration_ticks=s.duration_ticks,
-            stages=[
-                StageInfo(index=i, name=st.name, description=st.description, start_tick=st.start_tick)
-                for i, st in enumerate(s.stages)
-            ],
-        )
-        for s in SCENARIOS.values()
-    ]
+    return scenario_infos()
 
 
 @router.get("/snapshot")
@@ -126,6 +81,7 @@ async def set_speed(body: SimulationSpeed, runner: RunnerDep) -> SimulationStatu
 @router.post("/inject")
 async def inject(body: InjectRequest, runner: RunnerDep) -> list[Event]:
     """Apply an operator event now; returns it plus any derived events (all published on the bus)."""
-    return await runner.inject(
+    events = await runner.inject(
         body.event_type, body.payload, location=body.location, source=body.source, severity=body.severity
     )
+    return [typed_event(e) for e in events]

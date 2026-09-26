@@ -3,7 +3,7 @@ import { KeyValue } from '@/components/ui/KeyValue';
 import { bandLabel } from '@/components/ui/bandLabel';
 import { zoneName } from '@/live/derive';
 import { fmtIndex, fmtPct, fmtSimTime, statusLabel } from '@/live/format';
-import type { LiveAssets } from '@/live/types';
+import type { LiveAssets } from '@/live/assets';
 
 interface CityStateFactsProps { snapshot: CitySnapshot; city: City | null; roads: LiveAssets['roads'] }
 

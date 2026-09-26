@@ -5,11 +5,11 @@ import { cityFixture } from '@/test/fixtures/city';
 export function fakeClient(overrides: Partial<ApiClient> = {}): ApiClient {
   const rejectMock = () => Promise.reject(new Error('not implemented'));
   return {
-    mode: 'mock', health: rejectMock, llmStatus: rejectMock, city: () => Promise.resolve(cityFixture), events: rejectMock,
-    incidents: rejectMock, incident: rejectMock, approvals: () => Promise.resolve([]), decide: rejectMock, actions: rejectMock,
-    action: rejectMock, document: rejectMock, chunk: rejectMock,
+    mode: 'mock', health: rejectMock, city: () => Promise.resolve(cityFixture), chunk: rejectMock,
     simulation: { start: rejectMock, pause: rejectMock, resume: rejectMock, reset: rejectMock, setSpeed: rejectMock, inject: rejectMock },
     openSocket: () => ({ close: () => undefined }),
+    llmStatus: rejectMock, bands: rejectMock, events: rejectMock, incidents: rejectMock, incident: rejectMock,
+    approvals: () => Promise.resolve([]), decide: rejectMock, actions: rejectMock, action: rejectMock, document: rejectMock,
     ...overrides,
   };
 }

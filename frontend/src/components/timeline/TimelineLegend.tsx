@@ -11,13 +11,22 @@ function LineKey({ color, dashed = false, wash = false }: { color: string; dashe
   );
 }
 
-/** Legend for the index chart: always shown, text in ink, keys mirror the marks. Also names whose thresholds are drawn. */
-export function TimelineLegend({ hazard }: { hazard: Hazard }) {
+interface TimelineLegendProps {
+  hazard: Hazard;
+  /** The threat detector's indices are charted (PENDING until the detector lands). */
+  indices?: boolean;
+  thresholds?: boolean;
+}
+
+/** Legend for the index chart: always shown, text in ink, keys mirror the marks drawn. Also names whose thresholds are drawn. */
+export function TimelineLegend({ hazard, indices = true, thresholds = true }: TimelineLegendProps) {
   const items = [
-    { name: SERIES.landslide.name, key: <LineKey color={SERIES.landslide.color} /> },
-    { name: SERIES.flood.name, key: <LineKey color={SERIES.flood.color} /> },
+    ...(indices ? [
+      { name: SERIES.landslide.name, key: <LineKey color={SERIES.landslide.color} /> },
+      { name: SERIES.flood.name, key: <LineKey color={SERIES.flood.color} /> },
+    ] : []),
     { name: SERIES.saturation.name, key: <LineKey color={SERIES.saturation.color} wash /> },
-    { name: `${statusLabel(hazard)} thresholds`, key: <LineKey color="var(--color-ink-3)" dashed /> },
+    ...(thresholds ? [{ name: `${statusLabel(hazard)} thresholds`, key: <LineKey color="var(--color-ink-3)" dashed /> }] : []),
   ];
   return (
     <ul aria-label="Legend" className="flex items-center gap-3 text-[11px] text-ink-2">

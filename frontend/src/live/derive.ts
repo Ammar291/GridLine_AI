@@ -1,13 +1,19 @@
 // Pure selectors over live state. Arithmetic over what the backend sent; no inference (spec F6).
-import type { AgentRun, Approval, Action, Band, City, Hazard, Incident, NodeName, StateChange, StepOutput, Zone, ZoneState } from '@/api/types';
+import type {
+  AgentRun, Approval, Action, Band, City, Hazard, Incident, NodeName, StateChange, StepOutput, WorldSnapshot, Zone, ZoneState,
+} from '@/api/types';
 import { bandLabel, bandRank, maxBand } from '@/components/ui/bandLabel';
+import type { LiveAssets } from './assets';
 import { fmtIndex, fmtPct } from './format';
-import type { LiveAssets, TelemetryPoint } from './types';
+import type { TelemetryPoint } from './types';
 
 export interface CityStatus { band: Band; label: string }
 
-export function cityStatus(zoneState: Record<string, ZoneState>): CityStatus {
-  const band = maxBand(Object.values(zoneState).map((z) => z.band));
+/** Highest detector band over the zones; null until the threat detector has reported any zone (PENDING). */
+export function cityStatus(zoneState: Record<string, ZoneState>): CityStatus | null {
+  const bands = Object.values(zoneState).map((z) => z.band);
+  if (bands.length === 0) return null;
+  const band = maxBand(bands);
   return { band, label: bandLabel(band) };
 }
 
@@ -46,17 +52,20 @@ export function preventiveActions(actions: Record<string, Action>, approvals: Re
   };
 }
 
-export function resources(assets: LiveAssets) {
+export function resources(assets: LiveAssets, world: WorldSnapshot | null) {
   const crews = Object.values(assets.crews);
   const openShelters = Object.values(assets.shelters).filter((s) => s.status === 'open');
+  const ambulances = Object.values(world?.ambulances ?? {});
   return {
     crewsAvailable: crews.filter((c) => c.status === 'available').length,
     crewsTotal: crews.length,
     sheltersOpen: openShelters.length,
     shelterCapacityOpen: openShelters.reduce((n, s) => n + s.capacity, 0),
-    pumpsAtDepot: assets.pumpUnits.filter((p) => p.status === 'at_depot').length,
+    pumpsAtDepot: assets.pumpUnits.filter((p) => p.status === 'available').length,
     pumpsTotal: assets.pumpUnits.length,
-    roadsClosed: Object.values(assets.roads).filter((r) => r.status === 'closed').length,
+    ambulancesAvailable: ambulances.filter((a) => a.status === 'available').length,
+    ambulancesTotal: ambulances.length,
+    roadsImpassable: Object.values(assets.roads).filter((r) => r.status !== 'open').length,
   };
 }
 
@@ -98,7 +107,7 @@ export interface WhatChanged {
   readingDeltas: { label: string; from: string; to: string }[];
 }
 
-const READINGS: { label: string; pick: (p: TelemetryPoint) => number; fmt: (x: number) => string }[] = [
+const READINGS: { label: string; pick: (p: TelemetryPoint) => number | null; fmt: (x: number) => string }[] = [
   { label: 'Landslide index', pick: (p) => p.landslide, fmt: fmtIndex },
   { label: 'Flood index', pick: (p) => p.flood, fmt: fmtIndex },
   { label: 'Saturation', pick: (p) => p.saturation, fmt: fmtPct },
@@ -108,21 +117,21 @@ const READINGS: { label: string; pick: (p: TelemetryPoint) => number; fmt: (x: n
 /** Band transitions and first-to-last reading deltas over the telemetry window the caller passes in. */
 export function whatChanged(_incident: Incident, run: AgentRun, telemetry: TelemetryPoint[], _city: City | null): WhatChanged {
   const bandTransitions: string[] = [];
-  for (let i = 1; i < telemetry.length; i++) {
-    const prev = telemetry[i - 1];
-    const cur = telemetry[i];
+  const banded = telemetry.filter((p): p is TelemetryPoint & { band: Band } => p.band !== null);
+  for (let i = 1; i < banded.length; i++) {
+    const prev = banded[i - 1];
+    const cur = banded[i];
     if (prev && cur && prev.band !== cur.band) bandTransitions.push(`${bandLabel(prev.band)} → ${bandLabel(cur.band)}`);
   }
-  const first = telemetry[0];
-  const last = telemetry.at(-1);
-  const readingDeltas =
-    first && last
-      ? READINGS.flatMap((r) => {
-          const from = r.fmt(r.pick(first));
-          const to = r.fmt(r.pick(last));
-          return from === to ? [] : [{ label: r.label, from, to }];
-        })
-      : [];
+  const readingDeltas = READINGS.flatMap((r) => {
+    const values = telemetry.map(r.pick).filter((v): v is number => v !== null);
+    const first = values[0];
+    const last = values.at(-1);
+    if (first === undefined || last === undefined) return [];
+    const from = r.fmt(first);
+    const to = r.fmt(last);
+    return from === to ? [] : [{ label: r.label, from, to }];
+  });
   return { trigger: run.trigger, replanReason: run.replan_reason ?? null, bandTransitions, readingDeltas };
 }
 
@@ -135,6 +144,7 @@ export function entityName(assets: LiveAssets, entityType: StateChange['entity_t
     case 'crew': return assets.crews[id]?.name ?? id;
     case 'shelter': return assets.shelters[id]?.name ?? id;
     case 'road': return assets.roads[id]?.name ?? id;
+    case 'bridge': return assets.bridges[id]?.name ?? id;
     case 'project': return assets.projects[id]?.name ?? id;
     case 'channel': return assets.channels[id]?.name ?? id;
     default: return id;

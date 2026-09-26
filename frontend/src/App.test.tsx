@@ -16,7 +16,7 @@ describe('App', () => {
     }
     expect(screen.getByText('Mock data. Backend not connected.')).toBeInTheDocument();
     expect(await screen.findByText('No backend')).toBeInTheDocument();
-    expect(await screen.findByRole('option', { name: 'Hillside landslide' })).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: 'Hillside landslide risk' })).toBeInTheDocument();
     expect(screen.getByTestId('dashboard')).toHaveClass('overflow-hidden', 'h-screen');
   });
 
@@ -38,11 +38,11 @@ describe('App', () => {
     expect(screen.getByRole('dialog', { name: 'Why?' })).toHaveTextContent('This item is no longer in the live state.');
   });
 
-  it('Start drives the mock replay: sim clock advances and city status goes Watch then Warning', async () => {
+  it('Start drives the mock replay: sim clock advances and the scripted detector takes the city to Watch then Warning', async () => {
     render(<App client={new MockApiClient({ tickMs: 4 })} />);
-    await screen.findByRole('option', { name: 'Hillside landslide' });
+    await screen.findByRole('option', { name: 'Hillside landslide risk' });
     const status = () => screen.getByRole('group', { name: 'City status' });
-    expect(within(status()).getByText('Normal')).toBeInTheDocument();
+    await waitFor(() => { expect(status()).toHaveTextContent('No threat detector readings yet'); });
     fireEvent.click(screen.getByRole('button', { name: 'Start' }));
     await waitFor(() => { expect(within(status()).getByText('Watch')).toBeInTheDocument(); }, { timeout: 3000, interval: 5 });
     await waitFor(() => { expect(within(status()).getByText('Warning')).toBeInTheDocument(); }, { timeout: 3000 });

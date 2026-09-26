@@ -1,5 +1,5 @@
 // Map colours and sizes, all from the design tokens. Band colours carry severity; nothing else is saturated.
-import type { Band, Crew } from '@/api/types';
+import type { Band, CrewState } from '@/api/types';
 import type { LayerId } from '@/ui/uiStore';
 
 export const LAYER_LABELS: Record<LayerId, string> = {
@@ -30,12 +30,14 @@ export const bandColor = (b: Band): string => `var(--color-band-${b})`;
 
 export const ZONE_FILL_OPACITY: Record<Band, number> = { normal: 0.12, watch: 0.28, warning: 0.36, critical: 0.42 };
 
-export const CREW_FILL: Record<Crew['status'], string> = {
+export const CREW_FILL: Record<CrewState['status'], string> = {
   available: OK,
   dispatched: ACCENT,
   en_route: ACCENT,
   on_site: bandColor('watch'),
   blocked: bandColor('critical'),
+  busy: INK_3,
+  off_duty: INK_3,
 };
 
 /** Channels count as blocked on the map above this fraction. */

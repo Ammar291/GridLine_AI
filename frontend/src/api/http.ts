@@ -4,17 +4,18 @@ import type {
   Approval,
   ApprovalDecision,
   ApprovalStatus,
+  Bands,
   Chunk,
   City,
   Document,
   Event,
-  EventType,
   Health,
   Incident,
   IncidentSummary,
-  InjectEvent,
+  InjectRequest,
   LlmStatus,
-  SimStatus,
+  SimulationStart,
+  SimulationStatus,
 } from './types';
 
 async function request<T>(fetchImpl: typeof fetch, url: string, init?: RequestInit): Promise<T> {
@@ -26,6 +27,18 @@ async function request<T>(fetchImpl: typeof fetch, url: string, init?: RequestIn
   if (!res.ok) throw new ApiError(res.status, body, `${init?.method ?? 'GET'} ${url} failed with ${String(res.status)}`);
   return body as T;
 }
+
+/**
+ * PENDING: the backend does not serve this route yet (openapi.pending.yaml). Answer 501 without a request so the
+ * console stays clean and panels show their empty states. When the route lands, call this.get/this.post instead and
+ * delete the route's overlay entry.
+ */
+function pending<T>(route: string): Promise<T> {
+  return Promise.reject(new ApiError(501, { detail: `${route} is not served by the backend yet` }, `${route} is pending`));
+}
+
+/** WebSocket.CONNECTING, spelled out so injected test doubles need not define the constant. */
+const CONNECTING = 0;
 
 function defaultWsUrl(): string {
   const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -58,44 +71,31 @@ export class HttpApiClient implements ApiClient {
   }
 
   health(): Promise<Health> { return this.get('/health'); }
-  llmStatus(): Promise<LlmStatus> { return this.get('/llm/status'); }
   city(): Promise<City> { return this.get('/city'); }
-
-  events(q: { since?: string; type?: EventType; limit?: number } = {}): Promise<Event[]> {
-    const params = new URLSearchParams();
-    if (q.since !== undefined) params.set('since', q.since);
-    if (q.type !== undefined) params.set('type', q.type);
-    if (q.limit !== undefined) params.set('limit', String(q.limit));
-    const qs = params.toString();
-    return this.get(`/events${qs ? `?${qs}` : ''}`);
-  }
-
-  incidents(): Promise<IncidentSummary[]> { return this.get('/incidents'); }
-  incident(id: string): Promise<Incident> { return this.get(`/incidents/${encodeURIComponent(id)}`); }
-
-  approvals(status?: ApprovalStatus): Promise<Approval[]> {
-    return this.get(status === undefined ? '/approvals' : `/approvals?status=${status}`);
-  }
-
-  decide(id: string, body: ApprovalDecision): Promise<Approval> {
-    return this.post(`/approvals/${encodeURIComponent(id)}/decide`, body);
-  }
-
-  actions(): Promise<Action[]> { return this.get('/actions'); }
-  action(id: string): Promise<Action> { return this.get(`/actions/${encodeURIComponent(id)}`); }
-  document(docId: string): Promise<Document> { return this.get(`/documents/${encodeURIComponent(docId)}`); }
   chunk(chunkId: string): Promise<Chunk> { return this.get(`/chunks/${encodeURIComponent(chunkId)}`); }
 
   readonly simulation = {
-    start: (body: { scenario: string; speed: number; seed?: number }): Promise<SimStatus> => this.post('/simulation/start', body),
-    pause: (): Promise<SimStatus> => this.post('/simulation/pause'),
-    resume: (): Promise<SimStatus> => this.post('/simulation/resume'),
-    reset: (): Promise<SimStatus> => this.post('/simulation/reset'),
-    setSpeed: (speed: number): Promise<SimStatus> => this.post('/simulation/speed', { speed }),
-    inject: (body: InjectEvent): Promise<SimStatus> => this.post('/simulation/inject', body),
+    start: (body: SimulationStart): Promise<SimulationStatus> => this.post('/simulation/start', body),
+    pause: (): Promise<SimulationStatus> => this.post('/simulation/pause'),
+    resume: (): Promise<SimulationStatus> => this.post('/simulation/resume'),
+    reset: (): Promise<SimulationStatus> => this.post('/simulation/reset'),
+    setSpeed: (speed: number): Promise<SimulationStatus> => this.post('/simulation/speed', { speed }),
+    inject: (body: InjectRequest): Promise<Event[]> => this.post('/simulation/inject', body),
   };
 
-  /** One raw socket. Reconnect is owned by LiveSocket (src/live/socket.ts). */
+  // ---- PENDING routes (see pending()) ----
+  llmStatus(): Promise<LlmStatus> { return pending('GET /api/llm/status'); }
+  bands(): Promise<Bands> { return pending('GET /api/detector/bands'); }
+  events(): Promise<Event[]> { return pending('GET /api/events'); }
+  incidents(): Promise<IncidentSummary[]> { return pending('GET /api/incidents'); }
+  incident(_id: string): Promise<Incident> { return pending('GET /api/incidents/{incident_id}'); }
+  approvals(_status?: ApprovalStatus): Promise<Approval[]> { return pending('GET /api/approvals'); }
+  decide(_id: string, _body: ApprovalDecision): Promise<Approval> { return pending('POST /api/approvals/{approval_id}/decide'); }
+  actions(): Promise<Action[]> { return pending('GET /api/actions'); }
+  action(_id: string): Promise<Action> { return pending('GET /api/actions/{action_id}'); }
+  document(_docId: string): Promise<Document> { return pending('GET /api/documents/{doc_id}'); }
+
+  /** One raw socket. Reconnect is owned by LiveSocket (src/live/socket.ts). Heartbeats are answered, never delivered. */
   openSocket(handlers: SocketHandlers): SocketHandle {
     const Impl = this.WebSocketImpl ?? WebSocket;
     const ws = new Impl(this.wsUrl ?? defaultWsUrl());
@@ -108,11 +108,22 @@ export class HttpApiClient implements ApiClient {
         handlers.onError(err);
         return;
       }
-      if (typeof parsed === 'object' && parsed !== null && (parsed as { type?: unknown }).type === 'heartbeat') return;
+      if (typeof parsed === 'object' && parsed !== null && (parsed as { event_type?: unknown }).event_type === 'sim.heartbeat') return;
       handlers.onEvent(parsed as Event);
     };
     ws.onclose = (ev: CloseEvent) => { handlers.onClose(String(ev.code)); };
     ws.onerror = (ev) => { handlers.onError(ev); };
-    return { close: () => { ws.close(); } };
+    return {
+      close: () => {
+        // Closing a socket that is still connecting makes the browser log an error (React StrictMode does this in dev);
+        // let it open, deliver nothing, and close then.
+        if (ws.readyState === CONNECTING) {
+          ws.onmessage = null;
+          ws.onopen = () => { ws.close(); };
+        } else {
+          ws.close();
+        }
+      },
+    };
   }
 }

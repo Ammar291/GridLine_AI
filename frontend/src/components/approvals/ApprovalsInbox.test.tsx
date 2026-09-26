@@ -20,10 +20,10 @@ const cards = () => screen.getAllByRole('article');
 const approveButton = () => screen.getByRole('button', { name: /^Approve \d+ actions?$/ });
 
 function requested(approval: Approval): Event {
-  return { ...eventsFixture['approval.requested'], id: `evt_${approval.id}`, payload: approval };
+  return { ...eventsFixture['approval.requested'], event_id: `evt_${approval.id}`, payload: approval };
 }
 function decided(approval: Approval): Event {
-  return { ...eventsFixture['approval.decided'], id: `evt_d_${approval.id}`, payload: approval };
+  return { ...eventsFixture['approval.decided'], event_id: `evt_d_${approval.id}`, payload: approval };
 }
 
 describe('ApprovalsInbox', () => {
@@ -161,7 +161,7 @@ describe('ApprovalsInbox', () => {
   });
 
   it('shows the empty state when nothing is waiting', () => {
-    seedLive([{ ...snapshotEventFixture, payload: { ...snapshotEventFixture.payload, approvals: [] } }], { snapshot: false });
+    seedLive([snapshotEventFixture, eventsFixture['incident.opened']], { snapshot: false });
     renderInbox();
     expect(screen.getByRole('note')).toHaveTextContent('No approvals waiting. Proposed actions appear here when the agent asks for a decision.');
     expect(screen.queryByRole('button', { name: /Decided/ })).toBeNull();

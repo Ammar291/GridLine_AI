@@ -12,8 +12,8 @@ import { FEED_FILTERS, FEED_MOTION_CSS, type FeedFilter } from './eventGroups';
 import { FeedFilters } from './FeedFilters';
 import { useAutoScroll } from './useAutoScroll';
 
-/** Event ids can repeat after a mock replay reset, so the wall timestamp is part of the key. */
-const rowKey = (e: { id: string; ts: string }) => `${e.id}@${e.ts}`;
+/** Event ids restart at every engine reset, so the wall timestamp is part of the key. */
+const rowKey = (e: { event_id: string; timestamp: string }) => `${e.event_id}@${e.timestamp}`;
 
 /** Live event stream, newest at the bottom. Keeps its rows through reconnects (only an empty feed shows a state). */
 export function EventFeed() {
@@ -24,7 +24,7 @@ export function EventFeed() {
   const setFeedFilter = useUiStore((s) => s.setFeedFilter);
   const selectIncident = useUiStore((s) => s.selectIncident);
 
-  const rows = useMemo(() => (filter === 'all' ? feed : feed.filter((e) => eventGroup(e.type) === filter)), [feed, filter]);
+  const rows = useMemo(() => (filter === 'all' ? feed : feed.filter((e) => eventGroup(e.event_type) === filter)), [feed, filter]);
   const keys = useMemo(() => rows.map(rowKey), [rows]);
   const { ref, pending, onScroll, jumpToLatest } = useAutoScroll(keys);
 

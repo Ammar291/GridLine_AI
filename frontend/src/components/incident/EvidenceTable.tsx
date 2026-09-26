@@ -9,19 +9,19 @@ export function EvidenceTable({ chunks }: { chunks: RetrievedChunk[] }) {
   return (
     <table className="w-full text-left text-[12px]">
       <thead className="text-[11px] text-ink-2">
-        <tr><th className="font-normal py-0.5">Source</th><th className="font-normal">Section</th><th className="font-normal">Kind</th><th className="font-normal text-right">Score</th></tr>
+        <tr><th className="font-normal py-0.5">Source</th><th className="font-normal">Section</th><th className="font-normal">Kind</th><th className="font-normal text-right">Similarity</th></tr>
       </thead>
       <tbody>
         {chunks.map((c) => (
-          <tr key={c.id} className="border-t border-line">
+          <tr key={c.chunk_id} className="border-t border-line">
             <td className="py-1 pr-2">
-              <button type="button" title={c.id} onClick={() => { openSource(c.id); }} className="text-accent hover:text-accent-strong text-left">
-                {c.doc_title}
+              <button type="button" title={c.chunk_id} onClick={() => { openSource(c.chunk_id); }} className="text-accent hover:text-accent-strong text-left">
+                {c.document_title}
               </button>
             </td>
-            <td className="pr-2 tnum text-ink-2">{c.section}</td>
+            <td className="pr-2 tnum text-ink-2" title={c.section}>{c.section_id}</td>
             <td className="pr-2 text-ink-2">{c.kind}</td>
-            <td className="tnum text-right">{fmtIndex(c.score)}</td>
+            <td className="tnum text-right">{fmtIndex(c.similarity)}</td>
           </tr>
         ))}
       </tbody>

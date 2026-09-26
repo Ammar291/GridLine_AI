@@ -34,6 +34,21 @@ export class LiveSocket {
     this.connect();
   }
 
+  /**
+   * Reopen now to receive a fresh snapshot (the backend sends one per connection). Used after an engine reset, whose
+   * new world is not otherwise sent. The connection status stays as it is; late frames of the old socket are dropped.
+   */
+  resync(): void {
+    if (this.stopped) return;
+    if (this.timer !== null) (this.opts.clearTimeoutImpl ?? clearTimeout)(this.timer);
+    this.timer = null;
+    this.generation++;
+    this.handle?.close();
+    this.handle = null;
+    this.attempt = 0;
+    this.connect(false);
+  }
+
   stop(): void {
     this.stopped = true;
     if (this.timer !== null) (this.opts.clearTimeoutImpl ?? clearTimeout)(this.timer);
@@ -43,11 +58,11 @@ export class LiveSocket {
     this.opts.onStatus('closed');
   }
 
-  private connect(): void {
+  private connect(announce = true): void {
     this.timer = null;
     if (this.stopped) return;
     const gen = ++this.generation;
-    this.opts.onStatus(this.attempt === 0 ? 'connecting' : 'reconnecting');
+    if (announce) this.opts.onStatus(this.attempt === 0 ? 'connecting' : 'reconnecting');
     this.handle = this.opts.client.openSocket({
       onOpen: () => {
         if (gen !== this.generation) return;

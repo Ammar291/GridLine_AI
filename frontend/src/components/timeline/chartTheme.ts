@@ -12,17 +12,18 @@ export const AXIS_STROKE = 'var(--color-viz-axis)';
 /** Milestone markers ride along the top of the 0–1 index axis. */
 export const MARKER_Y = 0.97;
 
-type SeriesKey = 'rain' | 'landslide' | 'flood' | 'saturation';
+export type SeriesKey = 'rain' | 'landslide' | 'flood' | 'saturation' | 'water';
 
 export const SERIES: Record<SeriesKey, { name: string; color: string; format: (x: number) => string }> = {
   rain: { name: 'Rain intensity', color: 'var(--color-viz-rain)', format: (x) => `${String(Math.round(x))} mm/h` },
   landslide: { name: 'Landslide index', color: 'var(--color-viz-landslide)', format: fmtIndex },
   flood: { name: 'Flood index', color: 'var(--color-viz-flood)', format: fmtIndex },
   saturation: { name: 'Saturation', color: 'var(--color-viz-saturation)', format: fmtPct },
+  water: { name: 'Standing water', color: 'var(--color-viz-flood)', format: (x) => `${String(Math.round(x))} cm` },
 };
 
 /** Tooltip reading order, two per row: the inputs (rain, saturation), then the indices they drive. */
-export const TOOLTIP_ORDER: readonly SeriesKey[] = ['rain', 'saturation', 'landslide', 'flood'];
+export const TOOLTIP_ORDER: readonly SeriesKey[] = ['rain', 'saturation', 'landslide', 'flood', 'water'];
 
 export function isTimelineRow(x: unknown): x is TimelineRow {
   return typeof x === 'object' && x !== null && 'simTime' in x && 'landslide' in x && 'rain' in x;

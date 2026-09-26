@@ -76,8 +76,8 @@ describe('WhyDrawer', () => {
 
   it('says which node has not finished when a section has nothing yet', () => {
     const run: AgentRun = { ...runFixture, steps: runFixture.steps.filter((s) => s.node !== 'observe' && s.node !== 'retrieve') };
-    const snapshot = { ...snapshotEventFixture, payload: { ...snapshotEventFixture.payload, incidents: [{ ...incidentFixture, runs: [run] }] } };
-    seedLive([snapshot], { snapshot: false });
+    const opened = { ...eventsFixture['incident.opened'], payload: { ...incidentFixture, runs: [run] } };
+    seedLive([snapshotEventFixture, opened], { snapshot: false });
     renderWithProviders(<WhyDrawer />);
     open({ kind: 'step', stepId: 'step_assess', runId: 'run_1', incidentId: 'inc_1' });
     expect(region('Retrieved evidence')).toHaveTextContent('Retrieve evidence has not finished yet.');

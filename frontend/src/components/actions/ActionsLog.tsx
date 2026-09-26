@@ -6,6 +6,7 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { Panel } from '@/components/ui/Panel';
 import { useLiveStore } from '@/live/liveStore';
+import { useLiveAssets } from '@/live/useLiveAssets';
 import { useUiStore } from '@/ui/uiStore';
 import { ActionRow } from './ActionRow';
 import { replanRunIds, simMinutesBetween, verificationState } from './verification';
@@ -19,7 +20,7 @@ export function ActionsLog() {
   const connection = useLiveStore((s) => s.connection);
   const actions = useLiveStore((s) => s.actions);
   const milestones = useLiveStore((s) => s.milestones);
-  const assets = useLiveStore((s) => s.assets);
+  const assets = useLiveAssets();
   const city = useLiveStore((s) => s.city);
   const simTime = useLiveStore((s) => s.sim.simTime);
   const openWhy = useUiStore((s) => s.openWhy);

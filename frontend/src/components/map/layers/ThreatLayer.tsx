@@ -24,7 +24,7 @@ export function ThreatLayer({ data, u }: { data: MapData; u: number }) {
             stroke={critical} strokeOpacity={0.35} strokeWidth={8} strokeDasharray="2 6" {...NON_SCALING} />
         ) : null;
       })}
-      {data.zones.filter((z) => z.state.band === 'critical').map(({ zone }) => (
+      {data.zones.filter((z) => z.state?.band === 'critical').map(({ zone }) => (
         <path key={`crit-${zone.id}`} d={zone.svg_path} data-threat="critical" data-threat-zone-id={zone.id} className="animate-pulse"
           fill="none" stroke={critical} strokeWidth={3} {...NON_SCALING} />
       ))}

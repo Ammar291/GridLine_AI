@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import type { EventOf } from '@/api/types';
 import { LiveSocket } from './socket';
-import { useLive } from './useLive';
+import { BATCH_MS, useLive } from './useLive';
 import { useLiveStore } from './liveStore';
 import type { ConnectionStatus } from './types';
 import { FakeSocketFactory } from '@/test/FakeSocket';
@@ -29,7 +30,7 @@ describe('LiveSocket', () => {
     expect(statuses.at(-1)).toBe('open');
     f.last().onEvent(snapshotEventFixture);
     f.last().onEvent(eventsFixture['sim.tick']);
-    expect(onEvent.mock.calls.map((c) => (c[0] as { type: string }).type)).toEqual(['state.snapshot', 'sim.tick']);
+    expect(onEvent.mock.calls.map((c) => (c[0] as { event_type: string }).event_type)).toEqual(['sim.snapshot', 'sim.tick']);
   });
 
   it('reconnects with backoff after close', () => {
@@ -64,6 +65,22 @@ describe('LiveSocket', () => {
     expect(f.handlers).toHaveLength(2); // the initial socket plus exactly one reconnect
   });
 
+  it('resync reopens at once without announcing a reconnect and drops the old socket', () => {
+    const { f, statuses, onEvent, s } = setup();
+    s.start();
+    f.last().onOpen();
+    const old = f.last();
+    s.resync();
+    expect(f.handlers).toHaveLength(2);
+    expect(f.closed).toBe(1);
+    expect(statuses).toEqual(['connecting', 'open']);
+    old.onEvent(eventsFixture['sim.tick']);
+    old.onClose('1000');
+    vi.advanceTimersByTime(60_000);
+    expect(onEvent).not.toHaveBeenCalled();
+    expect(f.handlers).toHaveLength(2);
+  });
+
   it('stop closes and prevents further opens', () => {
     const { f, statuses, s } = setup();
     s.start();
@@ -78,18 +95,27 @@ describe('LiveSocket', () => {
 });
 
 describe('useLive', () => {
-  it('wires the socket to the store and keeps data while reconnecting', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  function mount() {
     useLiveStore.getState().resetLive();
     const f = new FakeSocketFactory();
-    const client = f.attach(fakeClient());
-    const { unmount } = renderHook(() => { useLive(client); });
+    const hook = renderHook(() => { useLive(f.attach(fakeClient())); });
+    return { f, ...hook };
+  }
+
+  it('wires the socket to the store in batches and keeps data while reconnecting', () => {
+    const { f, unmount } = mount();
     expect(useLiveStore.getState().connection).toBe('connecting');
     expect(useLiveStore.getState().mode).toBe('mock');
     act(() => {
       f.last().onOpen();
       f.last().onEvent(snapshotEventFixture);
-      f.last().onEvent(eventsFixture['zone.state']);
+      f.last().onEvent(eventsFixture['incident.opened']);
     });
+    expect(useLiveStore.getState().hasSnapshot).toBe(false); // still batching
+    act(() => { vi.advanceTimersByTime(BATCH_MS); });
     expect(useLiveStore.getState().connection).toBe('open');
     act(() => { f.last().onClose('1006'); });
     const s = useLiveStore.getState();
@@ -99,5 +125,23 @@ describe('useLive', () => {
     expect(s.feed).toHaveLength(2);
     unmount();
     expect(useLiveStore.getState().connection).toBe('closed');
+  });
+
+  it('an engine reset (stage 0) reopens the socket for a fresh snapshot', () => {
+    const { f, unmount } = mount();
+    const reset: EventOf<'scenario.stage'> = {
+      ...eventsFixture['scenario.stage'], payload: { ...eventsFixture['scenario.stage'].payload, stage_index: 0 },
+    };
+    act(() => {
+      f.last().onOpen();
+      f.last().onEvent(snapshotEventFixture);
+      f.last().onEvent(eventsFixture['scenario.stage']);
+    });
+    expect(f.handlers).toHaveLength(1);
+    act(() => { f.last().onEvent(reset); });
+    expect(f.handlers).toHaveLength(2);
+    act(() => { vi.advanceTimersByTime(BATCH_MS); });
+    expect(useLiveStore.getState().connection).toBe('open');
+    unmount();
   });
 });

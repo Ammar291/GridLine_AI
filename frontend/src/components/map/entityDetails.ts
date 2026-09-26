@@ -21,16 +21,23 @@ export function entityDetails(ref: EntityRef, data: MapData): EntityDetails | nu
     case 'zone': {
       const z = data.zoneById.get(ref.id);
       if (!z) return null;
+      const c = z.conditions;
       const s = z.state;
       return {
-        title: z.zone.name, kindLabel: 'Zone', band: s.band,
+        title: z.zone.name, kindLabel: 'Zone', band: s?.band,
         items: [
           { label: 'Population', value: fmtNumber(z.zone.population) },
           { label: 'Slope', value: `${trim(z.zone.slope_deg)}°` },
-          { label: 'Saturation', value: fmtPct(s.saturation) },
-          { label: 'Rain intensity', value: `${trim(s.rain_intensity_mm_h)} mm/h` },
-          { label: 'Landslide index', value: fmtIndex(s.landslide_index) },
-          { label: 'Flood index', value: fmtIndex(s.flood_index) },
+          ...(c ? [
+            { label: 'Saturation', value: fmtPct(c.saturation) },
+            { label: 'Rain intensity', value: `${trim(c.rainfall_intensity_mm_h)} mm/h` },
+            { label: 'Rain, 24 h', value: `${trim(c.rain_24h_mm)} mm` },
+            { label: 'Standing water', value: `${trim(c.water_depth_cm)} cm` },
+          ] : []),
+          ...(s ? [
+            { label: 'Landslide index', value: fmtIndex(s.landslide_index) },
+            { label: 'Flood index', value: fmtIndex(s.flood_index) },
+          ] : []),
           { label: 'Soil', value: z.zone.soil_type },
         ],
       };
@@ -43,8 +50,8 @@ export function entityDetails(ref: EntityRef, data: MapData): EntityDetails | nu
         items: [
           { label: 'Status', value: statusLabel(c.status) },
           { label: 'Location', value: zone(c.location_zone_id) },
-          { label: 'Heading to', value: zone(c.target_zone_id) },
-          { label: 'Task', value: c.task ?? 'None' },
+          { label: 'Base', value: zone(c.base_zone_id) },
+          { label: 'Task', value: c.task || 'None' },
         ],
       };
     }
@@ -66,10 +73,25 @@ export function entityDetails(ref: EntityRef, data: MapData): EntityDetails | nu
       return {
         title: r.name, kindLabel: 'Road',
         items: [
-          { label: 'Status', value: statusLabel(r.status) },
+          { label: 'Status', value: `${statusLabel(r.status)}${r.reason ? `: ${r.reason}` : ''}` },
           { label: 'Evacuation route', value: yesNo(r.is_evacuation_route) },
-          { label: 'Bridge', value: yesNo(r.is_bridge) },
+          { label: 'Only access', value: yesNo(r.is_only_access) },
           { label: 'Zones', value: r.zone_ids.map(zone).join(', ') || 'None' },
+        ],
+      };
+    }
+    case 'bridge': {
+      const b = data.bridges.find((x) => x.id === ref.id);
+      if (!b) return null;
+      const road = data.roads.find((r) => r.id === b.road_id)?.name ?? b.road_id;
+      const crosses = data.features.find((f) => f.id === b.crosses_id)?.label ?? data.channels.find((c) => c.id === b.crosses_id)?.name;
+      return {
+        title: b.name, kindLabel: 'Bridge',
+        items: [
+          { label: 'Status', value: `${statusLabel(b.status)}${b.reason ? `: ${b.reason}` : ''}` },
+          { label: 'Carries', value: road },
+          { label: 'Crosses', value: crosses ?? b.crosses_id },
+          { label: 'Zone', value: zone(b.zone_id) },
         ],
       };
     }
@@ -79,8 +101,10 @@ export function entityDetails(ref: EntityRef, data: MapData): EntityDetails | nu
       return {
         title: c.name, kindLabel: 'Drainage channel',
         items: [
-          { label: 'Capacity', value: `${trim(c.current_capacity_m3s)} of ${trim(c.design_capacity_m3s)} m³/s` },
+          { label: 'Flow', value: `${trim(c.flow_m3s)} of ${trim(c.capacity_m3s)} m³/s` },
+          { label: 'Design capacity', value: `${trim(c.design_capacity_m3s)} m³/s` },
           { label: 'Blocked', value: `${fmtPct(c.blocked_fraction)}${c.blocked_fraction > BLOCKED_THRESHOLD ? ', over limit' : ''}` },
+          { label: 'Overflow', value: `${trim(c.overflow_m3s)} m³/s` },
           { label: 'Drains to', value: zone(c.downstream_zone_id) },
         ],
       };
@@ -91,9 +115,9 @@ export function entityDetails(ref: EntityRef, data: MapData): EntityDetails | nu
       return {
         title: p.name, kindLabel: 'Construction',
         items: [
-          { label: 'Status', value: statusLabel(p.status) },
+          { label: 'Status', value: `${statusLabel(p.status)}, ${p.activity}` },
           { label: 'Excavation', value: `${trim(p.excavation_depth_m)} of ${trim(p.planned_depth_m)} m` },
-          { label: 'Permit', value: p.permit_doc_id ?? 'None on file' },
+          { label: 'Permit', value: p.permit_number ?? 'None on file' },
           { label: 'Zone', value: zone(p.zone_id) },
         ],
       };
@@ -101,28 +125,35 @@ export function entityDetails(ref: EntityRef, data: MapData): EntityDetails | nu
     case 'hospital': {
       const h = data.hospitals.find((x) => x.id === ref.id);
       if (!h) return null;
-      return { title: h.name, kindLabel: 'Hospital', items: [{ label: 'Beds', value: fmtNumber(h.beds) }, { label: 'Zone', value: zone(h.zone_id) }] };
+      return {
+        title: h.name, kindLabel: 'Hospital',
+        items: [
+          { label: 'Beds occupied', value: `${fmtNumber(h.beds_occupied)} of ${fmtNumber(h.beds_total)}` },
+          { label: 'Emergency room', value: statusLabel(h.er_status) },
+          { label: 'Zone', value: zone(h.zone_id) },
+        ],
+      };
     }
     case 'sensor': {
       const s = data.sensors.find((x) => x.id === ref.id);
       if (!s) return null;
       return {
-        title: s.id, kindLabel: `${statusLabel(s.kind)} sensor`,
+        title: `${s.id} ${s.name}`, kindLabel: `${statusLabel(s.kind)} sensor`,
         items: [
-          { label: 'Last reading', value: s.last_value == null ? 'No reading yet' : `${trim(s.last_value)} ${s.unit}` },
+          { label: 'Last reading', value: s.reading?.text ?? 'No reading yet' },
           { label: 'Zone', value: zone(s.zone_id) },
         ],
       };
     }
     case 'pump_depot': {
       const units = data.depot.units;
-      const deployed = units.filter((p) => p.status === 'deployed');
+      const available = units.filter((p) => p.status === 'available');
       return {
-        title: 'Pump depot', kindLabel: 'Pumps',
+        title: 'Pump depot', kindLabel: 'Mobile pumps',
         items: [
-          { label: 'At depot', value: `${String(units.length - deployed.length)} of ${String(units.length)}` },
+          { label: 'Available', value: `${String(available.length)} of ${String(units.length)}` },
           { label: 'Zone', value: zone(data.depot.zone_id) },
-          { label: 'Deployed', value: deployed.map((p) => (p.channel_id ? `${p.id} on ${p.channel_id}` : p.id)).join(', ') || 'None' },
+          { label: 'Capacity each', value: units[0] ? `${trim(units[0].capacity_m3s)} m³/s` : 'None' },
         ],
       };
     }

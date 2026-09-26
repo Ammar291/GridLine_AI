@@ -1,75 +1,108 @@
-// Development scaffold (spec F1): serves the synthetic Nandipur city and replays scripted simulation/detector events.
-// Every AI-only endpoint rejects with 501; the mock never fabricates reasoning, approvals, actions or verification.
+// Development scaffold (spec F1): serves the backend-built Nandipur city and replays scripted events in the backend's
+// shapes. It never fabricates reasoning, approvals, actions or verification: those endpoints answer 501 or empty.
 import { ApiError, type ApiClient, type SocketHandle, type SocketHandlers } from '@/api/client';
 import type {
-  Action,
-  Approval,
-  ApprovalDecision,
-  Chunk,
-  City,
-  Document,
-  Event,
-  EventType,
-  Health,
-  Incident,
-  IncidentSummary,
-  InjectEvent,
-  LlmStatus,
-  SimStatus,
+  Action, Approval, ApprovalDecision, Bands, Chunk, City, Document, Event, EventOf, EventType, Health, Incident,
+  IncidentSummary, InjectRequest, LlmStatus, SimStatus, SimulationStart, SimulationStatus, WorldSnapshot,
 } from '@/api/types';
+import { applyEvent } from '@/live/applyEvent';
+import { initialLiveState, type LiveState } from '@/live/types';
 import cityJson from './fixtures/nandipur.city.json';
+import worldJson from './fixtures/nandipur.world.json';
 import { MockSocket } from './MockSocket';
-import { buildReplay, REPLAY_TICKS, simTimeAt, type ReplayStep } from './replay';
+import { buildReplay, MOCK_BANDS, REPLAY_SCENARIO, REPLAY_SEED, REPLAY_TICKS, simTimeAt, type ReplayStep } from './replay';
 
-export const nandipurCity: City = cityJson as City;
+/** Both fixtures are written by the backend (`npm run gen:contract`); never edit them by hand. */
+export const nandipurCity = cityJson as City;
+export const nandipurWorld = worldJson as WorldSnapshot;
 
-const PRIMARY_SCENARIO = 'hillside_landslide';
 const notInMock = () => Promise.reject(new ApiError(501, { detail: 'Not available in mock mode' }, 'Not available in mock mode'));
 
 export class MockApiClient implements ApiClient {
   readonly mode = 'mock' as const;
-  private readonly initialCity: City;
+  private readonly cityModel: City;
+  private readonly initialWorld: WorldSnapshot;
   private readonly tickMs: number;
   private readonly now: () => string;
   private readonly replay: ReplayStep[];
   private readonly sockets = new Set<MockSocket>();
-  private cityState: City;
-  private incidentList: Incident[] = [];
-  private feed: Event[] = [];
+  /** The mock's own view of what it has emitted, kept with the dashboard's reducer so snapshots stay current. */
+  private live: LiveState;
   private tick = 0;
   private running = false;
   private speed = 1;
-  private scenario: string | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private seq = 0;
 
-  constructor(opts: { city?: City; tickMs?: number; now?: () => string } = {}) {
-    this.initialCity = structuredClone(opts.city ?? nandipurCity);
-    this.cityState = structuredClone(this.initialCity);
+  constructor(opts: { city?: City; world?: WorldSnapshot; tickMs?: number; now?: () => string } = {}) {
+    this.cityModel = structuredClone(opts.city ?? nandipurCity);
+    this.initialWorld = structuredClone(opts.world ?? nandipurWorld);
     this.tickMs = opts.tickMs ?? 1000;
     this.now = opts.now ?? (() => new Date().toISOString());
-    this.replay = buildReplay(this.cityState);
+    this.replay = buildReplay(this.cityModel);
+    this.live = this.fresh();
   }
 
   // ---- REST ----
   health(): Promise<Health> { return Promise.resolve({ status: 'ok', version: 'mock' }); }
+  city(): Promise<City> { return Promise.resolve(structuredClone(this.cityModel)); }
+  chunk(_chunkId: string): Promise<Chunk> { return notInMock(); }
+
+  readonly simulation = {
+    start: (body: SimulationStart): Promise<SimulationStatus> => {
+      if (body.scenario != null && body.scenario !== REPLAY_SCENARIO) {
+        return Promise.reject(new ApiError(501, { detail: 'Only the primary scenario is scripted in mock mode' }));
+      }
+      if (body.speed != null) this.speed = body.speed;
+      this.run();
+      return Promise.resolve(this.announce());
+    },
+    pause: (): Promise<SimulationStatus> => {
+      this.halt();
+      return Promise.resolve(this.announce());
+    },
+    resume: (): Promise<SimulationStatus> => {
+      this.run();
+      return Promise.resolve(this.announce());
+    },
+    reset: (): Promise<SimulationStatus> => {
+      this.halt();
+      this.tick = 0;
+      this.live = this.fresh();
+      const stage = this.cityModel.scenarios.find((s) => s.name === REPLAY_SCENARIO)?.stages[0];
+      if (stage) {
+        this.emit(this.envelope('scenario.stage', {
+          scenario: REPLAY_SCENARIO, stage_index: 0, stage: stage.name, description: stage.description, tick: 0,
+        }));
+      }
+      return Promise.resolve(this.announce());
+    },
+    setSpeed: (speed: number): Promise<SimulationStatus> => {
+      this.speed = speed;
+      if (this.running) this.run();
+      return Promise.resolve(this.announce());
+    },
+    inject: (_body: InjectRequest): Promise<Event[]> => notInMock(),
+  };
+
+  // ---- PENDING endpoints: what mock mode can honestly answer ----
   llmStatus(): Promise<LlmStatus> { return Promise.resolve({ provider: 'none', model: null }); }
-  city(): Promise<City> { return Promise.resolve(structuredClone(this.cityState)); }
+  bands(): Promise<Bands> { return Promise.resolve(structuredClone(MOCK_BANDS)); }
 
   events(q: { since?: string; type?: EventType; limit?: number } = {}): Promise<Event[]> {
-    let list = this.feed;
+    let list = this.live.feed;
     if (q.since !== undefined) {
-      const i = list.findIndex((e) => e.id === q.since);
+      const i = list.findIndex((e) => e.event_id === q.since);
       list = i >= 0 ? list.slice(i + 1) : list;
     }
-    if (q.type !== undefined) list = list.filter((e) => e.type === q.type);
+    if (q.type !== undefined) list = list.filter((e) => e.event_type === q.type);
     if (q.limit !== undefined) list = list.slice(-q.limit);
     return Promise.resolve(structuredClone(list));
   }
 
   incidents(): Promise<IncidentSummary[]> {
     return Promise.resolve(
-      this.incidentList.map((i) => ({
+      Object.values(this.live.incidents).map((i) => ({
         id: i.id, zone_id: i.zone_id, hazard: i.hazard, band: i.band, status: i.status, opened_at: i.opened_at,
         opened_sim_time: i.opened_sim_time, closed_at: i.closed_at ?? null, run_count: i.runs.length, pending_approval_count: 0,
       })),
@@ -77,7 +110,7 @@ export class MockApiClient implements ApiClient {
   }
 
   incident(id: string): Promise<Incident> {
-    const found = this.incidentList.find((i) => i.id === id);
+    const found = this.live.incidents[id];
     return found ? Promise.resolve(structuredClone(found)) : Promise.reject(new ApiError(404, { detail: 'Incident not found' }));
   }
 
@@ -86,44 +119,6 @@ export class MockApiClient implements ApiClient {
   actions(): Promise<Action[]> { return Promise.resolve([]); }
   action(_id: string): Promise<Action> { return Promise.reject(new ApiError(404, { detail: 'Action not found' })); }
   document(_docId: string): Promise<Document> { return notInMock(); }
-  chunk(_chunkId: string): Promise<Chunk> { return notInMock(); }
-
-  readonly simulation = {
-    start: (body: { scenario: string; speed: number; seed?: number }): Promise<SimStatus> => {
-      if (body.scenario !== PRIMARY_SCENARIO) {
-        return Promise.reject(new ApiError(501, { detail: 'Only the primary scenario is scripted in mock mode' }));
-      }
-      this.scenario = body.scenario;
-      this.speed = body.speed;
-      this.run();
-      return Promise.resolve(this.status());
-    },
-    pause: (): Promise<SimStatus> => {
-      this.halt();
-      return Promise.resolve(this.status());
-    },
-    resume: (): Promise<SimStatus> => {
-      if (this.scenario !== null) this.run();
-      return Promise.resolve(this.status());
-    },
-    reset: (): Promise<SimStatus> => {
-      this.halt();
-      this.cityState = structuredClone(this.initialCity);
-      this.incidentList = [];
-      this.feed = [];
-      this.tick = 0;
-      this.scenario = null;
-      const snap = this.snapshotEvent();
-      for (const s of this.sockets) s.deliver(snap);
-      return Promise.resolve(this.status());
-    },
-    setSpeed: (speed: number): Promise<SimStatus> => {
-      this.speed = speed;
-      if (this.running) this.run();
-      return Promise.resolve(this.status());
-    },
-    inject: (_body: InjectEvent): Promise<SimStatus> => notInMock(),
-  };
 
   // ---- socket ----
   openSocket(handlers: SocketHandlers): SocketHandle {
@@ -134,8 +129,31 @@ export class MockApiClient implements ApiClient {
   }
 
   // ---- internals ----
-  private status(): SimStatus {
-    return { scenario: this.scenario, running: this.running, speed: this.speed, sim_time: this.tick === 0 ? null : simTimeAt(this.tick), tick: this.tick };
+  private fresh(): LiveState {
+    return applyEvent(initialLiveState('mock'), {
+      ...this.frame('evt-m-start'), event_type: 'sim.snapshot', payload: { status: this.simStatus(), world: this.initialWorld, city: this.cityModel },
+    });
+  }
+
+  private stageName(): string {
+    const stages = this.cityModel.scenarios.find((s) => s.name === REPLAY_SCENARIO)?.stages ?? [];
+    return [...stages].reverse().find((s) => s.start_tick <= this.tick)?.name ?? '';
+  }
+
+  private simStatus(): SimStatus {
+    const state = this.running ? 'running' : this.tick > 0 && this.tick < REPLAY_TICKS ? 'paused' : 'idle';
+    return {
+      state, running: this.running, scenario: REPLAY_SCENARIO, seed: REPLAY_SEED, speed: this.speed, tick: this.tick,
+      sim_time: simTimeAt(this.tick), stage: this.stageName(),
+    };
+  }
+
+  /** Publish the current status (as the backend does on every transition) and answer it as REST would. */
+  private announce(): SimulationStatus {
+    const s = this.simStatus();
+    this.emit(this.envelope('sim.status', s));
+    const stage = this.cityModel.scenarios.find((x) => x.name === REPLAY_SCENARIO)?.stages.find((x) => x.name === s.stage) ?? null;
+    return { ...s, scenario: REPLAY_SCENARIO, stage, minutes_per_tick: 5, tick_seconds: this.tickMs / 1000 };
   }
 
   private run(): void {
@@ -151,12 +169,19 @@ export class MockApiClient implements ApiClient {
     this.running = false;
   }
 
-  private stamp(e: Event): Event {
-    return { ...e, ts: this.now() };
+  private frame(eventId: string): Omit<EventOf<'sim.status'>, 'event_type' | 'payload'> {
+    return {
+      event_id: eventId, timestamp: this.now(), sim_time: simTimeAt(this.tick), source: 'simulation:engine', location: null,
+      severity: 'info', incident_id: null,
+    };
+  }
+
+  private envelope<T extends 'sim.status' | 'scenario.stage'>(type: T, payload: EventOf<T>['payload']): Event {
+    return { ...this.frame(`evt-m-${String(++this.seq)}`), event_type: type, payload } as EventOf<T>;
   }
 
   private emit(e: Event): void {
-    this.feed.push(e);
+    this.live = applyEvent(this.live, e);
     for (const s of this.sockets) s.deliver(e);
   }
 
@@ -165,53 +190,19 @@ export class MockApiClient implements ApiClient {
     if (!step) return;
     this.tick = step.tick;
     for (const raw of step.events) {
-      const e = this.stamp(raw.type === 'sim.tick' ? { ...raw, payload: { ...raw.payload, speed: this.speed } } : raw);
-      this.applyToCity(e);
-      this.emit(e);
+      const stamped = { ...raw, timestamp: this.now() };
+      this.emit(stamped.event_type === 'sim.tick' ? { ...stamped, payload: { ...stamped.payload, speed: this.speed } } : stamped);
     }
     if (this.tick >= REPLAY_TICKS) {
       this.halt();
-      const t = simTimeAt(this.tick);
-      this.emit(this.stamp({ id: `evt_m_end_${String(this.seq++)}`, ts: '', sim_time: t, type: 'sim.tick', payload: { sim_time: t, tick: this.tick, running: false, speed: this.speed } }));
-    }
-  }
-
-  /** Keep REST and later snapshots consistent with the replayed events. */
-  private applyToCity(e: Event): void {
-    if (e.type === 'zone.state') {
-      const { zone_id: zoneId, prev_band: _prev, ...state } = e.payload;
-      const zone = this.cityState.zones.find((z) => z.id === zoneId);
-      if (zone) zone.state = state;
-    } else if (e.type === 'sensor.reading') {
-      const sensor = this.cityState.sensors.find((s) => s.id === e.payload.sensor_id);
-      if (sensor) {
-        sensor.last_value = e.payload.value;
-        sensor.last_sim_time = e.sim_time;
-      }
-    } else if (e.type === 'incident.opened') {
-      this.incidentList.push(structuredClone(e.payload));
-    } else if (e.type === 'threat.escalated') {
-      const incident = this.incidentList.find((i) => i.id === e.payload.incident_id && i.zone_id === e.payload.zone_id);
-      if (incident) incident.band = e.payload.band;
+      this.announce();
     }
   }
 
   private snapshotEvent(): Event {
-    const simTime = this.tick === 0 ? null : simTimeAt(this.tick);
     return {
-      id: `evt_m_snapshot_${String(this.seq++)}`,
-      ts: this.now(),
-      sim_time: simTime,
-      type: 'state.snapshot',
-      payload: {
-        city: structuredClone(this.cityState),
-        sim: this.status(),
-        llm: { provider: 'none', model: null },
-        incidents: structuredClone(this.incidentList),
-        approvals: [],
-        actions: [],
-        alerts: [],
-      },
+      ...this.frame('evt-snapshot'), event_type: 'sim.snapshot',
+      payload: { status: this.simStatus(), world: this.live.world ?? this.initialWorld, city: structuredClone(this.cityModel) },
     };
   }
 }

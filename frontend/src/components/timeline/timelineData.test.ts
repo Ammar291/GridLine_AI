@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import type { Incident } from '@/api/types';
 import type { Milestone, TelemetryPoint } from '@/live/types';
 import { incidentFixture } from '@/test/fixtures/incident';
-import { cityFixture } from '@/test/fixtures/city';
+import { MOCK_BANDS } from '@/mock/replay';
 import { buildRows, groupMarkers, milestoneMarkers, thresholdLines, timelineHazard } from './timelineData';
 
 const point = (simTime: string, landslide: number, flood = 0.1): TelemetryPoint => ({
-  simTime, tick: 0, rain: 40, saturation: 0.5, landslide, flood, band: 'normal',
+  simTime, rain: 40, saturation: 0.5, landslide, flood, water: null, band: 'normal',
 });
 
 const milestone = (id: string, simTime: string | null, m: Partial<Milestone> = {}): Milestone => ({
@@ -16,7 +16,7 @@ const milestone = (id: string, simTime: string | null, m: Partial<Milestone> = {
 describe('buildRows', () => {
   it('maps telemetry fields and labels HH:mm', () => {
     expect(buildRows([point('2026-07-14T10:05:00', 0.4)])).toEqual([
-      { simTime: '2026-07-14T10:05:00', label: '10:05', rain: 40, saturation: 0.5, landslide: 0.4, flood: 0.1 },
+      { simTime: '2026-07-14T10:05:00', label: '10:05', rain: 40, saturation: 0.5, landslide: 0.4, flood: 0.1, water: null },
     ]);
   });
   it('keeps the last reading when a sim time repeats', () => {
@@ -37,6 +37,12 @@ describe('milestoneMarkers', () => {
       milestone('m4', null, { zoneId: 'hillview' }),
     ], 'hillview', rows);
     expect(markers).toEqual([{ id: 'm1', simTime: '2026-07-14T10:05:00', label: 'fixture: m1', kind: 'band' }]);
+  });
+
+  it('marks city-wide milestones (a scenario stage) on every zone', () => {
+    const ms = [milestone('s1', '2026-07-14T10:05:00', { kind: 'scenario' })];
+    expect(milestoneMarkers(ms, 'hillview', rows).map((m) => m.id)).toEqual(['s1']);
+    expect(milestoneMarkers(ms, 'riverside', rows).map((m) => m.id)).toEqual(['s1']);
   });
 
   it("includes zone-less milestones of the zone's incidents when incidents are given", () => {
@@ -67,8 +73,8 @@ describe('milestoneMarkers', () => {
 
 describe('thresholds and hazard', () => {
   it('labels thresholds by band with two decimals', () => {
-    expect(thresholdLines(cityFixture.bands, 'landslide').map((t) => t.label)).toEqual(['Watch 0.35', 'Warning 0.55', 'Critical 0.75']);
-    expect(thresholdLines(cityFixture.bands, 'flood').map((t) => t.value)).toEqual([0.3, 0.5, 0.7]);
+    expect(thresholdLines(MOCK_BANDS, 'landslide').map((t) => t.label)).toEqual(['Watch 0.35', 'Warning 0.55', 'Critical 0.75']);
+    expect(thresholdLines(MOCK_BANDS, 'flood').map((t) => t.value)).toEqual([0.3, 0.5, 0.7]);
     expect(thresholdLines(undefined, 'flood')).toEqual([]);
   });
   it("uses the zone's open incident hazard, else the leading index, else landslide", () => {

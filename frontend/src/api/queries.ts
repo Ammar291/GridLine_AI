@@ -1,11 +1,15 @@
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from './ApiClientProvider';
 import type { ApiError } from './client';
-import type { Action, Approval, ApprovalDecision, ApprovalStatus, Chunk, City, Incident, InjectEvent, LlmStatus, SimStatus } from './types';
+import type {
+  Action, Approval, ApprovalDecision, ApprovalStatus, Bands, Chunk, City, Event, Incident, InjectRequest, LlmStatus,
+  SimulationStart, SimulationStatus,
+} from './types';
 
 export const queryKeys = {
   city: ['city'] as const,
   llm: ['llm'] as const,
+  bands: ['bands'] as const,
   incidents: ['incidents'] as const,
   incident: (id: string) => ['incident', id] as const,
   approvals: (s?: ApprovalStatus) => ['approvals', s ?? 'all'] as const,
@@ -16,12 +20,19 @@ export const queryKeys = {
 
 export function useCity(): UseQueryResult<City> {
   const client = useApiClient();
-  return useQuery({ queryKey: queryKeys.city, queryFn: () => client.city() });
+  return useQuery({ queryKey: queryKeys.city, queryFn: () => client.city(), staleTime: Infinity });
 }
 
+/** PENDING (LLM provider): answered 501 by the HTTP client until the backend serves it. */
 export function useLlmStatus(): UseQueryResult<LlmStatus> {
   const client = useApiClient();
-  return useQuery({ queryKey: queryKeys.llm, queryFn: () => client.llmStatus(), refetchInterval: 15_000 });
+  return useQuery({ queryKey: queryKeys.llm, queryFn: () => client.llmStatus(), refetchInterval: 15_000, retry: false });
+}
+
+/** PENDING (threat detector): index band thresholds for the timeline's threshold lines. */
+export function useBands(): UseQueryResult<Bands> {
+  const client = useApiClient();
+  return useQuery({ queryKey: queryKeys.bands, queryFn: () => client.bands(), staleTime: Infinity, retry: false });
 }
 
 export function useIncident(id: string | null): UseQueryResult<Incident> {
@@ -66,22 +77,22 @@ export function useDecideApproval(): UseMutationResult<Approval, ApiError, { id:
 }
 
 export interface SimulationControls {
-  start: UseMutationResult<SimStatus, ApiError, { scenario: string; speed: number }>;
-  pause: UseMutationResult<SimStatus, ApiError, void>;
-  resume: UseMutationResult<SimStatus, ApiError, void>;
-  reset: UseMutationResult<SimStatus, ApiError, void>;
-  setSpeed: UseMutationResult<SimStatus, ApiError, number>;
-  inject: UseMutationResult<SimStatus, ApiError, InjectEvent>;
+  start: UseMutationResult<SimulationStatus, ApiError, SimulationStart>;
+  pause: UseMutationResult<SimulationStatus, ApiError, void>;
+  resume: UseMutationResult<SimulationStatus, ApiError, void>;
+  reset: UseMutationResult<SimulationStatus, ApiError, void>;
+  setSpeed: UseMutationResult<SimulationStatus, ApiError, number>;
+  inject: UseMutationResult<Event[], ApiError, InjectRequest>;
 }
 
 export function useSimulationControls(): SimulationControls {
   const client = useApiClient();
   return {
-    start: useMutation<SimStatus, ApiError, { scenario: string; speed: number }>({ mutationFn: (b) => client.simulation.start(b) }),
-    pause: useMutation<SimStatus, ApiError>({ mutationFn: () => client.simulation.pause() }),
-    resume: useMutation<SimStatus, ApiError>({ mutationFn: () => client.simulation.resume() }),
-    reset: useMutation<SimStatus, ApiError>({ mutationFn: () => client.simulation.reset() }),
-    setSpeed: useMutation<SimStatus, ApiError, number>({ mutationFn: (s) => client.simulation.setSpeed(s) }),
-    inject: useMutation<SimStatus, ApiError, InjectEvent>({ mutationFn: (b) => client.simulation.inject(b) }),
+    start: useMutation<SimulationStatus, ApiError, SimulationStart>({ mutationFn: (b) => client.simulation.start(b) }),
+    pause: useMutation<SimulationStatus, ApiError>({ mutationFn: () => client.simulation.pause() }),
+    resume: useMutation<SimulationStatus, ApiError>({ mutationFn: () => client.simulation.resume() }),
+    reset: useMutation<SimulationStatus, ApiError>({ mutationFn: () => client.simulation.reset() }),
+    setSpeed: useMutation<SimulationStatus, ApiError, number>({ mutationFn: (s) => client.simulation.setSpeed(s) }),
+    inject: useMutation<Event[], ApiError, InjectRequest>({ mutationFn: (b) => client.simulation.inject(b) }),
   };
 }

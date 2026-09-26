@@ -1,36 +1,41 @@
 import type { ApiMode } from '@/api/client';
-import type {
-  Action,
-  Alert,
-  Approval,
-  Band,
-  Channel,
-  City,
-  Crew,
-  Event,
-  Incident,
-  LlmStatus,
-  Project,
-  PumpUnit,
-  Road,
-  Sensor,
-  Shelter,
-  ZoneState,
-} from '@/api/types';
+import type { Action, Alert, Approval, Band, City, Event, Incident, SimStatus, WorldSnapshot, ZoneState } from '@/api/types';
 
 export type ConnectionStatus = 'connecting' | 'open' | 'reconnecting' | 'closed';
+export type RunnerState = SimStatus['state'];
 
-export interface TelemetryPoint {
-  simTime: string;
+export interface SimState {
+  state: RunnerState;
+  running: boolean;
+  scenario: string | null;
+  seed: number | null;
+  speed: number;
   tick: number;
-  rain: number;
-  saturation: number;
-  landslide: number;
-  flood: number;
-  band: Band;
+  simTime: string | null;
+  stage: string | null;
 }
 
-export type MilestoneKind = 'band' | 'incident' | 'approval' | 'action' | 'verified' | 'replan' | 'alert' | 'scenario';
+/** The latest observation a sensor reported, already worded with its unit ("12.4 mm/h"). */
+export interface SensorReading {
+  value: number;
+  text: string;
+  simTime: string;
+}
+
+/** One sim time of a zone's timeline. Readings the zone has no sensor or detector for stay null. */
+export interface TelemetryPoint {
+  simTime: string;
+  rain: number | null;
+  saturation: number | null;
+  landslide: number | null;
+  flood: number | null;
+  /** Standing water in cm (the simulation reports it where water ponds). */
+  water: number | null;
+  band: Band | null;
+}
+
+export type MilestoneKind =
+  | 'band' | 'incident' | 'approval' | 'action' | 'verified' | 'replan' | 'alert' | 'scenario' | 'infrastructure';
 
 export interface Milestone {
   id: string;
@@ -45,31 +50,23 @@ export interface Milestone {
   band?: Band;
 }
 
-export interface LiveAssets {
-  crews: Record<string, Crew>;
-  shelters: Record<string, Shelter>;
-  roads: Record<string, Road>;
-  channels: Record<string, Channel>;
-  projects: Record<string, Project>;
-  pumpUnits: PumpUnit[];
-  sensors: Record<string, Sensor>;
-}
-
 export interface LiveState {
   connection: ConnectionStatus;
   mode: ApiMode;
   hasSnapshot: boolean;
-  sim: { simTime: string | null; tick: number; running: boolean; speed: number; scenario: string | null };
-  llm: LlmStatus | null;
-  /** Static part of the city; live zone state is kept in zoneState. */
+  sim: SimState;
+  /** Static city from the snapshot (GET /api/city serves the same). */
   city: City | null;
+  /** Live state: the snapshot's world, kept current by the observation, infrastructure and emergency events. */
+  world: WorldSnapshot | null;
+  readings: Record<string, SensorReading>;
+  // PENDING (threat detector, agent, approvals, actions, alerts): only the events of later milestones fill these.
   zoneState: Record<string, ZoneState>;
   incidents: Record<string, Incident>;
   approvals: Record<string, Approval>;
   actions: Record<string, Action>;
   alerts: Alert[];
-  assets: LiveAssets;
-  /** Newest last, capped at FEED_CAP. */
+  /** Newest last, capped at FEED_CAP; a full feed drops its oldest tick or reading first. */
   feed: Event[];
   /** Per zone, capped at TELEMETRY_CAP. */
   telemetry: Record<string, TelemetryPoint[]>;
@@ -80,8 +77,8 @@ export const FEED_CAP = 500;
 export const TELEMETRY_CAP = 720;
 export const MILESTONE_CAP = 500;
 
-export function emptyAssets(): LiveAssets {
-  return { crews: {}, shelters: {}, roads: {}, channels: {}, projects: {}, pumpUnits: [], sensors: {} };
+export function initialSim(): SimState {
+  return { state: 'idle', running: false, scenario: null, seed: null, speed: 1, tick: 0, simTime: null, stage: null };
 }
 
 export function initialLiveState(mode: ApiMode): LiveState {
@@ -89,15 +86,15 @@ export function initialLiveState(mode: ApiMode): LiveState {
     connection: 'connecting',
     mode,
     hasSnapshot: false,
-    sim: { simTime: null, tick: 0, running: false, speed: 1, scenario: null },
-    llm: null,
+    sim: initialSim(),
     city: null,
+    world: null,
+    readings: {},
     zoneState: {},
     incidents: {},
     approvals: {},
     actions: {},
     alerts: [],
-    assets: emptyAssets(),
     feed: [],
     telemetry: {},
     milestones: [],

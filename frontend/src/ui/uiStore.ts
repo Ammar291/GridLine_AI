@@ -5,7 +5,7 @@ export type LayerId = 'hills' | 'water' | 'zones' | 'drainage' | 'roads' | 'cons
 export const ALL_LAYERS: readonly LayerId[] = ['hills', 'water', 'zones', 'drainage', 'roads', 'construction', 'hospitals', 'shelters', 'crews', 'sensors', 'threats'];
 
 export interface EntityRef {
-  kind: 'zone' | 'road' | 'channel' | 'project' | 'crew' | 'shelter' | 'hospital' | 'sensor' | 'pump_depot';
+  kind: 'zone' | 'road' | 'bridge' | 'channel' | 'project' | 'crew' | 'shelter' | 'hospital' | 'sensor' | 'pump_depot';
   id: string;
 }
 export type WhyTarget =

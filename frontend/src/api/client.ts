@@ -3,6 +3,7 @@ import type {
   Approval,
   ApprovalDecision,
   ApprovalStatus,
+  Bands,
   Chunk,
   City,
   Document,
@@ -11,9 +12,10 @@ import type {
   Health,
   Incident,
   IncidentSummary,
-  InjectEvent,
+  InjectRequest,
   LlmStatus,
-  SimStatus,
+  SimulationStart,
+  SimulationStatus,
 } from './types';
 
 export interface SocketHandlers {
@@ -30,8 +32,20 @@ export type ApiMode = 'http' | 'mock';
 export interface ApiClient {
   readonly mode: ApiMode;
   health(): Promise<Health>;
-  llmStatus(): Promise<LlmStatus>;
   city(): Promise<City>;
+  chunk(chunkId: string): Promise<Chunk>;
+  simulation: {
+    start(body: SimulationStart): Promise<SimulationStatus>;
+    pause(): Promise<SimulationStatus>;
+    resume(): Promise<SimulationStatus>;
+    reset(): Promise<SimulationStatus>;
+    setSpeed(speed: number): Promise<SimulationStatus>;
+    inject(body: InjectRequest): Promise<Event[]>;
+  };
+  openSocket(handlers: SocketHandlers): SocketHandle;
+  // PENDING (openapi.pending.yaml): later milestones. HttpApiClient answers these with 501 until the backend serves them.
+  llmStatus(): Promise<LlmStatus>;
+  bands(): Promise<Bands>;
   events(q?: { since?: string; type?: EventType; limit?: number }): Promise<Event[]>;
   incidents(): Promise<IncidentSummary[]>;
   incident(id: string): Promise<Incident>;
@@ -40,16 +54,6 @@ export interface ApiClient {
   actions(): Promise<Action[]>;
   action(id: string): Promise<Action>;
   document(docId: string): Promise<Document>;
-  chunk(chunkId: string): Promise<Chunk>;
-  simulation: {
-    start(body: { scenario: string; speed: number; seed?: number }): Promise<SimStatus>;
-    pause(): Promise<SimStatus>;
-    resume(): Promise<SimStatus>;
-    reset(): Promise<SimStatus>;
-    setSpeed(speed: number): Promise<SimStatus>;
-    inject(body: InjectEvent): Promise<SimStatus>;
-  };
-  openSocket(handlers: SocketHandlers): SocketHandle;
 }
 
 export class ApiError extends Error {

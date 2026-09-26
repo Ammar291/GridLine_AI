@@ -25,7 +25,8 @@ FailureKind = Literal["landslide", "culvert_collapse", "embankment_breach", "pow
 
 
 class Payload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # A serialized payload carries every field, so the published (serialization) schema marks all required.
+    model_config = ConfigDict(extra="forbid", json_schema_serialization_defaults_required=True)
 
 
 class SimTick(Payload):
@@ -49,8 +50,12 @@ class SimStatus(Payload):
 
 
 class SimSnapshot(Payload):
+    """``world`` is a ``WorldSnapshot`` dump and ``city`` the dashboard's ``CityMap`` dump (typed in the API's
+    ``SimSnapshotPayload``; kept as dicts here because those models import this module)."""
+
     status: SimStatus
     world: dict[str, Any]
+    city: dict[str, Any] = Field(default_factory=dict)
 
 
 class Heartbeat(Payload):

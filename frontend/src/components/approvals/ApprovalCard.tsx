@@ -4,6 +4,7 @@ import { runCitations } from '@/components/incident/citations';
 import { zoneName } from '@/live/derive';
 import { fmtWall, statusLabel } from '@/live/format';
 import { useLiveStore } from '@/live/liveStore';
+import { useLiveAssets } from '@/live/useLiveAssets';
 import { useUiStore } from '@/ui/uiStore';
 import { actionTargetName } from './actionTarget';
 import { DecisionBar } from './DecisionBar';
@@ -30,7 +31,7 @@ const STATUS_CHIP: Record<ApprovalStatus, string> = {
 /** One approval request: the proposed plan, and while it is pending, the operator's decision bar. */
 export function ApprovalCard({ approval, actions, onDecide, deciding, error, sent = false }: ApprovalCardProps) {
   const city = useLiveStore((s) => s.city);
-  const assets = useLiveStore((s) => s.assets);
+  const assets = useLiveAssets();
   const incident = useLiveStore((s) => s.incidents[approval.incident_id]);
   const openWhy = useUiStore((s) => s.openWhy);
   const headingId = useId();

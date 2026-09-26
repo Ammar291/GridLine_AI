@@ -10,7 +10,7 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 import { seedLive } from '@/test/seedStores';
 import { EventFeed } from './EventFeed';
 
-const dispatched: Event[] = [eventsFixture['sensor.reading'], eventsFixture['zone.state'], eventsFixture['approval.requested']];
+const dispatched: Event[] = [eventsFixture['weather.observation'], eventsFixture['zone.state'], eventsFixture['approval.requested']];
 const rows = () => within(screen.getByRole('log')).getAllByRole('listitem');
 const heading = () => screen.getByRole('heading', { name: /Live events/ });
 
@@ -20,13 +20,13 @@ describe('EventFeed', () => {
   it('renders rows in dispatch order with the describeEvent text and sim time', () => {
     renderWithProviders(<EventFeed />);
     const items = rows();
-    expect(items).toHaveLength(4); // the snapshot is the first feed entry
+    expect(items).toHaveLength(5); // the seeded snapshot and incident come first
     expect(items[0]).toHaveTextContent('Connected: city state received');
     dispatched.forEach((e, i) => {
-      expect(items[i + 1]).toHaveTextContent(describeEvent(e, cityFixture));
-      expect(items[i + 1]).toHaveTextContent('10:31:04');
+      expect(items[i + 2]).toHaveTextContent(describeEvent(e, cityFixture));
+      expect(items[i + 2]).toHaveTextContent('10:31:04');
     });
-    expect(heading()).toHaveTextContent('4');
+    expect(heading()).toHaveTextContent('5');
   });
 
   it('filters by group, the count follows the visible rows, and All restores', () => {
@@ -37,8 +37,24 @@ describe('EventFeed', () => {
     expect(heading()).toHaveTextContent('1');
     expect(useUiStore.getState().feedFilter).toBe('approval');
     fireEvent.click(screen.getByRole('radio', { name: 'All' }));
-    expect(rows()).toHaveLength(4);
+    expect(rows()).toHaveLength(5);
     expect(screen.getByRole('radio', { name: 'All' })).toBeChecked();
+  });
+
+  it('tags raised sensor bands and quiets routine readings; Readings and City filter the backend groups', () => {
+    const calm: Event = { ...eventsFixture['environment.soil'], event_id: 'evt_calm', severity: 'low' };
+    seedLive([eventsFixture['weather.observation'], calm, eventsFixture['infrastructure.road']]);
+    renderWithProviders(<EventFeed />);
+    const [, , rain, soil, road] = rows();
+    expect(rain).toHaveAttribute('data-severity', 'high');
+    expect(within(rain ?? document.body).getByTitle('Sensor band')).toHaveTextContent('High');
+    expect(within(soil ?? document.body).queryByTitle('Sensor band')).toBeNull();
+    expect(within(soil ?? document.body).getByTitle(/Soil moisture/)).toHaveClass('text-ink-2');
+    expect(within(road ?? document.body).getByTitle(/Hill Road blocked/)).toHaveClass('text-ink');
+    fireEvent.click(screen.getByRole('radio', { name: 'Readings' }));
+    expect(rows()).toHaveLength(2);
+    fireEvent.click(screen.getByRole('radio', { name: 'City' }));
+    expect(rows().map((r) => r.dataset.eventType)).toEqual(['infrastructure.road']);
   });
 
   it('says so when a filter matches nothing yet', () => {
@@ -50,11 +66,11 @@ describe('EventFeed', () => {
 
   it('an Incident tag selects that incident', () => {
     renderWithProviders(<EventFeed />);
-    const approvalRow = rows()[3];
+    const approvalRow = rows()[4];
     if (!approvalRow) throw new Error('missing row');
     fireEvent.click(within(approvalRow).getByRole('button', { name: 'Incident' }));
     expect(useUiStore.getState().selectedIncidentId).toBe('inc_1');
-    expect(within(rows()[1] ?? approvalRow).queryByRole('button', { name: 'Incident' })).toBeNull();
+    expect(within(rows()[2] ?? approvalRow).queryByRole('button', { name: 'Incident' })).toBeNull();
   });
 
   it('shows a New events pill when scrolled up and new events arrive, and jumps back on click', () => {
@@ -65,7 +81,7 @@ describe('EventFeed', () => {
     scroller.scrollTop = 0;
     fireEvent.scroll(scroller);
     expect(screen.queryByRole('button', { name: /New events/ })).toBeNull();
-    act(() => { useLiveStore.getState().dispatch({ ...eventsFixture['sim.tick'], id: 'evt_new_tick' }); });
+    act(() => { useLiveStore.getState().dispatch({ ...eventsFixture['sim.tick'], event_id: 'evt_new_tick' }); });
     const pill = screen.getByRole('button', { name: 'New events (1)' });
     fireEvent.click(pill);
     expect(screen.queryByRole('button', { name: /New events/ })).toBeNull();
@@ -76,7 +92,7 @@ describe('EventFeed', () => {
     renderWithProviders(<EventFeed />);
     const scroller = screen.getByTestId('event-feed-scroll');
     Object.defineProperty(scroller, 'scrollHeight', { configurable: true, value: 900 });
-    act(() => { useLiveStore.getState().dispatch({ ...eventsFixture['sim.tick'], id: 'evt_new_tick' }); });
+    act(() => { useLiveStore.getState().dispatch({ ...eventsFixture['sim.tick'], event_id: 'evt_new_tick' }); });
     expect(scroller.scrollTop).toBe(900);
     expect(screen.queryByRole('button', { name: /New events/ })).toBeNull();
   });
@@ -104,6 +120,6 @@ describe('EventFeed', () => {
   it('keeps its rows while reconnecting', () => {
     useLiveStore.getState().setConnection('reconnecting');
     renderWithProviders(<EventFeed />);
-    expect(rows()).toHaveLength(4);
+    expect(rows()).toHaveLength(5);
   });
 });

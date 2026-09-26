@@ -1,0 +1,461 @@
+{
+ "tick": 0,
+ "sim_time": "2026-07-14T06:00:00Z",
+ "stage_index": 0,
+ "weather": {
+  "temperature_c": 26.0,
+  "wind_speed_kmh": 8.0,
+  "wind_direction_deg": 240.0
+ },
+ "forecast": {
+  "issued_sim_time": "2026-07-14T06:00:00Z",
+  "horizon_h": 24.0,
+  "expected_total_mm": 60.0,
+  "peak_intensity_mm_h": 12.0,
+  "confidence": 0.7,
+  "summary": "Moderate monsoon rain over the eastern hills, about 60 mm in 24 h"
+ },
+ "zones": {
+  "Z-HV": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-TH": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-RS": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-OT": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-MW": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-SR": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-CL": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-LK": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-NC": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  },
+  "Z-MI": {
+   "saturation": 0.5,
+   "rainfall_intensity_mm_h": 0.0,
+   "rain_24h_mm": 0.0,
+   "water_depth_cm": 0.0,
+   "water_trend": "steady"
+  }
+ },
+ "slopes": {
+  "SL-HV-1": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  },
+  "SL-HV-2": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  },
+  "SL-HV-3": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  },
+  "SL-TH-1": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  },
+  "SL-TH-2": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  },
+  "SL-TH-3": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  },
+  "SL-CL-1": {
+   "saturation": 0.5,
+   "movement_rate_mm_h": 0.0,
+   "cumulative_movement_mm": 0.0
+  }
+ },
+ "channels": {
+  "D-2": {
+   "blocked_fraction": 0.0,
+   "capacity_m3s": 8.0,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-3": {
+   "blocked_fraction": 0.1,
+   "capacity_m3s": 12.6,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-4": {
+   "blocked_fraction": 0.08,
+   "capacity_m3s": 9.200000000000001,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-5": {
+   "blocked_fraction": 0.12,
+   "capacity_m3s": 6.6,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-7": {
+   "blocked_fraction": 0.0,
+   "capacity_m3s": 27.0,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-8": {
+   "blocked_fraction": 0.12,
+   "capacity_m3s": 11.44,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-9": {
+   "blocked_fraction": 0.0,
+   "capacity_m3s": 20.0,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-11": {
+   "blocked_fraction": 0.05,
+   "capacity_m3s": 9.025,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  },
+  "D-12": {
+   "blocked_fraction": 0.25,
+   "capacity_m3s": 9.0,
+   "extra_capacity_m3s": 0.0,
+   "gate_closed": false,
+   "flow_m3s": 0.0,
+   "overflow_m3s": 0.0
+  }
+ },
+ "rivers": {
+  "R-1": {
+   "level_m": 1.6,
+   "inflow_m3s": 85.0,
+   "trend": "steady"
+  }
+ },
+ "roads": {
+  "RD-01": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-02": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-03": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-04": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-05": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-06": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-07": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-08": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-09": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-10": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-11": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-12": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-13": {
+   "status": "open",
+   "reason": ""
+  },
+  "RD-14": {
+   "status": "open",
+   "reason": ""
+  }
+ },
+ "bridges": {
+  "BR-1": {
+   "status": "open",
+   "reason": ""
+  },
+  "BR-2": {
+   "status": "open",
+   "reason": ""
+  },
+  "BR-3": {
+   "status": "open",
+   "reason": ""
+  },
+  "BR-4": {
+   "status": "open",
+   "reason": ""
+  },
+  "BR-5": {
+   "status": "open",
+   "reason": ""
+  }
+ },
+ "projects": {
+  "PR-HT2": {
+   "status": "active",
+   "activity": "excavating",
+   "excavation_depth_m": 2.5
+  },
+  "PR-TQ": {
+   "status": "active",
+   "activity": "idle",
+   "excavation_depth_m": 35.0
+  },
+  "PR-MWM": {
+   "status": "active",
+   "activity": "idle",
+   "excavation_depth_m": 8.0
+  }
+ },
+ "crews": {
+  "C-1": {
+   "status": "available",
+   "location_zone_id": "Z-CL",
+   "task": ""
+  },
+  "C-2": {
+   "status": "available",
+   "location_zone_id": "Z-OT",
+   "task": ""
+  },
+  "C-3": {
+   "status": "busy",
+   "location_zone_id": "Z-SR",
+   "task": ""
+  },
+  "C-4": {
+   "status": "available",
+   "location_zone_id": "Z-RS",
+   "task": ""
+  },
+  "C-5": {
+   "status": "available",
+   "location_zone_id": "Z-CL",
+   "task": ""
+  },
+  "C-6": {
+   "status": "available",
+   "location_zone_id": "Z-CL",
+   "task": ""
+  },
+  "C-7": {
+   "status": "available",
+   "location_zone_id": "Z-LK",
+   "task": ""
+  },
+  "C-8": {
+   "status": "available",
+   "location_zone_id": "Z-NC",
+   "task": ""
+  }
+ },
+ "ambulances": {
+  "AMB-01": {
+   "status": "available",
+   "location_zone_id": "Z-CL"
+  },
+  "AMB-02": {
+   "status": "available",
+   "location_zone_id": "Z-CL"
+  },
+  "AMB-03": {
+   "status": "available",
+   "location_zone_id": "Z-CL"
+  },
+  "AMB-04": {
+   "status": "available",
+   "location_zone_id": "Z-CL"
+  },
+  "AMB-05": {
+   "status": "maintenance",
+   "location_zone_id": "Z-CL"
+  },
+  "AMB-06": {
+   "status": "available",
+   "location_zone_id": "Z-RS"
+  },
+  "AMB-07": {
+   "status": "available",
+   "location_zone_id": "Z-RS"
+  },
+  "AMB-08": {
+   "status": "available",
+   "location_zone_id": "Z-SR"
+  },
+  "AMB-09": {
+   "status": "available",
+   "location_zone_id": "Z-SR"
+  },
+  "AMB-10": {
+   "status": "available",
+   "location_zone_id": "Z-LK"
+  },
+  "AMB-11": {
+   "status": "available",
+   "location_zone_id": "Z-LK"
+  },
+  "AMB-12": {
+   "status": "available",
+   "location_zone_id": "Z-LK"
+  },
+  "AMB-13": {
+   "status": "available",
+   "location_zone_id": "Z-MI"
+  },
+  "AMB-14": {
+   "status": "available",
+   "location_zone_id": "Z-MI"
+  }
+ },
+ "hospitals": {
+  "H-1": {
+   "beds_occupied": 325,
+   "er_status": "normal"
+  },
+  "H-2": {
+   "beds_occupied": 63,
+   "er_status": "normal"
+  },
+  "H-3": {
+   "beds_occupied": 46,
+   "er_status": "normal"
+  },
+  "H-4": {
+   "beds_occupied": 93,
+   "er_status": "normal"
+  },
+  "H-5": {
+   "beds_occupied": 79,
+   "er_status": "normal"
+  }
+ },
+ "shelters": {
+  "S-1": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-2": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-3": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-4": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-5": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-6": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-7": {
+   "status": "closed",
+   "occupancy": 0
+  },
+  "S-8": {
+   "status": "closed",
+   "occupancy": 0
+  }
+ }
+}

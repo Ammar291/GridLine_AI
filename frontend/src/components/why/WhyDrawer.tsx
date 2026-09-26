@@ -10,7 +10,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { zoneName } from '@/live/derive';
 import { statusLabel } from '@/live/format';
 import { useLiveStore } from '@/live/liveStore';
-import type { LiveAssets } from '@/live/types';
+import { useLiveAssets } from '@/live/useLiveAssets';
+import type { LiveAssets } from '@/live/assets';
 import { useUiStore } from '@/ui/uiStore';
 import { CityStateFacts } from './CityStateFacts';
 import { buildWhyContent, type WhyContent } from './whyContent';
@@ -23,7 +24,7 @@ export function WhyDrawer() {
   const closeWhy = useUiStore((s) => s.closeWhy);
   const incidents = useLiveStore((s) => s.incidents);
   const city = useLiveStore((s) => s.city);
-  const assets = useLiveStore((s) => s.assets);
+  const assets = useLiveAssets();
   const content = useMemo(() => (target ? buildWhyContent(target, incidents) : null), [target, incidents]);
 
   if (!target) return null;

@@ -23,7 +23,17 @@ describe('OverviewStrip', () => {
     expect(tile('Preventive actions')).toHaveTextContent('3');
     expect(tile('Preventive actions')).toHaveTextContent('1 executed, 1 verified, 0 failed');
     expect(tile('Active incidents')).toHaveTextContent('1');
-    expect(tile('Emergency resources')).toHaveTextContent('3 of 3 crews available');
+    expect(tile('Emergency resources')).toHaveTextContent('3 of 3 crews free');
+  });
+
+  it('with only the backend running (no detector yet) it says so and counts live resources', () => {
+    seedLive([eventsFixture['emergency.rescue_team'], eventsFixture['infrastructure.road']]);
+    useLiveStore.setState({ zoneState: {}, incidents: {} }); // what http mode holds until the detector lands
+    renderWithProviders(<OverviewStrip />);
+    expect(tile('City status')).toHaveTextContent('—');
+    expect(tile('City status')).toHaveTextContent('No threat detector readings yet');
+    expect(tile('Active incidents')).toHaveTextContent('0');
+    expect(tile('Emergency resources')).toHaveTextContent('2 of 3 crews free · 1/2 ambulances · 4/4 pumps · 0 shelters open · 1 road cut');
   });
 
   it('clicking a tile selects the incident', () => {

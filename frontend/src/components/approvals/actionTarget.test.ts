@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { applyEvent } from '@/live/applyEvent';
-import { initialLiveState } from '@/live/types';
-import { cityFixture } from '@/test/fixtures/city';
-import { snapshotEventFixture } from '@/test/fixtures/events';
+import { liveAssets } from '@/live/assets';
+import { cityFixture, worldFixture } from '@/test/fixtures/city';
 import { actionTargetName } from './actionTarget';
 
-const { assets } = applyEvent(initialLiveState('mock'), snapshotEventFixture);
+const assets = liveAssets(cityFixture, worldFixture, {});
 const target = (tool: string, input: Record<string, unknown>) => actionTargetName(tool, input, assets, cityFixture);
 
 describe('actionTargetName', () => {

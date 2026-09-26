@@ -17,7 +17,7 @@ const findMap = () => screen.findByRole('group', { name: 'Map of Nandipur' });
 
 function zoneStateEvent(zoneId: string, band: 'warning' | 'critical'): Event {
   const e = eventsFixture['zone.state'];
-  return { ...e, id: `evt_zs_${zoneId}_${band}`, payload: { ...e.payload, zone_id: zoneId, band } };
+  return { ...e, event_id: `evt_zs_${zoneId}_${band}`, payload: { ...e.payload, zone_id: zoneId, band } };
 }
 
 describe('CityMap', () => {
@@ -27,7 +27,7 @@ describe('CityMap', () => {
     renderMap();
     const svg = await findMap();
     expect(svg).toHaveAttribute('aria-roledescription', 'map');
-    expect(screen.getByRole('button', { name: /^Hillview,/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hillview' })).toBeInTheDocument(); // no detector band yet
     expect(svg.querySelectorAll('[data-layer="zones"] [data-zone-id]')).toHaveLength(6);
     expect(svg.querySelectorAll('[data-layer="roads"] [data-road-id]')).toHaveLength(cityFixture.roads.length);
     expect(svg.querySelectorAll('[data-layer="drainage"] [data-channel-id]')).toHaveLength(3);
@@ -97,11 +97,30 @@ describe('CityMap', () => {
   });
 
   it('applies live asset state: a closed road is drawn closed', async () => {
-    useLiveStore.getState().dispatch({ ...eventsFixture['action.executed'], id: 'evt_close_b04', payload: failedActionFixture });
+    useLiveStore.getState().dispatch({ ...eventsFixture['action.executed'], event_id: 'evt_close_b04', payload: failedActionFixture });
     renderMap();
     const svg = await findMap();
     expect(svg.querySelector('[data-road-id="b04"]')).toHaveAttribute('data-status', 'closed');
     expect(svg.querySelector('[data-road-id="hill_road"]')).toHaveAttribute('data-status', 'open');
+  });
+
+  it('draws the backend world: blocked road, closed bridge, overflowing drain, standing water and a crew away from base', async () => {
+    for (const e of ['infrastructure.road', 'infrastructure.bridge', 'environment.drainage', 'environment.water_accumulation', 'emergency.rescue_team'] as const) {
+      useLiveStore.getState().dispatch(eventsFixture[e]);
+    }
+    renderMap();
+    const svg = await findMap();
+    expect(svg.querySelector('[data-road-id="hill_road"]')).toHaveAttribute('data-status', 'blocked');
+    expect(screen.getByRole('button', { name: /^Hill Road, blocked, fixture: debris/ })).toBeInTheDocument();
+    expect(svg.querySelector('[data-bridge-id="br_1"]')).toHaveAttribute('data-status', 'closed');
+    expect(svg.querySelector('[data-channel-id="d7"]')).toHaveAttribute('data-overflowing', 'true');
+    expect(svg.querySelector('[data-water-zone-id="riverside"]')).not.toBeNull();
+    expect(svg.querySelector('[data-layer="labels"]')).toHaveTextContent('Water 13 cm');
+    expect(svg.querySelector('[data-crew-route="c1"]')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /^Kalinadi Bridge, closed/ }));
+    const bridge = screen.getByRole('dialog', { name: 'Kalinadi Bridge' });
+    expect(bridge).toHaveTextContent('Closed: fixture: river at danger level');
+    expect(bridge).toHaveTextContent('CrossesKalinadi');
   });
 
   it('draws the threat overlay: critical pulse, evacuation ring and cascade arrow', async () => {

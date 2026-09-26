@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { Zone } from '@/api/types';
 import { useUiStore } from '@/ui/uiStore';
-import { cityFixture } from '@/test/fixtures/city';
+import { cityFixture, normalZoneState } from '@/test/fixtures/city';
 import { incidentFixture, runFixture } from '@/test/fixtures/incident';
 import { ThreatCard } from './ThreatCard';
 
@@ -25,7 +25,7 @@ describe('ThreatCard', () => {
   beforeEach(() => { useUiStore.getState().reset(); });
 
   it('shows hazard, zone, band, assessment and prediction from the latest run', () => {
-    render(<ThreatCard incident={incidentFixture} run={runFixture} zone={hillview} zoneState={hillview.state} cascadeZones={[]} />);
+    render(<ThreatCard incident={incidentFixture} run={runFixture} zone={hillview} zoneState={normalZoneState} cascadeZones={[]} />);
     expect(screen.getByRole('heading', { name: 'Landslide risk' })).toBeInTheDocument();
     expect(screen.getByText('Hillview')).toBeInTheDocument();
     expect(screen.getByText('Warning')).toHaveAttribute('data-band', 'warning');
@@ -38,7 +38,7 @@ describe('ThreatCard', () => {
   });
 
   it('lists each contributing factor with its citation chip', () => {
-    render(<ThreatCard incident={incidentFixture} run={runFixture} zone={hillview} zoneState={hillview.state} cascadeZones={[]} />);
+    render(<ThreatCard incident={incidentFixture} run={runFixture} zone={hillview} zoneState={normalZoneState} cascadeZones={[]} />);
     const factors = within(screen.getByRole('list', { name: 'Contributing factors' })).getAllByRole('listitem');
     expect(factors).toHaveLength(2);
     const [first, second] = factors as [HTMLElement, HTMLElement];
@@ -49,13 +49,13 @@ describe('ThreatCard', () => {
   });
 
   it('adds cascade zones to the population at risk', () => {
-    render(<ThreatCard incident={incidentFixture} run={runFixture} zone={hillview} zoneState={hillview.state} cascadeZones={[riverside]} />);
+    render(<ThreatCard incident={incidentFixture} run={runFixture} zone={hillview} zoneState={normalZoneState} cascadeZones={[riverside]} />);
     expect(field('Population at risk')).toHaveTextContent('22,700');
     expect(field('Population at risk')).toHaveTextContent('Riverside');
   });
 
   it('says what it is waiting for when no run has finished', () => {
-    render(<ThreatCard incident={incidentFixture} run={undefined} zone={hillview} zoneState={hillview.state} cascadeZones={[]} />);
+    render(<ThreatCard incident={incidentFixture} run={undefined} zone={hillview} zoneState={normalZoneState} cascadeZones={[]} />);
     expect(field('Confidence')).toHaveTextContent('Awaiting assessment');
     expect(field('Estimated onset')).toHaveTextContent('Awaiting prediction');
     expect(screen.getByTestId('contributing-factors')).toHaveTextContent('Awaiting assessment');
@@ -63,7 +63,7 @@ describe('ThreatCard', () => {
   });
 
   it('shows the flood index for a flood incident', () => {
-    render(<ThreatCard incident={{ ...incidentFixture, hazard: 'flood' }} run={undefined} zone={hillview} zoneState={hillview.state} cascadeZones={[]} />);
+    render(<ThreatCard incident={{ ...incidentFixture, hazard: 'flood' }} run={undefined} zone={hillview} zoneState={normalZoneState} cascadeZones={[]} />);
     expect(screen.getByRole('heading', { name: 'Flood risk' })).toBeInTheDocument();
     expect(field('Flood index')).toHaveTextContent('0.10');
   });

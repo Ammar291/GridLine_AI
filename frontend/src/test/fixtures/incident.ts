@@ -50,8 +50,8 @@ const outputs: Record<NodeName, StepOutput> = {
   retrieve: {
     node: 'retrieve',
     chunks: [
-      { id: 'dmp-2024#s4.2', doc_id: 'dmp-2024', doc_title: 'Disaster Management Policy', section: 's4.2', kind: 'policy', score: 0.82 },
-      { id: 'permit-ht-2026-014#s3', doc_id: 'permit-ht-2026-014', doc_title: 'Hillview Terrace permit', section: 's3', kind: 'permit', score: 0.74 },
+      { chunk_id: 'dmp-2024#s4.2', document_id: 'dmp-2024', document_title: 'Disaster Management Policy', section_id: 's4.2', section: 'Rainfall thresholds', kind: 'policy', similarity: 0.82 },
+      { chunk_id: 'permit-ht-2026-014#s3', document_id: 'permit-ht-2026-014', document_title: 'Hillview Terrace permit', section_id: 's3', section: 'Conditions', kind: 'permit', similarity: 0.74 },
     ],
   },
   assess: {

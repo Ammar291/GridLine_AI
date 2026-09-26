@@ -3,6 +3,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { Panel } from '@/components/ui/Panel';
+import { useBands } from '@/api/queries';
 import { useSelectedIncident } from '@/hooks/useSelectedIncident';
 import { zoneName } from '@/live/derive';
 import { useLiveStore } from '@/live/liveStore';
@@ -10,6 +11,7 @@ import { useUiStore } from '@/ui/uiStore';
 import { IndexChart } from './IndexChart';
 import { RainChart } from './RainChart';
 import { TimelineLegend } from './TimelineLegend';
+import { WaterChart } from './WaterChart';
 import { buildRows, milestoneMarkers, thresholdLines, timelineHazard } from './timelineData';
 
 /** Vertical space (px) the two chart headings take out of an explicit test size. */
@@ -37,7 +39,10 @@ export function RiskTimeline({ size }: { size?: { width: number; height: number 
     [milestones, zoneId, rows, incidents],
   );
   const hazard = zoneId === null ? 'landslide' : timelineHazard(zoneId, incidents, rows);
-  const thresholds = useMemo(() => thresholdLines(city?.bands, hazard), [city, hazard]);
+  const bands = useBands();
+  const hasIndices = rows.some((r) => r.landslide !== null || r.flood !== null);
+  // PENDING (threat detector): index thresholds come from GET /api/detector/bands; without indices there is nothing to mark.
+  const thresholds = useMemo(() => (hasIndices ? thresholdLines(bands.data, hazard) : []), [hasIndices, bands.data, hazard]);
   const anyReadings = Object.values(telemetry).some((p) => p.length > 0);
 
   let body;
@@ -53,18 +58,26 @@ export function RiskTimeline({ size }: { size?: { width: number; height: number 
     const chartHeight = size ? size.height - HEADINGS_PX : undefined;
     const rainHeight = chartHeight === undefined ? undefined : Math.round(chartHeight * 0.3);
     const indexHeight = chartHeight === undefined || rainHeight === undefined ? undefined : chartHeight - rainHeight;
+    // A zone without soil probes or detector readings (a flood plain) charts its standing water instead.
+    const soil = hasIndices || rows.some((r) => r.saturation !== null);
+    const hasRain = rows.some((r) => r.rain !== null);
+    const name = zoneId === null ? 'this zone' : zoneName(city, zoneId);
     body = (
       <div className="flex flex-col h-full min-h-0 px-2 pt-1">
         <h3 className="px-1 text-[11px] leading-4 font-medium text-ink-2">Rain intensity (mm/h)</h3>
         <div className="flex-[3] min-h-0">
-          <RainChart rows={rows} width={size?.width} height={rainHeight} />
+          {hasRain
+            ? <RainChart rows={rows} width={size?.width} height={rainHeight} />
+            : <p className="px-1 text-[12px] text-ink-3">{`No rain gauge in ${name}.`}</p>}
         </div>
         <div className="flex items-center justify-between gap-3 px-1 mt-1">
-          <h3 className="text-[11px] leading-4 font-medium text-ink-2">Indices</h3>
-          <TimelineLegend hazard={hazard} />
+          <h3 className="text-[11px] leading-4 font-medium text-ink-2">{hasIndices ? 'Indices' : soil ? 'Soil saturation' : 'Standing water (cm)'}</h3>
+          {soil && <TimelineLegend hazard={hazard} indices={hasIndices} thresholds={thresholds.length > 0} />}
         </div>
         <div className="flex-[7] min-h-0">
-          <IndexChart rows={rows} thresholds={thresholds} markers={markers} width={size?.width} height={indexHeight} />
+          {soil
+            ? <IndexChart rows={rows} thresholds={thresholds} markers={markers} width={size?.width} height={indexHeight} />
+            : <WaterChart rows={rows} markers={markers} width={size?.width} height={indexHeight} />}
         </div>
       </div>
     );

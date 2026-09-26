@@ -8,8 +8,12 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 import { seedLive } from '@/test/seedStores';
 import { IncidentPanel } from './IncidentPanel';
 
-function snapshotWith(incidents: typeof incidentFixture[]): Event {
-  return { ...snapshotEventFixture, payload: { ...snapshotEventFixture.payload, incidents } };
+/** The snapshot, then one PENDING incident.opened per incident. */
+function snapshotWith(incidents: typeof incidentFixture[]): Event[] {
+  return [
+    snapshotEventFixture,
+    ...incidents.map((i): Event => ({ ...eventsFixture['incident.opened'], event_id: `evt_open_${i.id}`, payload: i })),
+  ];
 }
 
 describe('IncidentPanel', () => {
@@ -24,7 +28,7 @@ describe('IncidentPanel', () => {
   });
 
   it('shows detector fields and awaits the agent when the incident has no run (mock mode)', () => {
-    seedLive([snapshotWith([{ ...incidentFixture, runs: [] }])], { snapshot: false });
+    seedLive(snapshotWith([{ ...incidentFixture, runs: [] }]), { snapshot: false });
     renderWithProviders(<IncidentPanel />);
     expect(screen.getAllByText('Awaiting assessment')).not.toHaveLength(0);
     expect(screen.getByText('No agent run yet for this incident. Reasoning appears here as each node finishes.')).toBeInTheDocument();
@@ -37,14 +41,14 @@ describe('IncidentPanel', () => {
   });
 
   it('shows the empty state when no incident is open', () => {
-    seedLive([snapshotWith([])], { snapshot: false });
+    seedLive(snapshotWith([]), { snapshot: false });
     renderWithProviders(<IncidentPanel />);
     expect(screen.getByRole('note')).toHaveTextContent('No open incidents. Threats appear here when the detector opens an incident.');
   });
 
   it('offers an incident switcher when more than one incident is open', () => {
     const flood = { ...incidentFixture, id: 'inc_2', zone_id: 'riverside', hazard: 'flood' as const, band: 'watch' as const, runs: [] };
-    seedLive([snapshotWith([incidentFixture, flood])], { snapshot: false });
+    seedLive(snapshotWith([incidentFixture, flood]), { snapshot: false });
     renderWithProviders(<IncidentPanel />);
     const select = screen.getByRole('combobox', { name: 'Incident' });
     expect(select).toHaveValue('inc_1');
