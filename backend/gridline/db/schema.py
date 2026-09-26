@@ -18,5 +18,11 @@ async def drop_schema(engine: AsyncEngine) -> None:
 
 
 async def truncate_corpus(engine: AsyncEngine) -> None:
+    """Clear what the RAG layer owns: every chunk and each document's ingestion fingerprint.
+
+    ``documents`` and ``document_sections`` are seeded by the city data layer and referenced by projects,
+    incidents and infrastructure changes, so they are kept (``TRUNCATE documents CASCADE`` would wipe them).
+    """
     async with engine.begin() as conn:
-        await conn.execute(text("TRUNCATE TABLE documents CASCADE"))
+        await conn.execute(text("TRUNCATE TABLE chunks"))
+        await conn.execute(text("UPDATE documents SET content_hash = '', embedding_model = ''"))

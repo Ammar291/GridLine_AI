@@ -3,6 +3,7 @@
 import asyncio
 import os
 from collections.abc import AsyncIterator, Callable
+from pathlib import Path
 
 import psycopg
 import pytest
@@ -10,10 +11,12 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from gridline.db.engine import create_engine, session_factory
 from gridline.db.schema import create_schema, drop_schema, truncate_corpus
+from gridline.db.seed import SeedSummary, reset_and_seed
 
 LoopFactory = Callable[[], asyncio.AbstractEventLoop]
 
 DEFAULT_TEST_URL = "postgresql+psycopg://gridline:gridline@localhost:5433/gridline_test"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
 def pytest_asyncio_loop_factories(config: pytest.Config, item: pytest.Item) -> dict[str, LoopFactory]:
@@ -46,3 +49,17 @@ async def db_engine(db_url: str) -> AsyncIterator[AsyncEngine]:
 async def db_sessions(db_engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     await truncate_corpus(db_engine)
     return session_factory(db_engine)
+
+
+@pytest.fixture(scope="session")
+async def seeded(db_engine: AsyncEngine) -> SeedSummary:
+    """Drop, recreate and seed the test database once per session with the full Nandipur dataset."""
+    return await reset_and_seed(db_engine, DATA_DIR)
+
+
+@pytest.fixture
+async def session(db_engine: AsyncEngine, seeded: SeedSummary) -> AsyncIterator[AsyncSession]:
+    """A session on the seeded database; rolled back afterwards so tests cannot leak writes."""
+    async with session_factory(db_engine)() as s:
+        yield s
+        await s.rollback()
