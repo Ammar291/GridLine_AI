@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from gridline.db.engine import create_engine, session_factory
-from gridline.db.schema import create_schema, truncate_corpus
+from gridline.db.schema import create_schema, drop_schema, truncate_corpus
 
 LoopFactory = Callable[[], asyncio.AbstractEventLoop]
 
@@ -36,6 +36,7 @@ def db_url() -> str:
 @pytest.fixture(scope="session")
 async def db_engine(db_url: str) -> AsyncIterator[AsyncEngine]:
     engine = create_engine(db_url)
+    await drop_schema(engine)  # fresh tables every session, so model changes always reach the test database
     await create_schema(engine)
     yield engine
     await engine.dispose()
