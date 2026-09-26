@@ -2,6 +2,7 @@
 document_id: test-policy
 title: Test Disaster Policy
 kind: policy
+category: policy
 source: Test Municipal Corporation, Disaster Cell
 version: "1.0"
 effective_date: 2024-03-15

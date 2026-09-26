@@ -1,4 +1,5 @@
 import pytest
+from pydantic import ValidationError
 
 from gridline.db.seed.corpus import load_corpus
 from gridline.rag.chunker import chunk_document
@@ -50,6 +51,18 @@ async def test_retrieve_applies_filters(loaded_store):
     assert only_sop and all(r.kind == "sop" for r in only_sop)
     no_fire = await retriever.retrieve("fire market", filters=RetrievalFilters(hazards=["flood"]), top_k=10)
     assert no_fire and all(r.document_id != "test-fire-sop" for r in no_fire)
+    reports = RetrievalFilters(categories=["incident_report"])
+    only_reports = await retriever.retrieve("fire market flood", filters=reports, top_k=10)
+    assert only_reports and all(r.category == "incident_report" for r in only_reports)
+
+
+def test_category_filter_is_a_closed_set():
+    assert RetrievalFilters(categories=["engineering_report", "evacuation"]).categories == [
+        "engineering_report",
+        "evacuation",
+    ]
+    with pytest.raises(ValidationError):
+        RetrievalFilters.model_validate({"categories": ["gossip"]})
 
 
 async def test_retrieve_min_similarity_can_empty_results(loaded_store):

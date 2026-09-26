@@ -2,6 +2,7 @@
 document_id: pol-evacuation-2022
 title: Evacuation Policy
 kind: policy
+category: evacuation
 source: NMC-DMC
 version: "1.1"
 effective_date: 2022-03-01

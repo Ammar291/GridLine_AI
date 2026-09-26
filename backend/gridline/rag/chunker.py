@@ -56,6 +56,7 @@ def chunk_document(doc: ParsedDocument, *, max_words: int = 350) -> list[ChunkDr
                     zone_ids=list(meta.zone_ids),
                     hazards=list(meta.hazards),
                     metadata={
+                        "category": meta.category,
                         "section_title": section.heading,
                         "part": part,
                         "word_count": len(text.split()),

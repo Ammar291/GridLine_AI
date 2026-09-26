@@ -2,6 +2,7 @@
 document_id: permit-ht-2026-014
 title: Construction Permit HT-2026-014 — Hillview Terrace Phase 2
 kind: permit
+category: construction_safety
 source: NMC Town Planning Department
 version: "1.0"
 effective_date: 2026-01-20

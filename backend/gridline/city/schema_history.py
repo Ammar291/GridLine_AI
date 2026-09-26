@@ -8,6 +8,12 @@ from pydantic import BaseModel, ConfigDict
 from gridline.city.schema_common import Located, Record
 
 DocumentKind = Literal["policy", "sop", "report", "permit", "change_log", "profile"]
+# The ten knowledge categories of the RAG brief (RAG spec §4). ``kind`` is the document's form, ``category``
+# what it is about: every ``report`` is an ``incident_report``, and only reports are.
+DocumentCategory = Literal[
+    "policy", "sop", "procedure", "incident_report", "infrastructure_report", "engineering_report",
+    "construction_safety", "evacuation", "resource_rules", "change_log",
+]  # fmt: skip
 Hazard = Literal["flood", "flash_flood", "landslide", "cyclone", "urban_fire"]
 Impact = Literal[
     "closed", "blocked", "overflowed", "surcharged", "flooded", "damaged", "destroyed", "outage", "failed",
@@ -101,6 +107,7 @@ class DocumentMeta(BaseModel):
     document_id: str
     title: str
     kind: DocumentKind
+    category: DocumentCategory
     source: str
     version: str
     effective_date: dt.date

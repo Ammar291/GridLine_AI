@@ -2,6 +2,7 @@
 document_id: city-profile-2026
 title: Nandipur City Profile 2026
 kind: profile
+category: change_log
 source: NMC Planning Department
 version: "2026"
 effective_date: 2026-06-30

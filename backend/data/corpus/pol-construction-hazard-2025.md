@@ -2,6 +2,7 @@
 document_id: pol-construction-hazard-2025
 title: Construction Hazard Policy
 kind: policy
+category: construction_safety
 source: NMC Town Planning Department
 version: "1.0"
 effective_date: 2025-02-01

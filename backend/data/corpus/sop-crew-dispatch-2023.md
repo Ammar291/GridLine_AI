@@ -2,6 +2,7 @@
 document_id: sop-crew-dispatch-2023
 title: Crew Dispatch SOP
 kind: sop
+category: procedure
 source: NMC-DMC
 version: "1.0"
 effective_date: 2023-05-01

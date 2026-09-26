@@ -2,6 +2,7 @@
 document_id: test-riverside-report
 title: Test Riverside Flood Report 2021
 kind: report
+category: incident_report
 source: Test Emergency Operations Centre
 version: "1.0"
 effective_date: 2021-08-10

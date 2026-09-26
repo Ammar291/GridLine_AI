@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
-from gridline.main import create_app
 
 from gridline.city.model import City
 from gridline.config import Settings
+from gridline.main import create_app
 
 
 def test_health(settings: Settings, city: City) -> None:

@@ -202,6 +202,8 @@ def _apply_filters(stmt: AnySelect, filters: RetrievalFilters | None) -> AnySele
         return stmt
     if filters.kinds:
         stmt = stmt.where(Chunk.kind.in_(filters.kinds))
+    if filters.categories:
+        stmt = stmt.where(Chunk.metadata_["category"].astext.in_(filters.categories))
     if filters.document_ids:
         stmt = stmt.where(Chunk.document_id.in_(filters.document_ids))
     if filters.hazards:
@@ -220,6 +222,7 @@ def _to_stored(row: Any) -> StoredChunk:
         section=row.section_title,
         source=row.source,
         kind=row.kind,
+        category=row.metadata["category"],
         zone_ids=list(row.zone_ids),
         hazards=list(row.hazards),
         text=row.text,

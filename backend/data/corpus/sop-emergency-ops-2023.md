@@ -2,6 +2,7 @@
 document_id: sop-emergency-ops-2023
 title: Emergency Operations Standard Operating Procedures
 kind: sop
+category: sop
 source: NMC-DMC, Emergency Operations Centre
 version: "2.1"
 effective_date: 2023-06-01

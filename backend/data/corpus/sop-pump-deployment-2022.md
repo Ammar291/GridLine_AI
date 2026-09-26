@@ -2,6 +2,7 @@
 document_id: sop-pump-deployment-2022
 title: Mobile Pump Deployment SOP
 kind: sop
+category: procedure
 source: NMC Drainage Division
 version: "1.1"
 effective_date: 2022-07-01

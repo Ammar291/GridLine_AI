@@ -86,6 +86,7 @@ async def test_get_chunk_returns_stored_fields(store):
     assert "25 degrees" in chunk.text
     assert chunk.metadata["section_title"] == "Slope construction halt rule"
     assert chunk.metadata["version"] == "1.0"
+    assert chunk.category == "policy" and chunk.metadata["category"] == "policy"
     assert await store.get_chunk("test-policy#s99") is None
 
 
@@ -107,6 +108,29 @@ async def test_search_kind_filter(store):
     q = EMBEDDER.embed_query("evacuation route pump units")
     results = await store.search(q, top_k=10, filters=RetrievalFilters(kinds=["report"]))
     assert results and all(r.kind == "report" for r in results)
+
+
+async def test_search_category_filter(store):
+    await _index_fixtures(store)
+    q = EMBEDDER.embed_query("flood riverside pump units evacuation market fire")
+    reports = await store.search(q, top_k=10, filters=RetrievalFilters(categories=["incident_report"]))
+    assert reports and {r.document_id for r in reports} == {"test-riverside-report"}
+    assert all(r.category == r.metadata["category"] == "incident_report" for r in reports)
+    rules = await store.search(q, top_k=10, filters=RetrievalFilters(categories=["policy", "sop"]))
+    assert {r.document_id for r in rules} == {"test-policy", "test-fire-sop"}
+    assert all(r.category in ("policy", "sop") for r in rules)
+    unused = RetrievalFilters(categories=["engineering_report"])
+    assert await store.search(q, top_k=10, filters=unused) == []
+
+
+async def test_search_category_filter_intersects_other_filters(store):
+    await _index_fixtures(store)
+    q = EMBEDDER.embed_query("flood riverside pump units evacuation market fire")
+    sop_in_riverside = RetrievalFilters(categories=["sop"], zone_ids=["Z-RS"])
+    assert await store.search(q, top_k=10, filters=sop_in_riverside) == []
+    policy_on_floods = RetrievalFilters(categories=["policy"], hazards=["flood"], zone_ids=["Z-RS"])
+    results = await store.search(q, top_k=10, filters=policy_on_floods)
+    assert results and {r.document_id for r in results} == {"test-policy"}
 
 
 async def test_search_hazard_filter_excludes_other_hazard(store):
